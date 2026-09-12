@@ -69,7 +69,7 @@ Der kostenlose Supabase-Tarif bietet zum Zeitpunkt der Entscheidung 500 MB Daten
 
 ## Veröffentlichung
 
-Der Dokumentationsstand liegt im privaten [GitHub-Repository](https://github.com/sichgeis/phililog). GitHub Pages ist als Ziel gewählt; Pages-Veröffentlichung und Supabase-Projekt sind noch nicht eingerichtet.
+Die erste App-Version liegt im öffentlichen [GitHub-Repository](https://github.com/sichgeis/phililog). GitHub Pages ist mit GitHub Actions als Quelle aktiviert. Das erste Deployment wartet auf die produktive Supabase-Konfiguration.
 
 ## Lizenz
 
