@@ -5,7 +5,8 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 ## Aktueller Stand
 
 - Fortschritt: Erste Version implementiert und lokal mit echter Supabase-Instanz geprüft. Fachliche Antworten übernommen: Stillen als Startauswahl, 15/30 Minuten, unbekannte Dauer, Stillbeginn/-ende per Klick.
-- Offen: Produktives Supabase-Free-Projekt mit zwei Konten, Entscheidung zur kostenlosen Pages-Veröffentlichung und Abnahme auf den echten Smartphones. Keine offenen fachlichen Blocker für den lokalen MVP.
+- Offen: Produktives Supabase-Free-Projekt mit zwei Konten, erstes Pages-Deployment und Abnahme auf den echten Smartphones. Keine offenen fachlichen Blocker für den lokalen MVP.
+- Veröffentlichung: Quellcode gepusht; Repository auf ausdrücklichen Nutzerwunsch öffentlich und GitHub Pages aktiviert. Der Workflow wartet auf die produktiven Supabase-Variablen.
 - Nächster Schritt: Supabase-Free-Projekt anhand von `docs/setup.md` einrichten.
 
 ## Aufgaben

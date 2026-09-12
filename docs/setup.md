@@ -26,7 +26,7 @@ Für ein neues oder verlorenes Passwort kann ein Projektadministrator den Zugang
 
 ## GitHub Pages
 
-Das Repository ist derzeit privat. **GitHub Free unterstützt Pages für öffentliche Repositories.** Private Quellcode-Repositories benötigen dafür einen entsprechenden bezahlten GitHub-Tarif. Vor einer Änderung der Sichtbarkeit ist eine ausdrückliche Entscheidung erforderlich. Die Logbucheinträge bleiben in Supabase; Quellcode und Anmeldeseite dürfen öffentlich sein. [GitHub-Dokumentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
+Das Repository wurde am 12. September 2026 auf ausdrücklichen Wunsch öffentlich gemacht und GitHub Pages mit GitHub Actions als Quelle aktiviert. **GitHub Free unterstützt Pages für öffentliche Repositories.** Die Logbucheinträge bleiben in Supabase; Quellcode und Anmeldeseite dürfen öffentlich sein. [GitHub-Dokumentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
 
 Wenn das Hosting geklärt ist:
 
