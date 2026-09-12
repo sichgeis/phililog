@@ -36,3 +36,7 @@ Dritte interne Ansicht `about` ohne Router-Abhängigkeit. Gemeinsamer Footer fü
 ## Dauer und Milchart
 
 0 wird im UI als unbekannte Dauer verwendet, in SQL bleibt NULL. Bestehende lokale Checkbox-Entwürfe werden beim Laden auf 0 umgestellt. Nullable Spalte `milk_type` mit Werten `pre`/`breast_milk`, nur für Flaschen; Altbestand bleibt NULL. Spaltenrechte für Familien-CRUD erweitern.
+
+## Wickeln und Rückmeldung
+
+Bestehende Tabelle `feedings` wird aus Kompatibilitätsgründen um `diaper` und nullable Bool-Spalten `urine`, `stool`, `held_success` ergänzt. Typabhängige Constraints verhindern Vermischung; bisherige RLS und Versionskontrolle gelten unverändert. CSV wird um diese Felder erweitert. DOM-Konfetti außerhalb der gerenderten App überlebt das anschließende Datenrefresh und entfernt sich nach 1,6 Sekunden.

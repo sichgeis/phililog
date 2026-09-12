@@ -83,8 +83,22 @@ test('0 Minuten ist unbekannt; Milchart startet mit Pre und bleibt beim Bearbeit
   assert.equal(input.duration_minutes, null);
   assert.equal(input.milk_type, 'pre');
   const entry = { ...input, milk_type: 'breast_milk' as const, id: 'id', created_by: 'user', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
-  assert.deepEqual(feedingInput(draftFromFeeding(entry), now), entry && { ...input, milk_type: 'breast_milk' });
+  assert.deepEqual(feedingInput(draftFromFeeding(entry), now), { ...input, milk_type: 'breast_milk' });
   for (const breastDuration of ['-1', '0.5', '']) assert.throws(() => feedingInput({ ...newDraft(), breastDuration }, now));
   assert.equal(feedingInput({ ...newDraft(), breastDuration: '0' }, now).started_at, null);
   assert.equal(sameInput(input, { ...input, milk_type: 'breast_milk' }), false);
+});
+
+test('Wickeln trennt alle Fütterungsdetails und erhält unabhängige Toggles beim Bearbeiten', () => {
+  for (const urine of [false, true]) for (const stool of [false, true]) for (const heldSuccess of [false, true]) {
+    const input = feedingInput({ ...newDraft(), kind: 'diaper', urine, stool, heldSuccess, amount: '60', side: 'left', breastStart: now.toISOString() }, now);
+    assert.equal(input.urine, urine); assert.equal(input.stool, stool); assert.equal(input.held_success, heldSuccess);
+    for (const field of ['duration_minutes','amount_ml','started_at','milk_type','side'] as const) assert.equal(input[field], null);
+    const entry = { ...input, id: 'id', created_by: 'user', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
+    assert.deepEqual(feedingInput(draftFromFeeding(entry), now), input);
+    assert.match(toCsv([entry]), /Wickeln/);
+    assert.equal(sameInput(input, { ...input, urine: !urine }), false);
+  }
+  const feeding = feedingInput({ ...newDraft(), urine: true, stool: true, heldSuccess: true }, now);
+  assert.equal(feeding.urine, null); assert.equal(feeding.stool, null); assert.equal(feeding.held_success, null);
 });
