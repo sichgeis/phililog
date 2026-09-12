@@ -32,3 +32,7 @@ GitHub-Actions-Workflow zum manuellen Pages-Deployment vorbereiten. Kein automat
 ## Kompakte Oberfläche
 
 Dritte interne Ansicht `about` ohne Router-Abhängigkeit. Gemeinsamer Footer für Projektinfo und Abmeldung; keine Kopfzeile im angemeldeten Bereich. Semantische, visuell verborgene Eingabeüberschrift. Kompakte Abstände mit mindestens 44 px hohen Touch-Zielen und seitenweitem CSS-Aquarellhintergrund. Browserprüfung mit lokaler Supabase und synthetischen Konten: 320/390 px, Entwurf bei About-Wechsel, Stillstart/-ende und Footer-Abmeldung.
+
+## Dauer und Milchart
+
+0 wird im UI als unbekannte Dauer verwendet, in SQL bleibt NULL. Bestehende lokale Checkbox-Entwürfe werden beim Laden auf 0 umgestellt. Nullable Spalte `milk_type` mit Werten `pre`/`breast_milk`, nur für Flaschen; Altbestand bleibt NULL. Spaltenrechte für Familien-CRUD erweitern.

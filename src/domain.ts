@@ -1,4 +1,5 @@
 export type FeedingKind = 'bottle' | 'breast';
+export type MilkType = 'pre' | 'breast_milk';
 export type Side = 'left' | 'right' | 'both';
 export interface Draft {
   kind: FeedingKind;
@@ -7,6 +8,7 @@ export interface Draft {
   bottleUnknown: boolean;
   breastUnknown: boolean;
   amount: string;
+  milkType: MilkType | '';
   side: '' | Side;
   timeMode: 'now' | 'custom';
   localTime: string;
@@ -21,6 +23,7 @@ export interface FeedingInput {
   duration_minutes: number | null;
   amount_ml: number | null;
   side: Side | null;
+  milk_type?: MilkType | null;
 }
 export interface Feeding extends FeedingInput {
   id: string;
@@ -32,7 +35,7 @@ export interface Feeding extends FeedingInput {
 export const PAGE_SIZE = 30;
 export function newDraft(): Draft {
   return { kind: 'breast', bottleDuration: '15', breastDuration: '30', bottleUnknown: false,
-    breastUnknown: false, amount: '', side: '', timeMode: 'now', localTime: '', exactTime: null, breastStart: null, breastEnd: null };
+    breastUnknown: false, milkType: 'pre', amount: '', side: '', timeMode: 'now', localTime: '', exactTime: null, breastStart: null, breastEnd: null };
 }
 export function localDateTime(value: string | Date): string {
   const date = new Date(value);
@@ -47,11 +50,12 @@ export function draftFromFeeding(entry: Feeding): Draft {
   draft.exactTime = entry.occurred_at;
   if (entry.kind === 'bottle') {
     draft.bottleUnknown = entry.duration_minutes === null;
-    draft.bottleDuration = String(entry.duration_minutes ?? 15);
+    draft.bottleDuration = String(entry.duration_minutes ?? 0);
     draft.amount = String(entry.amount_ml ?? '');
+    draft.milkType = entry.milk_type ?? '';
   } else {
     draft.breastUnknown = entry.duration_minutes === null;
-    draft.breastDuration = String(entry.duration_minutes ?? 30);
+    draft.breastDuration = String(entry.duration_minutes ?? 0);
     draft.side = entry.side ?? '';
   }
   if (entry.kind === 'breast' && entry.started_at) {
@@ -68,7 +72,7 @@ function positiveInteger(value: string, label: string): number {
 }
 export function feedingInput(draft: Draft, now = new Date()): FeedingInput {
   const bottle = draft.kind === 'bottle';
-  const unknown = bottle ? draft.bottleUnknown : draft.breastUnknown;
+  const unknown = (bottle ? draft.bottleUnknown : draft.breastUnknown) || (bottle ? draft.bottleDuration : draft.breastDuration) === '0';
   const timed = !bottle && draft.breastStart !== null;
   if (timed && !draft.breastEnd) throw new Error('Bitte zuerst das Stillen beenden.');
   const duration = timed ? Math.max(1, Math.round((new Date(draft.breastEnd!).getTime() - new Date(draft.breastStart!).getTime()) / 60000)) : unknown ? null : positiveInteger(bottle ? draft.bottleDuration : draft.breastDuration, 'Dauer');
@@ -83,18 +87,19 @@ export function feedingInput(draft: Draft, now = new Date()): FeedingInput {
   const start = timed ? new Date(draft.breastStart!) : !bottle && duration !== null ? new Date(time.getTime() - duration * 60000) : null;
   if (start && (!Number.isFinite(start.getTime()) || start > time)) throw new Error('Der Beginn muss vor dem Ende liegen.');
   return { kind: draft.kind, occurred_at: time.toISOString(), started_at: start?.toISOString() ?? null, duration_minutes: duration,
-    amount_ml: amount, side: bottle ? null : draft.side || null };
+    amount_ml: amount, side: bottle ? null : draft.side || null, milk_type: bottle ? draft.milkType || null : null };
 }
 export function dayKey(iso: string): string { return localDateTime(iso).slice(0, 10); }
 export const sideLabel = (side: Side | null): string => side ? { left: 'Links', right: 'Rechts', both: 'Beide' }[side] : '';
+export const milkLabel = (milk: MilkType | null | undefined): string => milk === 'pre' ? 'Pre-Nahrung' : milk === 'breast_milk' ? 'Muttermilch' : '';
 export function toCsv(entries: Feeding[]): string {
   const escape = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`;
-  const rows: unknown[][] = [['Ende (UTC)', 'Beginn (UTC)', 'Art', 'Dauer (Minuten)', 'Menge (ml)', 'Stillseite']];
-  for (const entry of entries) rows.push([entry.occurred_at, entry.started_at, entry.kind === 'bottle' ? 'Flasche' : 'Stillen', entry.duration_minutes, entry.amount_ml, sideLabel(entry.side)]);
+  const rows: unknown[][] = [['Ende (UTC)', 'Beginn (UTC)', 'Art', 'Dauer (Minuten)', 'Menge (ml)', 'Stillseite', 'Milchart']];
+  for (const entry of entries) rows.push([entry.occurred_at, entry.started_at, entry.kind === 'bottle' ? 'Flasche' : 'Stillen', entry.duration_minutes, entry.amount_ml, sideLabel(entry.side), milkLabel(entry.milk_type)]);
   return '\uFEFF' + rows.map(row => row.map(escape).join(';')).join('\r\n') + '\r\n';
 }
 export interface PendingCreate { id: string; input: FeedingInput }
 export function sameInput(a: FeedingInput, b: FeedingInput): boolean {
   return (a.started_at === b.started_at || (a.started_at !== null && b.started_at !== null && new Date(a.started_at).getTime() === new Date(b.started_at).getTime())) && a.kind === b.kind && new Date(a.occurred_at).getTime() === new Date(b.occurred_at).getTime()
-    && a.duration_minutes === b.duration_minutes && a.amount_ml === b.amount_ml && a.side === b.side;
+    && a.duration_minutes === b.duration_minutes && a.amount_ml === b.amount_ml && a.side === b.side && (a.milk_type ?? null) === (b.milk_type ?? null);
 }

@@ -77,3 +77,14 @@ test('Mengen-Korrektur verändert den sekundengenauen Flaschenzeitpunkt nicht', 
   draft.amount = '65';
   assert.equal(feedingInput(draft, now).occurred_at, input.occurred_at);
 });
+
+test('0 Minuten ist unbekannt; Milchart startet mit Pre und bleibt beim Bearbeiten erhalten', () => {
+  const input = feedingInput({ ...newDraft(), kind: 'bottle', amount: '60', bottleDuration: '0' }, now);
+  assert.equal(input.duration_minutes, null);
+  assert.equal(input.milk_type, 'pre');
+  const entry = { ...input, milk_type: 'breast_milk' as const, id: 'id', created_by: 'user', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
+  assert.deepEqual(feedingInput(draftFromFeeding(entry), now), entry && { ...input, milk_type: 'breast_milk' });
+  for (const breastDuration of ['-1', '0.5', '']) assert.throws(() => feedingInput({ ...newDraft(), breastDuration }, now));
+  assert.equal(feedingInput({ ...newDraft(), breastDuration: '0' }, now).started_at, null);
+  assert.equal(sameInput(input, { ...input, milk_type: 'breast_milk' }), false);
+});
