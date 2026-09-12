@@ -1,0 +1,43 @@
+# Spec Driven Development
+
+## Grundsatz
+
+Zuerst klären wir **was** erreicht werden soll und woran wir den Erfolg erkennen. Danach planen wir **wie** es umgesetzt wird und zerlegen die Arbeit in prüfbare Schritte. Spezifikationen bleiben auch nach der Implementierung aktuell.
+
+Dieser Ablauf ist bewusst werkzeugunabhängig. Es ist kein SDD-Framework und keine zusätzliche CLI erforderlich.
+
+Die abgestimmte Architektur und das Budget von 0 € stehen im [README](../README.md#architektur-und-datenhaltung). Sie bilden die Randbedingungen für die folgenden Spezifikationen; die fachliche Beschreibung steht noch aus.
+
+## Ablage
+
+Jedes Feature erhält einen Ordner `specs/NNN-kurzer-name/` mit einer fortlaufenden dreistelligen Nummer. Kopiere dafür die drei Dateien aus [templates](templates/). Ersetze deren Platzhalter; kennzeichne ungeklärte Inhalte als offen, statt Anforderungen zu erfinden.
+
+| Datei | Verantwortung |
+| --- | --- |
+| `spec.md` | Problem, Ziel, Umfang, Anforderungen, Akzeptanzkriterien und offene fachliche Fragen |
+| `plan.md` | Technischer Ansatz, Entscheidungen, Alternativen und Validierungsstrategie |
+| `tasks.md` | Umsetzungsschritte, aktueller Arbeitsstand und Prüfnachweise |
+
+## Ablauf
+
+1. **Spezifizieren:** `spec.md` als Entwurf erstellen. Anforderungen mit `REQ-001` usw. und Akzeptanzkriterien mit `AC-001` usw. innerhalb des Features eindeutig benennen. Umfang und Nicht-Ziele abgrenzen.
+2. **Abstimmen:** Offene Fragen klären, die die Umsetzung beeinflussen. Die Zustimmung des Auftraggebers zum Umfang mit Datum und Bezug in `spec.md` festhalten; erst dann auf `Abgestimmt` setzen. Eine ausdrückliche Umsetzungsanweisung für den beschriebenen Umfang zählt als Zustimmung.
+3. **Planen:** `plan.md` aus der Spezifikation ableiten. Relevante technische Entscheidungen begründen und Prüfungen den Akzeptanzkriterien zuordnen. Neue fachliche Fragen zurück in die Spezifikation tragen.
+4. **Aufgaben ableiten:** In `tasks.md` kleine zusammenhängende Schritte mit Bezug auf Anforderungen oder Akzeptanzkriterien anlegen. Ein Implementierungsauftrag erlaubt die selbstständige Bearbeitung innerhalb seines Umfangs.
+5. **Umsetzen und prüfen:** Aufgaben bearbeiten, geeignete Tests ausführen und deren Ergebnisse dokumentieren. Bei geändertem Verhalten zuerst die Spezifikation anpassen; wesentliche Umfangsänderungen erneut abstimmen.
+6. **Abschließen:** Jedes Akzeptanzkriterium mit einem tatsächlichen Prüfnachweis belegen. Erst wenn alle Kriterien erfüllt und alle nötigen Aufgaben abgeschlossen sind, das Feature auf `Abgeschlossen` setzen. README bei Bedarf aktualisieren.
+
+## Status und Fortschritt
+
+Die folgende Übersicht ist die zentrale Quelle für den Feature-Status. `tasks.md` enthält den detaillierten Fortschritt; der Abstimmungsstand in `spec.md` dokumentiert die Zustimmung zur Spezifikation.
+
+Statusfolge: `Entwurf` → `Abgestimmt` → `In Umsetzung` → `Abgeschlossen`. Bei `Blockiert` den Grund und den vorherigen Status in `tasks.md` notieren.
+
+## Spezifikationsübersicht
+
+Noch keine Features spezifiziert oder zur Umsetzung freigegeben.
+
+| ID | Feature / Link | Status |
+| --- | --- | --- |
+
+**Nächster Schritt:** Gemeinsam den Umfang der ersten Produktspezifikation klären und als `001-<kurzer-name>` anlegen.
