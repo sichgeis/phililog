@@ -14,6 +14,12 @@ export async function listFeedings(limit = PAGE_SIZE, before?: { time: string; i
   if (error) throw error;
   return data as Feeding[];
 }
+export async function latestMeal(): Promise<Feeding | null> {
+  const { data, error } = await supabase!.from('feedings').select('*').in('kind', ['bottle', 'breast'])
+    .order('occurred_at', { ascending: false }).order('id', { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  return data as Feeding | null;
+}
 export async function allFeedings(): Promise<Feeding[]> {
   const entries: Feeding[] = [];
   let cursor: { time: string; id: string } | undefined;

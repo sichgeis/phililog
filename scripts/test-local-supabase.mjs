@@ -100,6 +100,14 @@ try {
     await assert.rejects(api.updateFeeding(first, { ...payload, amount_ml: 75 }), /inzwischen/);
     await assert.rejects(api.deleteFeeding(first), /inzwischen/);
     await api.deleteFeeding(corrected);
+    const mealId = randomUUID();
+    const newerDiapers = Array.from({ length: 35 }, (_, i) => ({ id: randomUUID(), kind: 'diaper', occurred_at: new Date(Date.UTC(2091, 0, 1, 0, i)).toISOString(), urine: true, stool: false, held_success: false, created_by: julia.user.id }));
+    ids.push(mealId, ...newerDiapers.map(row => row.id));
+    assert.ifError((await admin.from('feedings').insert({ ...payload, id: mealId, occurred_at: '2090-01-01T00:00:00Z', created_by: julia.user.id })).error);
+    assert.ifError((await admin.from('feedings').insert(newerDiapers)).error);
+    assert.equal((await api.listFeedings()).every(row => row.kind === 'diaper'), true);
+    assert.equal((await api.latestMeal()).id, mealId, 'Last meal ignores diapers beyond first history page');
+    assert.ifError((await admin.from('feedings').delete().in('id', [mealId, ...newerDiapers.map(row => row.id)])).error);
     const bulk = Array.from({ length: 505 }, (_, i) => ({ ...payload, id: randomUUID(), created_by: julia.user.id, occurred_at: new Date(Date.UTC(2025, 0, 1, 0, i)).toISOString() }));
     ids.push(...bulk.map(row => row.id));
     assert.ifError((await admin.from('feedings').insert(bulk)).error);

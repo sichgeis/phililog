@@ -115,3 +115,15 @@ export function sameInput(a: FeedingInput, b: FeedingInput): boolean {
   return (a.started_at === b.started_at || (a.started_at !== null && b.started_at !== null && new Date(a.started_at).getTime() === new Date(b.started_at).getTime())) && a.kind === b.kind && new Date(a.occurred_at).getTime() === new Date(b.occurred_at).getTime()
     && a.duration_minutes === b.duration_minutes && a.amount_ml === b.amount_ml && a.side === b.side && (a.milk_type ?? null) === (b.milk_type ?? null) && (a.urine ?? null) === (b.urine ?? null) && (a.stool ?? null) === (b.stool ?? null) && (a.held_success ?? null) === (b.held_success ?? null);
 }
+
+export function elapsedLabel(since: string, now = Date.now(), seconds = false): string {
+  const elapsed = now - new Date(since).getTime();
+  if (!Number.isFinite(elapsed)) return 'Zeitpunkt unbekannt';
+  if (elapsed < 0) return 'Zeitpunkt liegt in der Zukunft';
+  const total = Math.floor(elapsed / 1000);
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor(total / 60) % 60;
+  if (seconds) return `${hours ? `${hours} Std. ` : ''}${minutes} Min. ${String(total % 60).padStart(2, '0')} Sek.`;
+  if (total < 60) return 'gerade eben';
+  return `vor ${hours ? `${hours} Std. ` : ''}${minutes} Min.`;
+}

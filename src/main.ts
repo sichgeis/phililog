@@ -1,6 +1,6 @@
 import './style.css';
-import { configured, supabase, listFeedings, allFeedings, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
-import { newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
+import { configured, supabase, listFeedings, allFeedings, latestMeal, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
+import { newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, elapsedLabel, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const icons = {
@@ -24,6 +24,7 @@ let edit: Feeding | null = null;
 let pending: PendingCreate | null = null;
 let entries: Feeding[] = [];
 let latest: Feeding | null = null;
+let meal: Feeding | null = null;
 let hasMore = false;
 let busy = false;
 let loading = false;
@@ -101,13 +102,13 @@ function formView(): string {
   return `<h1 class="${edit ? 'edit-heading' : 'sr-only'}">${edit ? 'Eintrag bearbeiten' : 'Eintrag erfassen'}</h1><div class="form-layout"><section class="card feeding-card"><form id="feeding-form" novalidate><fieldset ${busy || pending ? 'disabled' : ''}><legend class="sr-only">Eintrag erfassen</legend><div class="field-header"><label>Was möchtet ihr festhalten?</label></div><div class="kind-picker" role="group" aria-label="Eintragsart"><button type="button" data-kind="bottle" ${draft.breastStart && !draft.breastEnd ? 'disabled' : ''} aria-pressed="${bottle}" class="kind-button ${bottle ? 'selected' : ''}">${icon('bottle')}<span>Flasche</span>${bottle ? icon('check') : ''}</button><button type="button" data-kind="breast" aria-pressed="${draft.kind === 'breast'}" class="kind-button ${draft.kind === 'breast' ? 'selected' : ''}">${icon('heart')}<span>Stillen</span>${draft.kind === 'breast' ? icon('check') : ''}</button><button type="button" data-kind="diaper" ${draft.breastStart && !draft.breastEnd ? 'disabled' : ''} aria-pressed="${diaper}" class="kind-button ${diaper ? 'selected' : ''}">${icon('diaper')}<span>Wickeln</span></button></div>
       ${diaper ? `<div class="field-block"><div class="field-header"><label>Was war in der Windel?</label></div><div class="diaper-toggles" role="group" aria-label="Windelinhalt"><button type="button" data-diaper="urine" aria-pressed="${draft.urine}" class="secondary ${draft.urine ? 'selected' : ''}">💧 Urin</button><button type="button" data-diaper="stool" aria-pressed="${draft.stool}" class="secondary ${draft.stool ? 'selected' : ''}">💩 Stuhl</button></div><p class="field-note">Beides möglich. Ohne Auswahl: Windel trocken.</p><button type="button" data-diaper="heldSuccess" aria-pressed="${draft.heldSuccess}" class="secondary held-toggle ${draft.heldSuccess ? 'selected' : ''}">${icon('check')} Abhalten erfolgreich</button></div>` : ''}
       ${bottle ? `<div class="field-block"><label for="milk-type">Milchart</label><select id="milk-type"><option value="pre" ${draft.milkType === 'pre' ? 'selected' : ''}>Pre-Nahrung</option><option value="breast_milk" ${draft.milkType === 'breast_milk' ? 'selected' : ''}>Muttermilch</option>${draft.milkType === '' ? '<option value="" selected>Nicht angegeben</option>' : ''}</select></div><div class="field-block"><div class="field-header"><label for="amount">Wie viel?</label><span class="field-hint">In 5-ml-Schritten</span></div><div class="stepper amount-stepper"><button type="button" data-step="amount:-5" aria-label="Menge um 5 Milliliter verringern">−</button><div class="unit-input"><input id="amount" name="amount" type="number" inputmode="numeric" min="5" step="5" placeholder="—" value="${escape(draft.amount)}" required><span>ml</span></div><button type="button" data-step="amount:5" aria-label="Menge um 5 Milliliter erhöhen">+</button></div><p class="field-note">Die tatsächlich getrunkene Menge.</p></div>` : diaper ? '' : `<div class="field-block"><div class="field-header"><label>Welche Seite?</label><span class="field-hint">Optional</span></div><div class="segmented side-picker" role="group" aria-label="Stillseite">${[['', 'Offen'], ['left', 'Links'], ['right', 'Rechts'], ['both', 'Beide']].map(([value, label]) => `<button type="button" data-side="${value}" aria-pressed="${draft.side === value}" class="${draft.side === value ? 'active' : ''}">${label}</button>`).join('')}</div></div>`}
-      ${draft.kind === 'breast' ? `<div class="timer-box"><div><span class="eyebrow">STILLZEIT FESTHALTEN</span><p>${draft.breastStart ? `Beginn ${timeLabel(draft.breastStart)}${draft.breastEnd ? ` · Ende ${timeLabel(draft.breastEnd)}` : ' · läuft'}` : 'Ein Klick zum Start. Einer zum Ende.'}</p></div>${!draft.breastStart ? `<button type="button" id="start-breast" class="secondary">Stillen starten</button>` : !draft.breastEnd ? `<button type="button" id="end-breast" class="primary">Stillen beenden</button>` : '<span class="timer-done">Zeiten erfasst</span>'}${draft.breastStart ? '<button type="button" id="clear-timer" class="text-button">Zeiten manuell angeben</button>' : ''}</div>` : ''}
+      ${draft.kind === 'breast' ? `<div class="timer-box"><div><span class="eyebrow">STILLZEIT FESTHALTEN</span><p>${draft.breastStart ? `Beginn ${timeLabel(draft.breastStart)}${draft.breastEnd ? ` · Ende ${timeLabel(draft.breastEnd)}` : ' · läuft'}` : 'Ein Klick zum Start. Einer zum Ende.'}</p>${draft.breastStart ? `<strong class="elapsed-timer" id="nursing-elapsed">${elapsedLabel(draft.breastStart, draft.breastEnd ? new Date(draft.breastEnd).getTime() : Date.now(), true)}</strong>` : ''}</div>${!draft.breastStart ? `<button type="button" id="start-breast" class="secondary">Stillen starten</button>` : !draft.breastEnd ? `<button type="button" id="end-breast" class="primary">Stillen beenden</button>` : '<span class="timer-done">Zeiten erfasst</span>'}${draft.breastStart ? '<button type="button" id="clear-timer" class="text-button">Zeiten manuell angeben</button>' : ''}</div>` : ''}
       <div class="field-block duration-block" ${diaper ? 'hidden' : ''}><div class="field-header"><label for="duration">Wie lange?</label><span class="field-hint">${timed ? 'Aus Start und Ende' : 'Vorschlag · anpassbar'}</span></div><div class="stepper"><button type="button" data-step="duration:-1" aria-label="Dauer um eine Minute verringern" ${timed ? 'disabled' : ''}>−</button><div class="unit-input"><input id="duration" name="duration" type="number" inputmode="numeric" min="0" step="1" placeholder="—" value="${timed && !draft.breastEnd ? '' : escape(bottle ? draft.bottleDuration : draft.breastDuration)}" ${timed ? 'disabled' : ''}><span>Min.</span></div><button type="button" data-step="duration:1" aria-label="Dauer um eine Minute erhöhen" ${timed ? 'disabled' : ''}>+</button></div>${!timed ? '<p class="field-note">0 Minuten = Dauer nicht bekannt</p>' : ''}</div>
       <div class="field-block time-block" ${timed ? 'hidden' : ''}><div class="field-header"><label>${diaper ? 'Wann wurde gewickelt?' : 'Wann war die Mahlzeit zu Ende?'}</label></div><div class="segmented" role="group" aria-label="Zeitpunkt"><button type="button" data-time="now" aria-pressed="${draft.timeMode === 'now'}" class="${draft.timeMode === 'now' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Gerade eben</button><button type="button" data-time="custom" aria-pressed="${draft.timeMode === 'custom'}" class="${draft.timeMode === 'custom' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Anderer Zeitpunkt</button></div>${draft.timeMode === 'custom' ? `<label class="sr-only" for="local-time">Datum und Uhrzeit</label><input id="local-time" ${timed ? 'disabled' : ''} type="datetime-local" step="60" value="${escape(draft.localTime)}" required>` : '<p class="field-note">Die aktuelle Uhrzeit wird beim Speichern eingetragen.</p>'}</div></fieldset>
       ${pending ? '<p class="pending-note">Die Bestätigung fehlt noch. „Erneut speichern“ prüft dieselbe Übermittlung, ohne einen zweiten Eintrag anzulegen.</p>' : ''}
-      <button class="primary full save-button" type="submit" ${busy || (timed && !draft.breastEnd) ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : pending ? 'Erneut speichern' : edit ? 'Änderungen speichern' : 'io triumphe'} ${icon('check')}</button>
+      <button class="primary full save-button" type="submit" ${busy || (timed && !draft.breastEnd) ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : pending ? 'Erneut speichern' : edit ? 'Änderungen speichern' : 'Io triumphe'} ${icon('check')}</button>
       ${edit ? `<div class="edit-actions"><button type="button" id="cancel-edit" class="text-button" ${busy ? 'disabled' : ''}>Abbrechen</button><button type="button" id="delete-entry" class="text-button danger" ${busy ? 'disabled' : ''}>Eintrag löschen</button></div>` : ''}
-      </form></section><aside class="aside"><section class="last-entry"><div class="section-title"><h2>Letzter Eintrag</h2><span class="small-dot"></span></div>${latest ? entryCard(latest, true) : `<div class="empty-mini">${icon('book')}<p>${loading ? 'Logbuch wird geladen …' : 'Hier erscheint euer letzter Eintrag.'}</p></div>`}<button id="see-history" class="history-link">Zum Logbuch ${icon('arrow')}</button></section></aside></div>`;
+      </form></section><aside class="aside"><section class="last-entry"><div class="section-title"><h2>${diaper ? 'Letzter Eintrag' : 'Letzte Mahlzeit'}</h2></div>${diaper ? (latest ? entryCard(latest, true) : '<p class="muted">Noch kein Eintrag vorhanden.</p>') : meal ? `<div class="meal-age"><strong id="meal-elapsed">${elapsedLabel(meal.occurred_at)}</strong><p>${kindLabel(meal.kind)} · Ende ${timeLabel(meal.occurred_at)}</p></div>` : `<p class="muted meal-age">${loading ? 'Mahlzeit wird geladen …' : 'Noch keine Mahlzeit eingetragen.'}</p>`}<button id="see-history" class="history-link">Zum Logbuch ${icon('arrow')}</button></section></aside></div>`;
 }
 function historyView(): string {
   let previous = '';
@@ -282,10 +283,13 @@ async function refresh(more = false) {
   const ownRefresh = ++refreshGeneration;
   const last = more ? entries.at(-1) : undefined;
   try {
-    const rows = await listFeedings(PAGE_SIZE, last ? { time: last.occurred_at, id: last.id } : undefined);
+    const [rows, recentMeal] = await Promise.all([
+      listFeedings(PAGE_SIZE, last ? { time: last.occurred_at, id: last.id } : undefined),
+      more ? Promise.resolve(meal) : latestMeal(),
+    ]);
     if (ownEpoch !== epoch || ownRefresh !== refreshGeneration) return;
     if (more) entries = [...entries, ...rows.filter(row => !entries.some(e => e.id === row.id))];
-    else { entries = rows; latest = rows[0] ?? null; }
+    else { entries = rows; latest = rows[0] ?? null; meal = recentMeal; }
     hasMore = rows.length === PAGE_SIZE;
     error = '';
   } catch (e) { if (ownEpoch === epoch && ownRefresh === refreshGeneration) error = friendlyError(e); }
@@ -296,7 +300,7 @@ async function enterSession(id: string | null) {
   const previous = userId;
   const ownEpoch = ++epoch;
   if (previous && previous !== id) { try { localStorage.removeItem(storageKey()); } catch { /* no storage */ } }
-  userId = id; authorized = false; entries = []; latest = null; draft = newDraft(); pending = null; edit = null;
+  userId = id; authorized = false; entries = []; latest = null; meal = null; draft = newDraft(); pending = null; edit = null;
   error = ''; notice = ''; view = 'new'; busy = false; loading = Boolean(id);
   if (!id) { render(); return; }
   restore(); render();
@@ -309,9 +313,16 @@ async function enterSession(id: string | null) {
   } catch (e) { if (ownEpoch === epoch) error = friendlyError(e); }
   finally { if (ownEpoch === epoch) { loading = false; render(); if (authorized) await refresh(); } }
 }
+function updateElapsedTimes() {
+  const nursing = document.querySelector('#nursing-elapsed');
+  if (nursing && draft.breastStart) nursing.textContent = elapsedLabel(draft.breastStart, draft.breastEnd ? new Date(draft.breastEnd).getTime() : Date.now(), true);
+  const previousMeal = document.querySelector('#meal-elapsed');
+  if (previousMeal && meal) previousMeal.textContent = elapsedLabel(meal.occurred_at);
+}
+setInterval(() => { if (document.visibilityState === 'visible') updateElapsedTimes(); }, 1000);
 window.addEventListener('online', () => { if (!busy) void refresh(); });
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && !busy) void refresh();
+  if (document.visibilityState === 'visible' && !busy) { updateElapsedTimes(); void refresh(); }
   else if (document.visibilityState === 'hidden') { captureForm(); remember(); }
 });
 renderLogin();

@@ -79,3 +79,10 @@ Am 12. September 2026 ausdrücklich korrigiert: Der Name lautet **Philine**. Org
 Dritter Eintragstyp Wickeln mit unabhängig schaltbaren, beschrifteten Toggles für Urin und Stuhl sowie Abhalten erfolgreich. Ohne Inhaltsauswahl ist die Windel trocken; ausgeschaltetes Abhalten bedeutet kein bestätigter Erfolg, nicht zwingend einen Versuch. Zeitpunkt wie bisher jetzt beim Speichern oder manueller Nachtrag. Wickeleinträge haben keine Fütterungsmenge, Stillseite, Dauer oder Milchart. Gemeinsame Historie, Bearbeitung, Löschung, CSV und Duplikatschutz gelten für alle Typen. Neue Einträge tragen die Schaltflächenbeschriftung „io triumphe“. Ein kurzer Aquarell-Konfettieffekt erscheint nur bei bestätigter Speicherung, blockiert keine Eingabe und respektiert reduzierte Bewegung. Fehler, Ansichtswechsel und reine Aktualisierung lösen keinen Effekt aus.
 
 Abnahme: gemischte Historie und CSV, Wickeln bearbeiten, alle Toggle-Kombinationen inklusive trockener Windel; 0-Minuten-Schritte und Muttermilch; drei Arten bei 320/390 px bedienbar; Effekt nur bei Erfolg, bei reduzierter Bewegung aus.
+
+## Zeit seit Mahlzeit und laufende Stillzeit – beauftragt am 12. September 2026
+
+- Neue Speicherung heißt „Io triumphe“ (großes I).
+- Bei Stillen und Flasche ersetzt „Letzte Mahlzeit“ den letzten allgemeinen Eintrag. Maßgeblich ist das Ende der neuesten gespeicherten Flaschen- oder Stillmahlzeit, unabhängig von neueren Wickeleinträgen und Historienseiten. Anzeige in Stunden/Minuten, unter einer Minute „gerade eben“. Zukunftseinträge werden als solche benannt. Ohne Mahlzeit erscheint ein verständlicher Leerzustand.
+- Nach Stillstart erscheint die laufende Dauer in Minuten/Sekunden, ab einer Stunde zusätzlich Stunden. Berechnung aus dem gespeicherten Startzeitpunkt, auch nach Hintergrund und Neuladen. Stop hält die Anzeige an. Tick aktualisiert nur die Zeitanzeigen und verliert weder Fokus noch Eingaben.
+- Wickeln behält den letzten allgemeinen Eintrag. Icons werden als fünf Entwürfe vorgelegt; das installierte App-Icon wird erst nach Auswahl ersetzt.
