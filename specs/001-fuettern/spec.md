@@ -8,9 +8,9 @@
 
 ## Ziel und Grenzen
 
-Julia und Christian dokumentieren gemeinsam Fütterungen auf ihren Smartphones mit wenigen Eingaben. Es gibt eine Web-App mit zwei Hauptansichten. Architektur und Budget von 0 € stehen im [README](../../README.md#architektur-und-datenhaltung).
+Julia und Christian dokumentieren gemeinsam Fütterungen auf ihren Smartphones mit wenigen Eingaben. Es gibt eine Web-App mit zwei Hauptansichten und einer Projektinfo. Architektur und Budget von 0 € stehen im [README](../../README.md#architektur-und-datenhaltung).
 
-Nicht enthalten: Urin/Stuhl, Erinnerungstimer, Diagramme, Erinnerungen, dauerhafte persönliche Einstellungen und vollständige Offline-Synchronisation. Fehlende Verbindung darf nicht als erfolgreiche Speicherung erscheinen.
+Nicht enthalten: Erinnerungstimer, Diagramme, Erinnerungen, dauerhafte persönliche Einstellungen und vollständige Offline-Synchronisation. Fehlende Verbindung darf nicht als erfolgreiche Speicherung erscheinen.
 
 ## Anforderungen
 
@@ -18,7 +18,7 @@ Nicht enthalten: Urin/Stuhl, Erinnerungstimer, Diagramme, Erinnerungen, dauerhaf
 | --- | --- |
 | REQ-001 | Nach Anmeldung öffnet sich direkt die Eingabe. Die Historie ist separat erreichbar. |
 | REQ-002 | Fütterungsart: Flasche oder Stillen. Dauer wird je Art vorbelegt und kann für diesen Eintrag geändert werden. Änderungen werden nicht als neue Standards gespeichert. |
-| REQ-003 | Startwerte: Stillen, 15 Minuten für Flasche, 30 Minuten für Stillen. Dauer optional über „nicht bekannt“. Positive ganze Minuten, keine medizinisch begründete Obergrenze. |
+| REQ-003 | Startwerte: Stillen, 15 Minuten für Flasche, 30 Minuten für Stillen. Dauer unbekannt über 0 Minuten (keine Checkbox). Sonst positive ganze Minuten, keine medizinisch begründete Obergrenze. |
 | REQ-004 | Zeitpunkt standardmäßig „jetzt“ beim Absenden; ausdrücklich geänderte lokale Datums-/Zeitangaben bleiben erhalten. Die gespeicherte Zeit bezeichnet das Ende; bei Stillen wird zusätzlich der Beginn erfasst. |
 | REQ-005 | Bei Flasche ist eine positive Menge in ganzen 5-ml-Schritten erforderlich, ohne Vorbelegung. Beim Stillen ist die Menge ausgeblendet und wird nicht gespeichert. |
 | REQ-006 | Beim Stillen kann optional links, rechts oder beide gewählt werden. |
@@ -73,3 +73,9 @@ Am 12. September 2026 ausdrücklich korrigiert: Der Name lautet **Philine**. Org
 ## Dauer und Flascheninhalt – beauftragt am 12. September 2026
 
 0 Minuten bedeutet unbekannte Dauer (Datenbank weiterhin NULL); die Checkbox entfällt. Minus endet bei 0, Plus von 0 führt zu 1. Start-/Endmessungen bleiben unverändert. Flaschen enthalten standardmäßig Pre-Nahrung, alternativ Muttermilch. Bestehende Einträge ohne Milchart bleiben nicht angegeben. Milchart erscheint in Historie, Bearbeitung und CSV; beim Stillen ist sie leer. Negative oder gebrochene Minuten bleiben unzulässig.
+
+## Wickeln und Speicherfreude – zweiter beauftragter Commit, 12. September 2026
+
+Dritter Eintragstyp Wickeln mit unabhängig schaltbaren, beschrifteten Toggles für Urin und Stuhl sowie Abhalten erfolgreich. Ohne Inhaltsauswahl ist die Windel trocken; ausgeschaltetes Abhalten bedeutet kein bestätigter Erfolg, nicht zwingend einen Versuch. Zeitpunkt wie bisher jetzt beim Speichern oder manueller Nachtrag. Wickeleinträge haben keine Fütterungsmenge, Stillseite, Dauer oder Milchart. Gemeinsame Historie, Bearbeitung, Löschung, CSV und Duplikatschutz gelten für alle Typen. Neue Einträge tragen die Schaltflächenbeschriftung „io triumphe“. Ein kurzer Aquarell-Konfettieffekt erscheint nur bei bestätigter Speicherung, blockiert keine Eingabe und respektiert reduzierte Bewegung. Fehler, Ansichtswechsel und reine Aktualisierung lösen keinen Effekt aus.
+
+Abnahme: gemischte Historie und CSV, Wickeln bearbeiten, alle Toggle-Kombinationen inklusive trockener Windel; 0-Minuten-Schritte und Muttermilch; drei Arten bei 320/390 px bedienbar; Effekt nur bei Erfolg, bei reduzierter Bewegung aus.

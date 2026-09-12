@@ -59,3 +59,9 @@ Auf ausdrücklichen Wunsch Schreibweise **Philine** in Dokumentation, Supabase-A
 ## Dauer und Milchart – 12. September 2026
 
 Erster separater Commit: Checkbox durch 0 Minuten ersetzt, Milchart mit Pre als Startwert und Muttermilch als Alternative. Migration erhält Altbestand ohne erfundene Milchart. 13 Fachlogiktests und Build erfolgreich.
+
+## Wickeln und io triumphe – 12. September 2026
+
+Zweiter separater Commit: Wickeln mit unabhängigen Toggles, gemischter Historie/Bearbeitung/CSV und Aquarell-Konfetti nach bestätigter Speicherung. 14 Fachlogiktests und Build erfolgreich. Lokale Supabase-Prüfungen einschließlich Milchart, Wickel-Constraints, Fremdzugriff, gemeinsamer Korrektur/Löschung, Duplikatschutz und Export über 505 Einträge erfolgreich. Browser mit synthetischen Daten: Wickeln inklusive Urin/Stuhl/Abhalten erfolgreich gespeichert; 390 px visuell geprüft und 320 px ohne horizontalen Überlauf. Dauer: Minus von 1 nach 0, weiteres Minus bleibt 0, Plus führt zu 1; Pre vorbelegt. Ein Konfettieffekt bei Erfolg, kein Effekt bei ungültiger Menge und kein Effekt bei reduzierter Bewegung.
+
+Beide additive Migrationen 002 und 003 in einer Transaktion im produktiven Supabase-Projekt erfolgreich ausgeführt; keine Produktionseinträge geändert.

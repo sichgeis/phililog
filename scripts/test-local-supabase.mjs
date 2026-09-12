@@ -70,6 +70,18 @@ try {
   assert.ok((await julia.client.from('feedings').update({ milk_type: 'pre' }).eq('id', breast.id)).error, 'Milk type only for bottle');
   const removed = await christian.client.from('feedings').delete().eq('id', input.id).eq('version', 3).select();
   assert.ifError(removed.error); assert.equal(removed.data.length, 1);
+  const diaper = { id: randomUUID(), kind: 'diaper', occurred_at: '2026-09-12T09:00:00Z', urine: true, stool: true, held_success: true };
+  ids.push(diaper.id);
+  const diaperCreated = await julia.client.from('feedings').insert(diaper).select().single();
+  assert.ifError(diaperCreated.error);
+  assert.equal((await christian.client.from('feedings').select().eq('id', diaper.id).single()).data.held_success, true);
+  assert.ok((await outsider.client.from('feedings').insert({ ...diaper, id: randomUUID() })).error);
+  assert.ok((await julia.client.from('feedings').insert({ ...diaper, id: randomUUID(), amount_ml: 5 })).error);
+  assert.ok((await julia.client.from('feedings').insert({ ...diaper, id: randomUUID(), stool: null })).error);
+  assert.ok((await julia.client.from('feedings').update({ urine: true }).eq('id', breast.id)).error);
+  assert.ifError((await christian.client.from('feedings').update({ urine: false, stool: false, held_success: false }).eq('id', diaper.id)).error);
+  assert.deepEqual((await outsider.client.from('feedings').delete().eq('id', diaper.id).select()).data, []);
+  assert.ifError((await christian.client.from('feedings').delete().eq('id', diaper.id)).error);
   // Exercise the application's actual repository functions, including pagination and retry.
   process.env.VITE_SUPABASE_URL = status.API_URL;
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY = key;

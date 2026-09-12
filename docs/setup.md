@@ -5,7 +5,7 @@ Die Anwendung benötigt GitHub Pages für die Oberfläche und ein Supabase-Free-
 ## Supabase Free vorbereiten
 
 1. Im Supabase-Dashboard eine **Free-Organisation** und ein Free-Projekt anlegen. Keinen Pro-Tarif oder kostenpflichtige Zusatzfunktionen wählen. Eine verfügbare EU-Region wählen. Das Datenbankpasswort sicher aufbewahren.
-2. Den Inhalt von [202609120001_feedings.sql](../supabase/migrations/202609120001_feedings.sql) im SQL-Editor des neuen, leeren Projekts einmal ausführen. Die Migration legt Tabellen, Constraints und Zugriffsregeln an.
+2. Die SQL-Dateien unter `supabase/migrations/` in aufsteigender Reihenfolge im SQL-Editor des neuen Projekts jeweils einmal ausführen. Bei bestehenden Installationen nur die noch fehlenden Migrationen anwenden. Die Migration legt Tabellen, Constraints und Zugriffsregeln an.
 3. In Authentication die öffentliche Registrierung („Allow new users to sign up“) und anonyme Anmeldung deaktivieren.
 4. Unter Authentication → Users zwei Benutzer mit den tatsächlichen E-Mail-Adressen von Julia und Christian und jeweils eigenem sicheren Passwort administrativ erstellen. Bei dieser manuellen Einrichtung die E-Mail bestätigen. Dadurch ist für den MVP kein eigener E-Mail-Versand nötig. Zugangsdaten nicht im Repository speichern.
 5. Die beiden Benutzer-UUIDs kopieren und im SQL-Editor einsetzen:

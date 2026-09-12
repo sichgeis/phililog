@@ -1,12 +1,13 @@
 import './style.css';
 import { configured, supabase, listFeedings, allFeedings, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
-import { newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, sideLabel, milkLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
+import { newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const icons = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   book: '<path d="M4 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-2H4zM13 7a3 3 0 0 1 3-3h4v15h-3a4 4 0 0 0-4 2"/>',
   bottle: '<path d="M9 3h6v4l2 3v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V10l2-3zM9 7h6M7 12h4M7 16h4"/>',
+  diaper: '<path d="M4 5h16l-2 13a8 8 0 0 1-12 0zM4 9c4 0 5 4 5 8m11-8c-4 0-5 4-5 8"/>',
   heart: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>',
   arrow: '<path d="m9 5 7 7-7 7"/>',
   download: '<path d="M12 3v12m-5-5 5 5 5-5M5 16v5h14v-5"/>',
@@ -56,7 +57,7 @@ function remember() {
 function restore() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey()) ?? 'null');
-    if (saved && ['bottle', 'breast'].includes(saved.draft?.kind)) {
+    if (saved && ['bottle', 'breast', 'diaper'].includes(saved.draft?.kind)) {
       draft = { ...newDraft(), ...saved.draft };
       if (draft.bottleUnknown) draft.bottleDuration = '0';
       if (draft.breastUnknown) draft.breastDuration = '0';
@@ -87,23 +88,26 @@ function renderLogin() {
   bindLogout();
 }
 function details(entry: Feeding): string {
+  if (entry.kind === 'diaper') return [entry.urine ? 'Urin' : '', entry.stool ? 'Stuhl' : '', !entry.urine && !entry.stool ? 'Windel trocken' : '', entry.held_success ? 'Abhalten erfolgreich' : ''].filter(Boolean).join(' · ');
   return [entry.started_at ? `${timeLabel(entry.started_at)}–${timeLabel(entry.occurred_at)}` : '', entry.amount_ml !== null ? `${entry.amount_ml} ml` : sideLabel(entry.side), entry.duration_minutes === null ? 'Dauer unbekannt' : `${entry.duration_minutes} Min.`, milkLabel(entry.milk_type)].filter(Boolean).join(' · ');
 }
 function entryCard(entry: Feeding, compact = false): string {
-  return `<article class="entry ${compact ? 'compact' : ''}"><span class="entry-icon ${entry.kind}">${icon(entry.kind === 'bottle' ? 'bottle' : 'heart')}</span><div class="entry-content"><div class="entry-heading"><strong>${entry.kind === 'bottle' ? 'Flasche' : 'Stillen'}</strong><time datetime="${escape(entry.occurred_at)}">${timeLabel(entry.occurred_at)}</time></div><p>${escape(details(entry))}</p>${compact ? `<span class="entry-date">${dateLabel(entry.occurred_at)}</span>` : ''}</div><button class="edit-button" data-edit="${entry.id}" aria-label="${entry.kind === 'bottle' ? 'Flasche' : 'Stillen'} vom ${escape(dateLabel(entry.occurred_at))} um ${timeLabel(entry.occurred_at)} bearbeiten">${icon('arrow')}</button></article>`;
+  return `<article class="entry ${compact ? 'compact' : ''}"><span class="entry-icon ${entry.kind}">${icon(entry.kind === 'bottle' ? 'bottle' : entry.kind === 'diaper' ? 'diaper' : 'heart')}</span><div class="entry-content"><div class="entry-heading"><strong>${kindLabel(entry.kind)}</strong><time datetime="${escape(entry.occurred_at)}">${timeLabel(entry.occurred_at)}</time></div><p>${escape(details(entry))}</p>${compact ? `<span class="entry-date">${dateLabel(entry.occurred_at)}</span>` : ''}</div><button class="edit-button" data-edit="${entry.id}" aria-label="${kindLabel(entry.kind)} vom ${escape(dateLabel(entry.occurred_at))} um ${timeLabel(entry.occurred_at)} bearbeiten">${icon('arrow')}</button></article>`;
 }
 function formView(): string {
   const bottle = draft.kind === 'bottle';
-  const timed = !bottle && Boolean(draft.breastStart);
-  return `<h1 class="${edit ? 'edit-heading' : 'sr-only'}">${edit ? 'Eintrag bearbeiten' : 'Fütterung erfassen'}</h1><div class="form-layout"><section class="card feeding-card"><form id="feeding-form" novalidate><fieldset ${busy || pending ? 'disabled' : ''}><legend class="sr-only">Fütterung erfassen</legend><div class="field-header"><label>Wie wurde gefüttert?</label></div><div class="kind-picker" role="group" aria-label="Fütterungsart"><button type="button" data-kind="bottle" ${draft.breastStart && !draft.breastEnd ? 'disabled' : ''} aria-pressed="${bottle}" class="kind-button ${bottle ? 'selected' : ''}">${icon('bottle')}<span>Flasche</span>${bottle ? icon('check') : ''}</button><button type="button" data-kind="breast" aria-pressed="${!bottle}" class="kind-button ${!bottle ? 'selected' : ''}">${icon('heart')}<span>Stillen</span>${!bottle ? icon('check') : ''}</button></div>
-      ${bottle ? `<div class="field-block"><label for="milk-type">Milchart</label><select id="milk-type"><option value="pre" ${draft.milkType === 'pre' ? 'selected' : ''}>Pre-Nahrung</option><option value="breast_milk" ${draft.milkType === 'breast_milk' ? 'selected' : ''}>Muttermilch</option>${draft.milkType === '' ? '<option value="" selected>Nicht angegeben</option>' : ''}</select></div><div class="field-block"><div class="field-header"><label for="amount">Wie viel?</label><span class="field-hint">In 5-ml-Schritten</span></div><div class="stepper amount-stepper"><button type="button" data-step="amount:-5" aria-label="Menge um 5 Milliliter verringern">−</button><div class="unit-input"><input id="amount" name="amount" type="number" inputmode="numeric" min="5" step="5" placeholder="—" value="${escape(draft.amount)}" required><span>ml</span></div><button type="button" data-step="amount:5" aria-label="Menge um 5 Milliliter erhöhen">+</button></div><p class="field-note">Die tatsächlich getrunkene Menge.</p></div>` : `<div class="field-block"><div class="field-header"><label>Welche Seite?</label><span class="field-hint">Optional</span></div><div class="segmented side-picker" role="group" aria-label="Stillseite">${[['', 'Offen'], ['left', 'Links'], ['right', 'Rechts'], ['both', 'Beide']].map(([value, label]) => `<button type="button" data-side="${value}" aria-pressed="${draft.side === value}" class="${draft.side === value ? 'active' : ''}">${label}</button>`).join('')}</div></div>`}
-      ${!bottle ? `<div class="timer-box"><div><span class="eyebrow">STILLZEIT FESTHALTEN</span><p>${draft.breastStart ? `Beginn ${timeLabel(draft.breastStart)}${draft.breastEnd ? ` · Ende ${timeLabel(draft.breastEnd)}` : ' · läuft'}` : 'Ein Klick zum Start. Einer zum Ende.'}</p></div>${!draft.breastStart ? `<button type="button" id="start-breast" class="secondary">Stillen starten</button>` : !draft.breastEnd ? `<button type="button" id="end-breast" class="primary">Stillen beenden</button>` : '<span class="timer-done">Zeiten erfasst</span>'}${draft.breastStart ? '<button type="button" id="clear-timer" class="text-button">Zeiten manuell angeben</button>' : ''}</div>` : ''}
-      <div class="field-block duration-block"><div class="field-header"><label for="duration">Wie lange?</label><span class="field-hint">${timed ? 'Aus Start und Ende' : 'Vorschlag · anpassbar'}</span></div><div class="stepper"><button type="button" data-step="duration:-1" aria-label="Dauer um eine Minute verringern" ${timed ? 'disabled' : ''}>−</button><div class="unit-input"><input id="duration" name="duration" type="number" inputmode="numeric" min="0" step="1" placeholder="—" value="${timed && !draft.breastEnd ? '' : escape(bottle ? draft.bottleDuration : draft.breastDuration)}" ${timed ? 'disabled' : ''}><span>Min.</span></div><button type="button" data-step="duration:1" aria-label="Dauer um eine Minute erhöhen" ${timed ? 'disabled' : ''}>+</button></div>${!timed ? '<p class="field-note">0 Minuten = Dauer nicht bekannt</p>' : ''}</div>
-      <div class="field-block time-block" ${timed ? 'hidden' : ''}><div class="field-header"><label>Wann war die Mahlzeit zu Ende?</label></div><div class="segmented" role="group" aria-label="Fütterungszeitpunkt"><button type="button" data-time="now" aria-pressed="${draft.timeMode === 'now'}" class="${draft.timeMode === 'now' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Gerade eben</button><button type="button" data-time="custom" aria-pressed="${draft.timeMode === 'custom'}" class="${draft.timeMode === 'custom' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Anderer Zeitpunkt</button></div>${draft.timeMode === 'custom' ? `<label class="sr-only" for="local-time">Datum und Uhrzeit</label><input id="local-time" ${timed ? 'disabled' : ''} type="datetime-local" step="60" value="${escape(draft.localTime)}" required>` : '<p class="field-note">Die aktuelle Uhrzeit wird beim Speichern eingetragen.</p>'}</div></fieldset>
+  const diaper = draft.kind === 'diaper';
+  const timed = draft.kind === 'breast' && Boolean(draft.breastStart);
+  return `<h1 class="${edit ? 'edit-heading' : 'sr-only'}">${edit ? 'Eintrag bearbeiten' : 'Eintrag erfassen'}</h1><div class="form-layout"><section class="card feeding-card"><form id="feeding-form" novalidate><fieldset ${busy || pending ? 'disabled' : ''}><legend class="sr-only">Eintrag erfassen</legend><div class="field-header"><label>Was möchtet ihr festhalten?</label></div><div class="kind-picker" role="group" aria-label="Eintragsart"><button type="button" data-kind="bottle" ${draft.breastStart && !draft.breastEnd ? 'disabled' : ''} aria-pressed="${bottle}" class="kind-button ${bottle ? 'selected' : ''}">${icon('bottle')}<span>Flasche</span>${bottle ? icon('check') : ''}</button><button type="button" data-kind="breast" aria-pressed="${draft.kind === 'breast'}" class="kind-button ${draft.kind === 'breast' ? 'selected' : ''}">${icon('heart')}<span>Stillen</span>${draft.kind === 'breast' ? icon('check') : ''}</button><button type="button" data-kind="diaper" ${draft.breastStart && !draft.breastEnd ? 'disabled' : ''} aria-pressed="${diaper}" class="kind-button ${diaper ? 'selected' : ''}">${icon('diaper')}<span>Wickeln</span></button></div>
+      ${diaper ? `<div class="field-block"><div class="field-header"><label>Was war in der Windel?</label></div><div class="diaper-toggles" role="group" aria-label="Windelinhalt"><button type="button" data-diaper="urine" aria-pressed="${draft.urine}" class="secondary ${draft.urine ? 'selected' : ''}">💧 Urin</button><button type="button" data-diaper="stool" aria-pressed="${draft.stool}" class="secondary ${draft.stool ? 'selected' : ''}">💩 Stuhl</button></div><p class="field-note">Beides möglich. Ohne Auswahl: Windel trocken.</p><button type="button" data-diaper="heldSuccess" aria-pressed="${draft.heldSuccess}" class="secondary held-toggle ${draft.heldSuccess ? 'selected' : ''}">${icon('check')} Abhalten erfolgreich</button></div>` : ''}
+      ${bottle ? `<div class="field-block"><label for="milk-type">Milchart</label><select id="milk-type"><option value="pre" ${draft.milkType === 'pre' ? 'selected' : ''}>Pre-Nahrung</option><option value="breast_milk" ${draft.milkType === 'breast_milk' ? 'selected' : ''}>Muttermilch</option>${draft.milkType === '' ? '<option value="" selected>Nicht angegeben</option>' : ''}</select></div><div class="field-block"><div class="field-header"><label for="amount">Wie viel?</label><span class="field-hint">In 5-ml-Schritten</span></div><div class="stepper amount-stepper"><button type="button" data-step="amount:-5" aria-label="Menge um 5 Milliliter verringern">−</button><div class="unit-input"><input id="amount" name="amount" type="number" inputmode="numeric" min="5" step="5" placeholder="—" value="${escape(draft.amount)}" required><span>ml</span></div><button type="button" data-step="amount:5" aria-label="Menge um 5 Milliliter erhöhen">+</button></div><p class="field-note">Die tatsächlich getrunkene Menge.</p></div>` : diaper ? '' : `<div class="field-block"><div class="field-header"><label>Welche Seite?</label><span class="field-hint">Optional</span></div><div class="segmented side-picker" role="group" aria-label="Stillseite">${[['', 'Offen'], ['left', 'Links'], ['right', 'Rechts'], ['both', 'Beide']].map(([value, label]) => `<button type="button" data-side="${value}" aria-pressed="${draft.side === value}" class="${draft.side === value ? 'active' : ''}">${label}</button>`).join('')}</div></div>`}
+      ${draft.kind === 'breast' ? `<div class="timer-box"><div><span class="eyebrow">STILLZEIT FESTHALTEN</span><p>${draft.breastStart ? `Beginn ${timeLabel(draft.breastStart)}${draft.breastEnd ? ` · Ende ${timeLabel(draft.breastEnd)}` : ' · läuft'}` : 'Ein Klick zum Start. Einer zum Ende.'}</p></div>${!draft.breastStart ? `<button type="button" id="start-breast" class="secondary">Stillen starten</button>` : !draft.breastEnd ? `<button type="button" id="end-breast" class="primary">Stillen beenden</button>` : '<span class="timer-done">Zeiten erfasst</span>'}${draft.breastStart ? '<button type="button" id="clear-timer" class="text-button">Zeiten manuell angeben</button>' : ''}</div>` : ''}
+      <div class="field-block duration-block" ${diaper ? 'hidden' : ''}><div class="field-header"><label for="duration">Wie lange?</label><span class="field-hint">${timed ? 'Aus Start und Ende' : 'Vorschlag · anpassbar'}</span></div><div class="stepper"><button type="button" data-step="duration:-1" aria-label="Dauer um eine Minute verringern" ${timed ? 'disabled' : ''}>−</button><div class="unit-input"><input id="duration" name="duration" type="number" inputmode="numeric" min="0" step="1" placeholder="—" value="${timed && !draft.breastEnd ? '' : escape(bottle ? draft.bottleDuration : draft.breastDuration)}" ${timed ? 'disabled' : ''}><span>Min.</span></div><button type="button" data-step="duration:1" aria-label="Dauer um eine Minute erhöhen" ${timed ? 'disabled' : ''}>+</button></div>${!timed ? '<p class="field-note">0 Minuten = Dauer nicht bekannt</p>' : ''}</div>
+      <div class="field-block time-block" ${timed ? 'hidden' : ''}><div class="field-header"><label>${diaper ? 'Wann wurde gewickelt?' : 'Wann war die Mahlzeit zu Ende?'}</label></div><div class="segmented" role="group" aria-label="Zeitpunkt"><button type="button" data-time="now" aria-pressed="${draft.timeMode === 'now'}" class="${draft.timeMode === 'now' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Gerade eben</button><button type="button" data-time="custom" aria-pressed="${draft.timeMode === 'custom'}" class="${draft.timeMode === 'custom' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Anderer Zeitpunkt</button></div>${draft.timeMode === 'custom' ? `<label class="sr-only" for="local-time">Datum und Uhrzeit</label><input id="local-time" ${timed ? 'disabled' : ''} type="datetime-local" step="60" value="${escape(draft.localTime)}" required>` : '<p class="field-note">Die aktuelle Uhrzeit wird beim Speichern eingetragen.</p>'}</div></fieldset>
       ${pending ? '<p class="pending-note">Die Bestätigung fehlt noch. „Erneut speichern“ prüft dieselbe Übermittlung, ohne einen zweiten Eintrag anzulegen.</p>' : ''}
-      <button class="primary full save-button" type="submit" ${busy || (timed && !draft.breastEnd) ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : pending ? 'Erneut speichern' : edit ? 'Änderungen speichern' : 'Eintrag speichern'} ${icon('check')}</button>
+      <button class="primary full save-button" type="submit" ${busy || (timed && !draft.breastEnd) ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : pending ? 'Erneut speichern' : edit ? 'Änderungen speichern' : 'io triumphe'} ${icon('check')}</button>
       ${edit ? `<div class="edit-actions"><button type="button" id="cancel-edit" class="text-button" ${busy ? 'disabled' : ''}>Abbrechen</button><button type="button" id="delete-entry" class="text-button danger" ${busy ? 'disabled' : ''}>Eintrag löschen</button></div>` : ''}
-      </form></section><aside class="aside"><section class="last-entry"><div class="section-title"><h2>Zuletzt gefüttert</h2><span class="small-dot"></span></div>${latest ? entryCard(latest, true) : `<div class="empty-mini">${icon('book')}<p>${loading ? 'Logbuch wird geladen …' : 'Hier erscheint eure letzte Mahlzeit.'}</p></div>`}<button id="see-history" class="history-link">Zum Logbuch ${icon('arrow')}</button></section></aside></div>`;
+      </form></section><aside class="aside"><section class="last-entry"><div class="section-title"><h2>Letzter Eintrag</h2><span class="small-dot"></span></div>${latest ? entryCard(latest, true) : `<div class="empty-mini">${icon('book')}<p>${loading ? 'Logbuch wird geladen …' : 'Hier erscheint euer letzter Eintrag.'}</p></div>`}<button id="see-history" class="history-link">Zum Logbuch ${icon('arrow')}</button></section></aside></div>`;
 }
 function historyView(): string {
   let previous = '';
@@ -113,7 +117,7 @@ function historyView(): string {
     previous = day;
     return heading + entryCard(entry);
   }).join('');
-  return `<div class="page-heading"><h1>Logbuch</h1><button id="export" class="secondary" ${busy ? 'disabled' : ''}>${icon('download')}<span>CSV exportieren</span></button></div><section class="history-list">${list || `<div class="card empty-history">${icon('book')}<h2>${loading ? 'Einen Moment …' : 'Euer Logbuch wartet auf euch.'}</h2><p>${loading ? 'Wir laden eure Einträge.' : 'Die erste Mahlzeit erscheint hier, sobald ihr sie gespeichert habt.'}</p><button id="first-entry" class="secondary">Neuen Eintrag erstellen</button></div>`}${hasMore ? `<button class="secondary load-more" id="load-more" ${loading ? 'disabled' : ''}>${loading ? 'Wird geladen …' : 'Weitere Einträge laden'}</button>` : ''}</section>`;
+  return `<div class="page-heading"><h1>Logbuch</h1><button id="export" class="secondary" ${busy ? 'disabled' : ''}>${icon('download')}<span>CSV exportieren</span></button></div><section class="history-list">${list || `<div class="card empty-history">${icon('book')}<h2>${loading ? 'Einen Moment …' : 'Euer Logbuch wartet auf euch.'}</h2><p>${loading ? 'Wir laden eure Einträge.' : 'Der erste Eintrag erscheint hier, sobald ihr ihn gespeichert habt.'}</p><button id="first-entry" class="secondary">Neuen Eintrag erstellen</button></div>`}${hasMore ? `<button class="secondary load-more" id="load-more" ${loading ? 'disabled' : ''}>${loading ? 'Wird geladen …' : 'Weitere Einträge laden'}</button>` : ''}</section>`;
 }
 function aboutView(): string {
   return `<section class="card about-card"><h1>Über Phililog</h1><p>Ein kleines gemeinsames Logbuch für den Alltag mit Philine. Mahlzeiten schnell festhalten, gemeinsam den Überblick behalten und mehr Zeit füreinander haben.</p><p>Von Christian und Julia für Philine vibe-gecodet – mit Liebe in Göttingen entstanden.</p><p>Die Aquarellfarben erinnern an ihre Geburtskarte: ein bisschen Blau, Türkis und Violett begleitet euch durch den Alltag.</p><button class="secondary" data-view="new">Zurück zur Eingabe</button></section>`;
@@ -155,6 +159,10 @@ function bindLogout() {
 function bindForm() {
   const form = document.querySelector<HTMLFormElement>('#feeding-form');
   if (!form) return;
+  document.querySelectorAll<HTMLButtonElement>('[data-diaper]').forEach(button => button.addEventListener('click', () => {
+    const field = button.dataset.diaper as 'urine' | 'stool' | 'heldSuccess';
+    captureForm(); draft[field] = !draft[field]; remember(); render();
+  }));
   document.querySelector('#start-breast')?.addEventListener('click', () => {
     captureForm(); draft.breastStart = new Date().toISOString(); draft.breastEnd = null;
     draft.breastUnknown = false; remember(); render();
@@ -206,6 +214,21 @@ function captureForm() {
   }
   if (input('local-time')) draft.localTime = input('local-time')!.value;
 }
+function celebrate() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const shower = document.createElement('div');
+  shower.className = 'watercolor-celebration'; shower.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < 24; i++) {
+    const dot = document.createElement('i');
+    dot.style.setProperty('--x', `${Math.random() * 100}%`);
+    dot.style.setProperty('--delay', `${Math.random() * 180}ms`);
+    dot.style.setProperty('--drift', `${Math.random() * 100 - 50}px`);
+    dot.style.background = ['#83ced9', '#85b6df', '#b1a4d6'][i % 3];
+    shower.append(dot);
+  }
+  document.body.append(shower);
+  setTimeout(() => shower.remove(), 1600);
+}
 async function save() {
   if (busy || !userId) return;
   captureForm();
@@ -218,7 +241,7 @@ async function save() {
     if (edit) await updateFeeding(edit, input);
     else await createFeeding(pending!, userId);
     if (ownEpoch !== epoch) return;
-    notice = edit ? 'Änderungen gespeichert.' : 'Mahlzeit gespeichert. Alles festgehalten.';
+    notice = edit ? 'Änderungen gespeichert.' : 'Io triumphe! Eintrag festgehalten.';
     edit = null; pending = null; draft = newDraft(); remember();
   } catch (e) {
     if (ownEpoch !== epoch) return;
@@ -226,10 +249,10 @@ async function save() {
     // Definitive validation/permission rejections did not commit; allow correction.
     if (['23514', '42501', 'PGRST205'].includes((e as { code?: string })?.code ?? '')) { pending = null; remember(); }
   } finally { if (ownEpoch === epoch) { busy = false; render(); } }
-  if (ownEpoch === epoch && !error) await refresh();
+  if (ownEpoch === epoch && !error) { celebrate(); await refresh(); }
 }
 async function remove() {
-  if (busy || !edit || !await confirmAction('Diese Mahlzeit wirklich löschen? Das lässt sich nicht rückgängig machen.')) return;
+  if (busy || !edit || !await confirmAction('Diesen Eintrag wirklich löschen? Das lässt sich nicht rückgängig machen.')) return;
   busy = true; error = ''; render();
   try {
     await deleteFeeding(edit);
