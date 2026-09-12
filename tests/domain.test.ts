@@ -113,3 +113,15 @@ test('Zeitanzeige zählt Stunden, Minuten und Sekunden aus Zeitstempeln', () => 
   assert.equal(elapsedLabel(start, at(5), true), '0 Min. 05 Sek.');
   assert.equal(elapsedLabel(start, at(-1)), 'Zeitpunkt liegt in der Zukunft');
 });
+
+test('Wiegen erfasst nur positives Grammgewicht und Zeitpunkt, inklusive Bearbeitung und CSV', () => {
+  for (const weight of ['', '0', '-5', '3.5', '1e3']) assert.throws(() => feedingInput({ ...newDraft(), kind: 'weight', weight }, now));
+  const input = feedingInput({ ...newDraft(), kind: 'weight', weight: '3500', amount: '60', urine: true, heldSuccess: true, side: 'left' }, now);
+  assert.equal(input.weight_g, 3500);
+  for (const field of ['duration_minutes','amount_ml','side','urine','stool','held_success','milk_type','started_at'] as const) assert.equal(input[field], null);
+  const entry = { ...input, id: 'id', created_by: 'user', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
+  assert.deepEqual(feedingInput(draftFromFeeding(entry), now), input);
+  assert.match(toCsv([entry]), /Gewicht \(g\)/); assert.match(toCsv([entry]), /3500/);
+  assert.equal(sameInput(input, { ...input, weight_g: 3550 }), false);
+  assert.equal(feedingInput({ ...newDraft(), weight: '3500' }, now).weight_g, null);
+});

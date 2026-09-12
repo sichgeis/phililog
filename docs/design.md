@@ -33,4 +33,12 @@ Alle drei Farbrichtungen wurden im Browser gerendert und visuell geprüft. Die V
 
 ## Neue Icon-Vorschläge
 
-[Fünf Aquarell-Entwürfe](icon-proposals/index.html): Herz, io-Monogramm (Empfehlung), Tropfen, Geborgenheit und Blüte. Alle als eigene SVG-Dateien mit Papierweiß und transparenten Blau-/Türkis-/Violettflächen. Die Galerie zeigt zusätzlich Größen von 64 und 32 Pixeln. Noch kein Entwurf ist als App-Icon übernommen.
+[Fünf Aquarell-Entwürfe](icon-proposals/index.html): Herz, io-Monogramm (Empfehlung), Tropfen, Geborgenheit und Blüte. Alle als eigene SVG-Dateien mit Papierweiß und transparenten Blau-/Türkis-/Violettflächen. Die Galerie zeigt zusätzlich Größen von 64 und 32 Pixeln. Die spätere Auswahl ist unten dokumentiert.
+
+## Icon-Iteration: IO und Blütenfarben
+
+Auf Wunsch kombiniert [Entwurf 6](icon-proposals/io-bluete.html) das Monogramm mit großem I mit den fünf überlappenden Farbschichten der Blüte. Breitere transparente Blätter schaffen eine ruhige Mitte für die weißen, als Vektorpfade gezeichneten Buchstaben IO. Diese Blüteniteration bleibt ein ungewählter Entwurf.
+
+## Gewähltes App-Icon
+
+Ausdrücklich ausgewählt wurde der ursprüngliche große Aquarell-Klecks aus Entwurf 2: ein Farbverlauf mit weißem **Io**, großem I und kleinem o. `public/icon.svg` ist die Vektorquelle; daraus wurden die PNGs für PWA und Apple gerendert und visuell geprüft. Neue Icon-Dateinamen helfen bei der Aktualisierung bestehender Browser-Caches.
