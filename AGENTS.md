@@ -18,7 +18,7 @@
 
 - Arbeite in zusammenhängenden Schritten: umsetzen, angemessen prüfen, Fortschritt und Nachweise aktualisieren, fortsetzen.
 - Leite Tests aus Akzeptanzkriterien und relevanten Fehlerfällen ab. Behaupte keine erfolgreichen Prüfungen, die nicht ausgeführt wurden.
-- Es gibt aktuell weder Build- noch Testbefehle. Ergänze tatsächlich funktionierende Befehle im README, sobald Anwendungscode hinzukommt.
+- Prüfe Änderungen mit `npm run check`. Bei Änderungen an Datenbank oder Zugriffsschutz zusätzlich `node scripts/test-local-supabase.mjs` gegen die lokale Supabase-Instanz ausführen; Einrichtung siehe `docs/setup.md`. Keine Tests gegen echte Familiendaten.
 - Verwende für Beispiele und Tests ausschließlich erfundene Daten; keine echten Baby- oder Familiendaten im Repository.
 - Bleibe für kleine sequenzielle Arbeiten auf dem aktuellen Branch. Nutze Isolation bei konkretem Bedarf; neue Branches heißen standardmäßig `codex/<thema>`.
 - Erstelle Commits, Pushes und Veröffentlichungen nur im Rahmen der jeweiligen Nutzerautorisierung.

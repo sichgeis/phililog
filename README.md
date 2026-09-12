@@ -4,7 +4,7 @@ Ein geplantes Logbuch für den Alltag mit einem neugeborenen Baby. Es soll spät
 
 ## Projektstatus
 
-Das Repository enthält zunächst nur die Grundlage für **Spec Driven Development**. Die Architektur ist abgestimmt; es gibt noch keine Anwendung. Als Nächstes folgt die fachliche Beschreibung. Die genannten Anwendungsfälle sind eine erste Orientierung, keine ausgearbeitete oder zur Umsetzung freigegebene Produktspezifikation.
+Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält Fütterungseingabe, Stillstart/-ende, Historie, Korrekturen, Löschen und CSV-Export. Die produktive Supabase-Einrichtung und Veröffentlichung stehen noch aus. [MVP-Spezifikation](specs/001-fuettern/spec.md).
 
 ## Entwicklung
 
@@ -15,14 +15,40 @@ Wir beschreiben das gewünschte Verhalten vor der Implementierung und leiten dar
 - [Vorlage für einen technischen Plan](specs/templates/plan.md)
 - [Vorlage für Aufgaben und Prüfnachweise](specs/templates/tasks.md)
 - [Regeln für Coding-Agenten](AGENTS.md)
+- [Gestaltungsvorschläge zur Geburtskarte](docs/design.md)
 
 ## Einrichtung und lokaler Start
 
-Noch offen. Voraussetzungen und Startbefehle werden ergänzt, sobald die technische Grundlage feststeht. Aktuell ist keine Installation nötig.
+Voraussetzung: Node.js ab 22.12.
+
+```sh
+npm ci
+cp .env.example .env.local
+# Öffentliche Supabase-Projekt-URL und Publishable-/Anon-Key in .env.local einsetzen.
+npm run dev
+```
+
+Die App läuft unter `http://127.0.0.1:5173`. Ohne Supabase-Konfiguration zeigt sie eine Einrichtungsseite. [Vollständige Einrichtung, lokale Testdatenbank und Deployment](docs/setup.md).
+
+```sh
+npm run build
+npm run preview
+```
 
 ## Tests
 
-Noch keine Anwendungstests vorhanden. Testbefehle werden mit der ersten Implementierung ergänzt; die Prüfkriterien werden zuvor in deren Spezifikation beschrieben.
+```sh
+npm run check
+```
+
+Dies führt die Fachlogiktests sowie TypeScript-Prüfung und Produktionsbuild aus. Die tatsächlichen Supabase-Zugriffsregeln werden zusätzlich gegen eine lokale Docker-Instanz geprüft:
+
+```sh
+npx supabase@2.117.0 start
+node scripts/test-local-supabase.mjs
+```
+
+Die Einrichtung und Testkonten sind in der [Anleitung](docs/setup.md) beschrieben. Produktive Anmeldung und PWA-Installation auf euren echten Smartphones bleiben separate Abnahmeprüfungen.
 
 ## Architektur und Datenhaltung
 
@@ -37,13 +63,13 @@ Am 12. September 2026 vom Auftraggeber bestätigt:
 - **Budget: 0 €:** ausschließlich kostenlose Tarife und Funktionen, keine kostenpflichtigen Upgrades oder Zusatzdienste.
 - **Datensparsamkeit:** nur für das Logbuch nötige Daten erfassen, keine Werbe- oder Analyse-Tracker.
 
-Frontend-Framework, Datenmodell, genaue Anmeldemethode und fachlicher Umfang bleiben offen. Offline-Erfassung und Synchronisationsverhalten sind noch nicht festgelegt; eine PWA allein garantiert diese Funktionen nicht.
+Die Umsetzung verwendet Vite, TypeScript, CSS und Supabase Auth mit E-Mail/Passwort. Stillen ist die Startauswahl. Beginn und Ende lassen sich per Klick erfassen; alternativ sind Nachträge möglich. Ungespeicherte Entwürfe bleiben auf dem eigenen Gerät erhalten. Eine laufende Stillzeit wird erst beim Speichern mit dem anderen Gerät geteilt. Vollständige Offline-Synchronisation ist nicht Teil des MVP.
 
 Der kostenlose Supabase-Tarif bietet zum Zeitpunkt der Entscheidung 500 MB Datenbankplatz, kann bei geringer Aktivität pausiert werden und enthält keine automatischen Backups. Export und Datensicherung sind deshalb bei der fachlichen Beschreibung zu klären. Tarifbedingungen vor der Einrichtung erneut prüfen: [Supabase-Preise](https://supabase.com/pricing).
 
 ## Veröffentlichung
 
-GitHub Pages ist als Ziel gewählt. GitHub-Veröffentlichung und Supabase-Projekt sind noch nicht eingerichtet.
+Der Dokumentationsstand liegt im privaten [GitHub-Repository](https://github.com/sichgeis/phililog). GitHub Pages ist als Ziel gewählt; Pages-Veröffentlichung und Supabase-Projekt sind noch nicht eingerichtet.
 
 ## Lizenz
 
