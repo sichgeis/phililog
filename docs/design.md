@@ -42,3 +42,11 @@ Auf Wunsch kombiniert [Entwurf 6](icon-proposals/io-bluete.html) das Monogramm m
 ## Gewähltes App-Icon
 
 Ausdrücklich ausgewählt wurde der ursprüngliche große Aquarell-Klecks aus Entwurf 2: ein Farbverlauf mit weißem **Io**, großem I und kleinem o. `public/icon.svg` ist die Vektorquelle; daraus wurden die PNGs für PWA und Apple gerendert und visuell geprüft. Neue Icon-Dateinamen helfen bei der Aktualisierung bestehender Browser-Caches.
+
+## Schriftvarianten auf dem Aquarell-Klecks
+
+Erneuter Gestaltungsauftrag: drei Varianten mit serifenlosem I im Io-/IO-Schriftzug sowie je fünf Phi- und P-Varianten. Die [Vergleichsgalerie](icon-proposals/lettering/index.html) zeigt den identischen bestehenden Klecks mit weißen oder indigofarbenen Vektorzeichen in großen und kleinen Größen. Alle Zeichen sind als Pfade angelegt, ohne externe Schriftdateien. Die Auswahl ist offen; dies sind Entwürfe, keine Änderung des produktiven Icons.
+
+## Finale Auswahl: Φ 1 · Klar
+
+Das erste Phi der zweiten Galeriezeile wurde zur direkten Veröffentlichung ausgewählt. Weißes großes Phi mit rundem Abschluss auf dem bisherigen Aquarell-Klecks, unverändert aus `lettering/phi-1.svg` übernommen. Browser-, PWA- und Apple-Icons erhalten neue Phi-Dateinamen zur Cache-Aktualisierung.

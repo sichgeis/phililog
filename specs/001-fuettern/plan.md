@@ -48,3 +48,7 @@ Separate limitierte Supabase-Abfrage mit Filter `kind in (bottle, breast)` liefe
 ## Wiegen und gewähltes Icon
 
 Nullable Integer-Spalte `weight_g` und Typ `weight` in bestehender Tabelle; typabhängige Constraints und Spaltenrechte ergänzen. Seltene Arten in einem nativen Details-Element. Gemeinsame CRUD-/CSV-Pfade verwenden. Gewähltes SVG ist die Quelle für PNG-Rasterungen; neue Icon-URLs vermeiden alte Browser-Caches.
+
+## Phi-Icon
+
+Ausgewählte Vektorvorlage unverändert übernehmen und mit Browser-Harness in 192, 512 und 180 Pixeln rendern. Neue Phi-Dateinamen für Favicon, Manifest und Apple-Verweis verwenden; generische Altdateien aktualisieren.
