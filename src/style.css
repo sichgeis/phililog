@@ -19,3 +19,12 @@
 .timer-box{background:radial-gradient(ellipse at 100% 0,#83ced930,transparent 65%),#eff0f9}
 .art-orbit{background:radial-gradient(ellipse at 25% 25%,#83ced96b,transparent 75%),radial-gradient(ellipse at 75% 70%,#b1a4d670,transparent 80%),#e7eff8;border-radius:48% 52% 57% 43% / 43% 58% 42% 57%}
 @media(max-width:700px){.page-heading:before{width:75%;right:-6px;top:-20px;height:140px}.welcome:before{right:-16px}}
+
+/* Functional space first; watercolor remains behind the entire page. */
+body{background:radial-gradient(ellipse at 8% 12%,#83ced92b,transparent 42%),radial-gradient(ellipse at 92% 35%,#b1a4d630,transparent 46%),radial-gradient(ellipse at 20% 90%,#85b6df2b,transparent 46%),#faf9f6;background-attachment:fixed}
+.app-main{padding-top:16px;padding-bottom:8px}.main-nav{margin-bottom:16px}
+.feeding-card{padding:20px}.form-layout{gap:24px}.field-header{margin-bottom:8px}.field-block{margin-top:16px}.kind-button{min-height:48px;padding:10px 12px}.stepper,.amount-stepper{min-height:54px}.stepper button{width:44px;height:44px}.amount-stepper .unit-input input{font-size:28px}.segmented button{min-height:44px;padding:8px 6px}.checkbox{min-height:44px;margin-top:0}.time-block{padding-top:14px;margin-top:8px}.save-button{margin-top:16px;min-height:48px}.field-note{margin-top:6px}
+.timer-box{margin-top:14px;padding:10px 12px;gap:8px}.timer-box>div{flex:1 1 120px}.timer-box .eyebrow{display:none}.timer-box .text-button{min-height:44px;padding:8px}.timer-box p{font-size:11px}
+.app-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 16px;padding:12px 16px 20px}.app-footer .text-button{font-size:12px;min-height:44px;margin:0}.app-footer>span{font-size:12px}
+.app-main .page-heading{margin-bottom:16px}.app-main .page-heading:before{display:none}.app-main .page-heading h1,.edit-heading{font-size:26px}.edit-heading{margin-bottom:16px}.about-card{max-width:640px;padding:24px}.about-card h1{font-size:30px}.about-card p{font-size:15px;line-height:1.7}.about-card .secondary{margin-top:20px}
+@media(max-width:700px){.app-main{padding:12px 12px 8px}.main-nav{margin-bottom:12px}.feeding-card{padding:16px;border-radius:16px}.form-layout{gap:18px}.field-block{margin-top:14px}.time-block{margin-top:6px;padding-top:12px}.main-nav button{padding:8px}.app-main .page-heading:has(#export){flex-direction:row;align-items:center;gap:8px}.about-card{padding:20px}}

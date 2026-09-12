@@ -4,7 +4,7 @@ Ein geplantes Logbuch für den Alltag mit einem neugeborenen Baby. Es soll spät
 
 ## Projektstatus
 
-Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält Fütterungseingabe, Stillstart/-ende, Historie, Korrekturen, Löschen und CSV-Export. Die App ist auf [GitHub Pages](https://sichgeis.github.io/phililog/) veröffentlicht und mit dem Supabase-Free-Projekt Philine-Log in Europa verbunden. Beide Elternkonten und der gemeinsame Datenzugriff wurden produktiv geprüft. [MVP-Spezifikation](specs/001-fuettern/spec.md).
+Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält kompakte Fütterungseingabe, Stillstart/-ende, Historie, Korrekturen, Löschen, CSV-Export und eine Projektinfo. Die App ist auf [GitHub Pages](https://sichgeis.github.io/phililog/) veröffentlicht und mit dem Supabase-Free-Projekt Philine-Log in Europa verbunden. Beide Elternkonten und der gemeinsame Datenzugriff wurden produktiv geprüft. [MVP-Spezifikation](specs/001-fuettern/spec.md).
 
 ## Entwicklung
 

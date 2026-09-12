@@ -49,3 +49,9 @@ Nicht behauptet: tatsächliche iOS-/Android-Installation, Ende-zu-Ende-Verschlü
 ## Namenskorrektur vom 12. September 2026
 
 Auf ausdrücklichen Wunsch Schreibweise **Philine** in Dokumentation, Supabase-Anzeigenamen und lokaler Zugangsdaten-Datei korrigiert. App und Repository heißen weiterhin Phililog. `npm run check`: zwölf Tests und Produktionsbuild erfolgreich. Der zuvor erstellte E-Mail-Entwurf ist nicht mehr im Posteo-Entwurfsordner vorhanden und konnte nicht nachträglich geändert werden.
+
+## Kompakte Oberfläche – 12. September 2026
+
+- Nutzer meldet erfolgreichen ersten Smartphone-Smoke-Test. Daraufhin REQ-018 bis REQ-020 umgesetzt: Kopfbereich und dekorative Eingabeüberschrift entfernt, Abmelden im Footer, Projektinfo mit Philine und Göttingen, kompaktere Abstände und seitenweiter Aquarellhintergrund.
+- `npm run check`: zwölf Tests, TypeScript und Build erfolgreich. Keine Datenbank- oder Berechtigungsänderung.
+- Browser-Harness mit echter lokaler Supabase, synthetischem Konto und vorhandenen synthetischen Testeinträgen: bei 390 × 844 px endet der Speichern-Knopf auf Höhe 672 px; visuell geprüft. Bei 320 px nach Neuladen kein horizontaler Überlauf. Projektinfo-Text geprüft; laufende Stillzeit bleibt bei Wechsel zur Projektinfo und zurück sowie Neuladen erhalten. Start und Ende bedienbar. Keine Produktionseinträge verändert.
