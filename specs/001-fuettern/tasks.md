@@ -77,3 +77,11 @@ Beide additive Migrationen 002 und 003 in einer Transaktion im produktiven Supab
 - Browser-Harness mit synthetischem Konto und lokaler Supabase: Weitere Ereignisse öffnen, Wiegen wählen, 3.500 g speichern und in der Historie anzeigen erfolgreich. 390 px ohne horizontalen Überlauf und visuell geprüft; Screenshot `/private/tmp/phililog-weight.png`.
 - Migration 004 in einer Transaktion im produktiven Supabase-SQL-Editor erfolgreich ausgeführt („Success. No rows returned“). Keine Produktionseinträge verändert.
 - Gewählter großer Aquarell-Klecks mit weißem **Io** als SVG, PWA-PNGs und Apple-Icon übernommen und visuell geprüft. Tatsächliche Aktualisierung bereits installierter Smartphone-Icons bleibt geräteabhängig.
+
+## Weitere Icon-Schriftvarianten – 12. September 2026
+
+13 Entwürfe unter `docs/icon-proposals/lettering/index.html`: drei serifenlose Io-/IO-, fünf Phi- und fünf P-Zeichen auf identischem Aquarell-Klecks. Große Ansicht und 48-/32-px-Vergleich; SVG-Dateien einzeln herunterladbar. Vektoren XML-geprüft, alle 39 Vorschaubilder im Browser erfolgreich geladen, Desktopansicht visuell geprüft und bei 390 px kein horizontaler Überlauf. Übersicht: `docs/icon-proposals/lettering/overview.png`. `npm run check`: 16 Tests und Build erfolgreich. Keine Produkt- oder Datenbankänderung; Auswahl der Variante ist offen.
+
+## Φ 1 als App-Icon – 12. September 2026
+
+Ausgewählte Variante unverändert implementiert. SVG sowie PNGs für Browser/PWA/Apple aktualisiert, mit neuen Phi-URLs. 512-px-Rasterung visuell geprüft; PNG-Maße 192/512/180 px und Manifest-Zieldateien im Build geprüft. `npm run check`: 16 Tests, TypeScript und Build erfolgreich. Veröffentlichung beauftragt. Keine Änderung an Fachlogik oder Datenbank.

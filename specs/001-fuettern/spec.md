@@ -92,3 +92,7 @@ Abnahme: gemischte Historie und CSV, Wickeln bearbeiten, alle Toggle-Kombination
 Unter einem dezenten aufklappbaren Bereich „Weitere Ereignisse“ liegt Wiegen. Die drei häufigen Arten bleiben unverändert prominent. Gewicht ist eine positive ganze Grammzahl ohne Vorbelegung; Zeitpunkt jetzt beim Speichern oder manuell wie bei anderen Ereignissen. Wiegen erscheint in der gemeinsamen Historie, kann korrigiert/gelöscht werden und wird in CSV exportiert. Keine Dauer, Milchart, Fütterungsmenge oder Wickelangaben für Wiegen. Gewichte beeinflussen die letzte Mahlzeit nicht. Entwurfserhalt, RLS und Versionsschutz gelten unverändert.
 
 Icon-Auswahl: ursprünglicher großer Aquarell-Klecks aus Entwurf 2 mit großem I und kleinem o. Als SVG, PWA- und Apple-Icon übernehmen; Blüteniteration bleibt nur ein Entwurf.
+
+## Finale Icon-Auswahl – 12. September 2026
+
+Ausdrücklich zur Umsetzung und Veröffentlichung ausgewählt: **Φ 1 · Klar**, erstes Icon der zweiten Zeile der Schriftgalerie. Dieses große weiße Phi ersetzt das Io auf dem unveränderten Aquarell-Klecks als Browser-, PWA- und Apple-Icon.
