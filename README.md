@@ -4,7 +4,7 @@ Ein geplantes Logbuch für den Alltag mit einem neugeborenen Baby. Es soll spät
 
 ## Projektstatus
 
-Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält Fütterungseingabe, Stillstart/-ende, Historie, Korrekturen, Löschen und CSV-Export. Die produktive Supabase-Einrichtung und Veröffentlichung stehen noch aus. [MVP-Spezifikation](specs/001-fuettern/spec.md).
+Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält Fütterungseingabe, Stillstart/-ende, Historie, Korrekturen, Löschen und CSV-Export. Die App ist auf [GitHub Pages](https://sichgeis.github.io/phililog/) veröffentlicht und mit dem Supabase-Free-Projekt Filine-Log in Europa verbunden. Beide Elternkonten und der gemeinsame Datenzugriff wurden produktiv geprüft. [MVP-Spezifikation](specs/001-fuettern/spec.md).
 
 ## Entwicklung
 
@@ -69,7 +69,7 @@ Der kostenlose Supabase-Tarif bietet zum Zeitpunkt der Entscheidung 500 MB Daten
 
 ## Veröffentlichung
 
-Die erste App-Version liegt im öffentlichen [GitHub-Repository](https://github.com/sichgeis/phililog). GitHub Pages ist mit GitHub Actions als Quelle aktiviert. Das erste Deployment wartet auf die produktive Supabase-Konfiguration.
+Die erste App-Version liegt im öffentlichen [GitHub-Repository](https://github.com/sichgeis/phililog). GitHub Pages ist mit GitHub Actions als Quelle aktiviert. Das [erste Deployment](https://github.com/sichgeis/phililog/actions/runs/34689824057) war erfolgreich. [App öffnen](https://sichgeis.github.io/phililog/).
 
 ## Lizenz
 

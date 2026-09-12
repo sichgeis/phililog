@@ -5,9 +5,9 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 ## Aktueller Stand
 
 - Fortschritt: Erste Version implementiert und lokal mit echter Supabase-Instanz geprüft. Fachliche Antworten übernommen: Stillen als Startauswahl, 15/30 Minuten, unbekannte Dauer, Stillbeginn/-ende per Klick.
-- Offen: Produktives Supabase-Free-Projekt mit zwei Konten, erstes Pages-Deployment und Abnahme auf den echten Smartphones. Keine offenen fachlichen Blocker für den lokalen MVP.
-- Veröffentlichung: Quellcode gepusht; Repository auf ausdrücklichen Nutzerwunsch öffentlich und GitHub Pages aktiviert. Der Workflow wartet auf die produktiven Supabase-Variablen.
-- Nächster Schritt: Supabase-Free-Projekt anhand von `docs/setup.md` einrichten.
+- Offen: Abnahme auf den echten Smartphones. Supabase Free und Pages sind produktiv eingerichtet. Keine offenen fachlichen Blocker für den lokalen MVP.
+- Veröffentlichung: Quellcode gepusht; Repository auf ausdrücklichen Nutzerwunsch öffentlich und GitHub Pages aktiviert. Workflow 34689824057 erfolgreich; App unter https://sichgeis.github.io/phililog/.
+- Nächster Schritt: App mit beiden Eltern auf den echten Smartphones öffnen, zum Home-Bildschirm hinzufügen und gemeinsam abnehmen.
 
 ## Aufgaben
 
@@ -35,4 +35,13 @@ Die Browserprüfungen verwenden ausschließlich synthetische Konten und echte lo
 
 Lokale Screenshot-Artefakte: `/private/tmp/phililog-screenshots/eingabe.png`, `/private/tmp/phililog-screenshots/historie.png`, `/private/tmp/phililog-screenshots/desktop.png`.
 
-Nicht behauptet: produktive Supabase-Prüfung, tatsächliche iOS-/Android-Installation, Ende-zu-Ende-Verschlüsselung oder vollständige Offline-Synchronisation. Die laufende Stillmessung ist bis zum Speichern nur auf dem eigenen Gerät vorhanden. Feature bleibt bis zur Einrichtung und Abnahme in Umsetzung.
+Nicht behauptet: tatsächliche iOS-/Android-Installation, Ende-zu-Ende-Verschlüsselung oder vollständige Offline-Synchronisation. Die laufende Stillmessung ist bis zum Speichern nur auf dem eigenen Gerät vorhanden. Feature bleibt bis zur Smartphone-Abnahme in Umsetzung.
+
+## Produktive Einrichtung vom 12. September 2026
+
+- Eigene Organisation Filine-Log im Free-Tarif, Projekt `aiyjwwbdfjtflehtvedt`, Region Europa. Bestehende Organisation Masch-Tech musste nicht gelöscht werden.
+- Migration erfolgreich ausgeführt; genau Julia und Christian in der privaten Mitgliedschaftstabelle. Anmeldung und Mitgliedschaft mit beiden Konten geprüft; anonymer Datenzugriff abgewiesen.
+- Ein synthetischer Produktionseintrag: Erstellen, gemeinsames Lesen, Korrektur, Versionskonflikt und Löschen erfolgreich. Testeintrag vollständig entfernt. Keine echten Familiendaten für Tests verwendet.
+- Öffentliche Registrierung und anonyme Anmeldung im Dashboard nach erneutem Laden nachweislich ausgeschaltet. Site URL auf die Pages-Adresse gesetzt. Nur Publishable-Key und Projekt-URL in GitHub-Variablen.
+- GitHub-Workflow: zwölf Tests, Build und Deployment erfolgreich. Produktive Browser-Anmeldung und Sitzungserhalt nach Neuladen geprüft. Aquarell-Layout bei 390 px visuell geprüft, kein horizontaler Überlauf.
+- Persönliche Zugangsdaten liegen nur in einer ignorierten lokalen Datei mit Dateirechten 0600; keine Zugangsdaten im Repository.

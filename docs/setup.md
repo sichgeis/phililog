@@ -65,3 +65,7 @@ Die Testdatenbank wird beim Stoppen nicht automatisch gelöscht. `supabase db re
 - Supabase Free kann bei geringer Aktivität pausieren und bietet keine automatischen Backups. Vor produktiver Einrichtung die [aktuellen Tarifbedingungen](https://supabase.com/pricing) prüfen.
 - Auth-Sitzung und ungespeicherter Entwurf liegen auf dem eigenen Gerät. Entwürfe werden bei Abmeldung entfernt. Browserdatenlöschung kann sie verlieren. Laufende Stillzeiten werden erst beim Speichern gemeinsam sichtbar, nicht bereits beim Start auf dem anderen Handy.
 - Für einen Stillnachtrag werden Beginn und Ende aus Endzeit und Dauer abgeleitet. Nach einer Start-/Endmessung bleiben die genauen Zeitstempel erhalten; für eine manuelle Korrektur „Zeiten manuell angeben“ wählen.
+
+## Produktiver Stand
+
+Seit 12. September 2026: [App](https://sichgeis.github.io/phililog/) und [Supabase-Projekt Filine-Log](https://supabase.com/dashboard/project/aiyjwwbdfjtflehtvedt) sind eingerichtet. Die eigene Organisation nutzt Free, das Projekt liegt in Europa. Beide Elternkonten sind administrativ erstellt und freigeschaltet. Öffentliche Registrierung und anonyme Anmeldung sind deaktiviert. GitHub-Variablen enthalten ausschließlich Projekt-URL und Publishable-Key. Der bestehende Masch-Tech-Bestand blieb erhalten, da für das neue Projekt keine Löschung nötig war.
