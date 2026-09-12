@@ -55,3 +55,7 @@ Auf ausdrücklichen Wunsch Schreibweise **Philine** in Dokumentation, Supabase-A
 - Nutzer meldet erfolgreichen ersten Smartphone-Smoke-Test. Daraufhin REQ-018 bis REQ-020 umgesetzt: Kopfbereich und dekorative Eingabeüberschrift entfernt, Abmelden im Footer, Projektinfo mit Philine und Göttingen, kompaktere Abstände und seitenweiter Aquarellhintergrund.
 - `npm run check`: zwölf Tests, TypeScript und Build erfolgreich. Keine Datenbank- oder Berechtigungsänderung.
 - Browser-Harness mit echter lokaler Supabase, synthetischem Konto und vorhandenen synthetischen Testeinträgen: bei 390 × 844 px endet der Speichern-Knopf auf Höhe 672 px; visuell geprüft. Bei 320 px nach Neuladen kein horizontaler Überlauf. Projektinfo-Text geprüft; laufende Stillzeit bleibt bei Wechsel zur Projektinfo und zurück sowie Neuladen erhalten. Start und Ende bedienbar. Keine Produktionseinträge verändert.
+
+## Dauer und Milchart – 12. September 2026
+
+Erster separater Commit: Checkbox durch 0 Minuten ersetzt, Milchart mit Pre als Startwert und Muttermilch als Alternative. Migration erhält Altbestand ohne erfundene Milchart. 13 Fachlogiktests und Build erfolgreich.

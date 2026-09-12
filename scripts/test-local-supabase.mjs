@@ -64,7 +64,11 @@ try {
   ids.push(breast.id);
   assert.ifError((await julia.client.from('feedings').insert(breast)).error);
   assert.ok((await julia.client.from('feedings').insert({ ...breast, id: randomUUID(), started_at: '2026-09-12T09:00:00Z' })).error, 'End before start denied');
-  const removed = await christian.client.from('feedings').delete().eq('id', input.id).eq('version', 2).select();
+  assert.ifError((await christian.client.from('feedings').update({ milk_type: 'breast_milk' }).eq('id', input.id)).error);
+  assert.equal((await julia.client.from('feedings').select('milk_type').eq('id', input.id).single()).data.milk_type, 'breast_milk');
+  assert.ok((await julia.client.from('feedings').update({ milk_type: 'invalid' }).eq('id', input.id)).error, 'Invalid milk denied');
+  assert.ok((await julia.client.from('feedings').update({ milk_type: 'pre' }).eq('id', breast.id)).error, 'Milk type only for bottle');
+  const removed = await christian.client.from('feedings').delete().eq('id', input.id).eq('version', 3).select();
   assert.ifError(removed.error); assert.equal(removed.data.length, 1);
   // Exercise the application's actual repository functions, including pagination and retry.
   process.env.VITE_SUPABASE_URL = status.API_URL;

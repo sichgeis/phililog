@@ -69,3 +69,7 @@ Am 12. September 2026 ausdrücklich korrigiert: Der Name lautet **Philine**. Org
 - REQ-020: Dezente Aquarellflächen liegen im gesamten Hintergrund; Formularfelder bleiben gut lesbar. Abstände und Stillzeitbereich werden kompakter.
 - AC-012: Bei 390 × 844 px sind die normale Still-Eingabe und der Speichern-Knopf ohne Scrollen erreichbar. Bei 320 px Breite entsteht kein horizontaler Überlauf.
 - AC-013: Projektinfo öffnen und zurück erhält Art, Menge und laufende Stillzeit; Abmelden bleibt im Footer erreichbar.
+
+## Dauer und Flascheninhalt – beauftragt am 12. September 2026
+
+0 Minuten bedeutet unbekannte Dauer (Datenbank weiterhin NULL); die Checkbox entfällt. Minus endet bei 0, Plus von 0 führt zu 1. Start-/Endmessungen bleiben unverändert. Flaschen enthalten standardmäßig Pre-Nahrung, alternativ Muttermilch. Bestehende Einträge ohne Milchart bleiben nicht angegeben. Milchart erscheint in Historie, Bearbeitung und CSV; beim Stillen ist sie leer. Negative oder gebrochene Minuten bleiben unzulässig.
