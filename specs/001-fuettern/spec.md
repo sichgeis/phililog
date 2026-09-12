@@ -61,3 +61,11 @@ Nicht enthalten: Urin/Stuhl, Erinnerungstimer, Diagramme, Erinnerungen, dauerhaf
 ## Namensschreibweise
 
 Am [Betriebsdatum privat] ausdrücklich korrigiert: Der Name lautet **dem Kind**. Organisation und Supabase-Projekt heißen **Familienlogbuch**. Der bereits mit PH geschriebene App- und Repositoryname **Phililog** bleibt bestehen.
+
+## Kompakte Eingabe und Projektinfo – beauftragt am [Betriebsdatum privat]
+
+- REQ-018: Angemeldete Ansichten beginnen direkt mit der Navigation, ohne Marken-Kopfbereich oder dekorativen Eingabetitel. Abmelden steht im Footer. Touch-Ziele bleiben mindestens 44 px hoch.
+- REQ-019: Eine über den Footer erreichbare Ansicht „Über das Projekt“ beschreibt Phililog als von Person B und Person A für dem Kind vibe-gecodetes Projekt, mit Liebe in privatem Ort entstanden. Der Eingabeentwurf bleibt beim Wechsel erhalten.
+- REQ-020: Dezente Aquarellflächen liegen im gesamten Hintergrund; Formularfelder bleiben gut lesbar. Abstände und Stillzeitbereich werden kompakter.
+- AC-012: Bei 390 × 844 px sind die normale Still-Eingabe und der Speichern-Knopf ohne Scrollen erreichbar. Bei 320 px Breite entsteht kein horizontaler Überlauf.
+- AC-013: Projektinfo öffnen und zurück erhält Art, Menge und laufende Stillzeit; Abmelden bleibt im Footer erreichbar.

@@ -28,3 +28,7 @@ Warme, ruhige Gestaltung mit großen Bedienelementen. Listenweise Historie mit N
 ## Bereitstellung
 
 GitHub-Actions-Workflow zum manuellen Pages-Deployment vorbereiten. Kein automatisches Deployment allein durch Push. Supabase-SQL-Migration und Einrichtungsanleitung gehören ins Repository. Kostenloser Betrieb und bestehende private Repository-Sichtbarkeit begrenzen die spätere Pages-Veröffentlichung; diese Entscheidung bleibt beim Auftraggeber.
+
+## Kompakte Oberfläche
+
+Dritte interne Ansicht `about` ohne Router-Abhängigkeit. Gemeinsamer Footer für Projektinfo und Abmeldung; keine Kopfzeile im angemeldeten Bereich. Semantische, visuell verborgene Eingabeüberschrift. Kompakte Abstände mit mindestens 44 px hohen Touch-Zielen und seitenweitem CSS-Aquarellhintergrund. Browserprüfung mit lokaler Supabase und synthetischen Konten: 320/390 px, Entwurf bei About-Wechsel, Stillstart/-ende und Footer-Abmeldung.
