@@ -40,3 +40,7 @@ Dritte interne Ansicht `about` ohne Router-Abhängigkeit. Gemeinsamer Footer fü
 ## Wickeln und Rückmeldung
 
 Bestehende Tabelle `feedings` wird aus Kompatibilitätsgründen um `diaper` und nullable Bool-Spalten `urine`, `stool`, `held_success` ergänzt. Typabhängige Constraints verhindern Vermischung; bisherige RLS und Versionskontrolle gelten unverändert. CSV wird um diese Felder erweitert. DOM-Konfetti außerhalb der gerenderten App überlebt das anschließende Datenrefresh und entfernt sich nach 1,6 Sekunden.
+
+## Zeitanzeigen
+
+Separate limitierte Supabase-Abfrage mit Filter `kind in (bottle, breast)` liefert die letzte Mahlzeit über alle Datensätze. Gemeinsames Refresh aktualisiert Liste und Mahlzeit; bestehende RLS gilt weiter. Ein Sekundenintervall aktualisiert nur Textknoten aus Zeitstempeln, keine sekündlichen API-Aufrufe oder Formular-Neurenderings.

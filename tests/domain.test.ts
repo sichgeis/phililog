@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { newDraft, feedingInput, draftFromFeeding, localDateTime, toCsv, sameInput, type Feeding } from '../src/domain.ts';
+import { newDraft, feedingInput, draftFromFeeding, localDateTime, toCsv, sameInput, elapsedLabel, type Feeding } from '../src/domain.ts';
 const now = new Date('2026-09-12T08:45:00Z');
 
 test('Stillen startet mit 30 Minuten, Flasche hat 15 und keine voreingestellte Menge', () => {
@@ -101,4 +101,15 @@ test('Wickeln trennt alle Fütterungsdetails und erhält unabhängige Toggles be
   }
   const feeding = feedingInput({ ...newDraft(), urine: true, stool: true, heldSuccess: true }, now);
   assert.equal(feeding.urine, null); assert.equal(feeding.stool, null); assert.equal(feeding.held_success, null);
+});
+
+test('Zeitanzeige zählt Stunden, Minuten und Sekunden aus Zeitstempeln', () => {
+  const start = '2026-09-12T08:00:00Z';
+  const at = (seconds: number) => new Date(start).getTime() + seconds * 1000;
+  assert.equal(elapsedLabel(start, at(59)), 'gerade eben');
+  assert.equal(elapsedLabel(start, at(60)), 'vor 1 Min.');
+  assert.equal(elapsedLabel(start, at(3661)), 'vor 1 Std. 1 Min.');
+  assert.equal(elapsedLabel(start, at(3661), true), '1 Std. 1 Min. 01 Sek.');
+  assert.equal(elapsedLabel(start, at(5), true), '0 Min. 05 Sek.');
+  assert.equal(elapsedLabel(start, at(-1)), 'Zeitpunkt liegt in der Zukunft');
 });
