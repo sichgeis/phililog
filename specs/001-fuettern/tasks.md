@@ -39,9 +39,13 @@ Nicht behauptet: tatsächliche iOS-/Android-Installation, Ende-zu-Ende-Verschlü
 
 ## Produktive Einrichtung vom 12. September 2026
 
-- Eigene Organisation Filine-Log im Free-Tarif, Projekt `aiyjwwbdfjtflehtvedt`, Region Europa. Bestehende Organisation Masch-Tech musste nicht gelöscht werden.
+- Eigene Organisation Philine-Log im Free-Tarif, Projekt `aiyjwwbdfjtflehtvedt`, Region Europa. Bestehende Organisation Masch-Tech musste nicht gelöscht werden.
 - Migration erfolgreich ausgeführt; genau Julia und Christian in der privaten Mitgliedschaftstabelle. Anmeldung und Mitgliedschaft mit beiden Konten geprüft; anonymer Datenzugriff abgewiesen.
 - Ein synthetischer Produktionseintrag: Erstellen, gemeinsames Lesen, Korrektur, Versionskonflikt und Löschen erfolgreich. Testeintrag vollständig entfernt. Keine echten Familiendaten für Tests verwendet.
 - Öffentliche Registrierung und anonyme Anmeldung im Dashboard nach erneutem Laden nachweislich ausgeschaltet. Site URL auf die Pages-Adresse gesetzt. Nur Publishable-Key und Projekt-URL in GitHub-Variablen.
 - GitHub-Workflow: zwölf Tests, Build und Deployment erfolgreich. Produktive Browser-Anmeldung und Sitzungserhalt nach Neuladen geprüft. Aquarell-Layout bei 390 px visuell geprüft, kein horizontaler Überlauf.
 - Persönliche Zugangsdaten liegen nur in einer ignorierten lokalen Datei mit Dateirechten 0600; keine Zugangsdaten im Repository.
+
+## Namenskorrektur vom 12. September 2026
+
+Auf ausdrücklichen Wunsch Schreibweise **Philine** in Dokumentation, Supabase-Anzeigenamen und lokaler Zugangsdaten-Datei korrigiert. App und Repository heißen weiterhin Phililog. `npm run check`: zwölf Tests und Produktionsbuild erfolgreich. Der zuvor erstellte E-Mail-Entwurf ist nicht mehr im Posteo-Entwurfsordner vorhanden und konnte nicht nachträglich geändert werden.

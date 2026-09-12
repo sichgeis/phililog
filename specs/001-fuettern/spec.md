@@ -57,3 +57,7 @@ Nicht enthalten: Urin/Stuhl, Erinnerungstimer, Diagramme, Erinnerungen, dauerhaf
 - Supabase-Projekt und öffentliche Browser-Konfiguration bereitstellen, zwei Konten anlegen und freischalten.
 - Kostenloses GitHub-Pages-Hosting benötigt bei GitHub Free ein öffentliches Quellcode-Repository. Das derzeit private Repository wird nicht ohne ausdrücklichen Auftrag öffentlich gestellt.
 - Produktive Anmeldung, Zugriffsregeln und PWA-Verhalten auf den tatsächlichen Smartphones vor Veröffentlichung prüfen.
+
+## Namensschreibweise
+
+Am 12. September 2026 ausdrücklich korrigiert: Der Name lautet **Philine**. Organisation und Supabase-Projekt heißen **Philine-Log**. Der bereits mit PH geschriebene App- und Repositoryname **Phililog** bleibt bestehen.
