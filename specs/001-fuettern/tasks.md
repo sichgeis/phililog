@@ -69,3 +69,11 @@ Beide additive Migrationen 002 und 003 in einer Transaktion im produktiven Supab
 ## Zeitangaben und Icon-Vorschläge – 12. September 2026
 
 „Io triumphe“, letzte echte Mahlzeit bei beiden Fütterungsarten und sekündliche Stilldauer umgesetzt. 15 Fachlogiktests und Produktionsbuild erfolgreich. Lokale Supabase-Prüfung: auch bei 35 neueren Wickeleinträgen wird die Mahlzeit außerhalb der ersten Historienseite gefunden. Browserprüfung mit synthetischem Konto bei 390 px: Timer zählt 00 → 02 Sekunden, übersteht Neuladen und bleibt nach Stop konstant; keine horizontalen Überläufe. Keine Produktionseinträge verändert. Fünf eigene SVG-Icon-Vorschläge unter `docs/icon-proposals/index.html`; aktuelles App-Icon bleibt bis zur Auswahl bestehen.
+
+## Wiegen und ausgewähltes Io-Icon – 12. September 2026
+
+- Dezent aufklappbarer Bereich „Weitere Ereignisse“ mit Wiegen, Gewicht in ganzen Gramm, Zeitpunkt, Entwurfserhalt sowie gemeinsamer Historie, Bearbeitung, Löschung und CSV umgesetzt. Letzte Mahlzeit bleibt auf Stillen/Flasche beschränkt.
+- `npm run check`: 16 Fachlogiktests, TypeScript und Produktionsbuild erfolgreich. Lokale Supabase-Prüfung einschließlich Gewichtskonstraints, Fremdzugriff, gemeinsamer Korrektur/Löschung und Export über 505 Einträge erfolgreich.
+- Browser-Harness mit synthetischem Konto und lokaler Supabase: Weitere Ereignisse öffnen, Wiegen wählen, 3.500 g speichern und in der Historie anzeigen erfolgreich. 390 px ohne horizontalen Überlauf und visuell geprüft; Screenshot `/private/tmp/phililog-weight.png`.
+- Migration 004 in einer Transaktion im produktiven Supabase-SQL-Editor erfolgreich ausgeführt („Success. No rows returned“). Keine Produktionseinträge verändert.
+- Gewählter großer Aquarell-Klecks mit weißem **Io** als SVG, PWA-PNGs und Apple-Icon übernommen und visuell geprüft. Tatsächliche Aktualisierung bereits installierter Smartphone-Icons bleibt geräteabhängig.

@@ -82,6 +82,16 @@ try {
   assert.ifError((await christian.client.from('feedings').update({ urine: false, stool: false, held_success: false }).eq('id', diaper.id)).error);
   assert.deepEqual((await outsider.client.from('feedings').delete().eq('id', diaper.id).select()).data, []);
   assert.ifError((await christian.client.from('feedings').delete().eq('id', diaper.id)).error);
+  const weight = { id: randomUUID(), kind: 'weight', occurred_at: '2026-09-12T09:00:00Z', weight_g: 3500 };
+  ids.push(weight.id);
+  assert.ifError((await julia.client.from('feedings').insert(weight)).error);
+  assert.equal((await christian.client.from('feedings').select().eq('id', weight.id).single()).data.weight_g, 3500);
+  assert.ok((await outsider.client.from('feedings').insert({ ...weight, id: randomUUID() })).error);
+  for (const invalid of [{ weight_g: 0 }, { amount_ml: 5 }, { urine: true }]) assert.ok((await julia.client.from('feedings').insert({ ...weight, ...invalid, id: randomUUID() })).error);
+  assert.ok((await julia.client.from('feedings').update({ weight_g: 3500 }).eq('id', breast.id)).error);
+  assert.ifError((await christian.client.from('feedings').update({ weight_g: 3550 }).eq('id', weight.id)).error);
+  assert.deepEqual((await outsider.client.from('feedings').delete().eq('id', weight.id).select()).data, []);
+  assert.ifError((await christian.client.from('feedings').delete().eq('id', weight.id)).error);
   // Exercise the application's actual repository functions, including pagination and retry.
   process.env.VITE_SUPABASE_URL = status.API_URL;
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY = key;

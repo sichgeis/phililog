@@ -86,3 +86,9 @@ Abnahme: gemischte Historie und CSV, Wickeln bearbeiten, alle Toggle-Kombination
 - Bei Stillen und Flasche ersetzt „Letzte Mahlzeit“ den letzten allgemeinen Eintrag. Maßgeblich ist das Ende der neuesten gespeicherten Flaschen- oder Stillmahlzeit, unabhängig von neueren Wickeleinträgen und Historienseiten. Anzeige in Stunden/Minuten, unter einer Minute „gerade eben“. Zukunftseinträge werden als solche benannt. Ohne Mahlzeit erscheint ein verständlicher Leerzustand.
 - Nach Stillstart erscheint die laufende Dauer in Minuten/Sekunden, ab einer Stunde zusätzlich Stunden. Berechnung aus dem gespeicherten Startzeitpunkt, auch nach Hintergrund und Neuladen. Stop hält die Anzeige an. Tick aktualisiert nur die Zeitanzeigen und verliert weder Fokus noch Eingaben.
 - Wickeln behält den letzten allgemeinen Eintrag. Icons werden als fünf Entwürfe vorgelegt; das installierte App-Icon wird erst nach Auswahl ersetzt.
+
+## Weitere Ereignisse: Wiegen – beauftragt am 12. September 2026
+
+Unter einem dezenten aufklappbaren Bereich „Weitere Ereignisse“ liegt Wiegen. Die drei häufigen Arten bleiben unverändert prominent. Gewicht ist eine positive ganze Grammzahl ohne Vorbelegung; Zeitpunkt jetzt beim Speichern oder manuell wie bei anderen Ereignissen. Wiegen erscheint in der gemeinsamen Historie, kann korrigiert/gelöscht werden und wird in CSV exportiert. Keine Dauer, Milchart, Fütterungsmenge oder Wickelangaben für Wiegen. Gewichte beeinflussen die letzte Mahlzeit nicht. Entwurfserhalt, RLS und Versionsschutz gelten unverändert.
+
+Icon-Auswahl: ursprünglicher großer Aquarell-Klecks aus Entwurf 2 mit großem I und kleinem o. Als SVG, PWA- und Apple-Icon übernehmen; Blüteniteration bleibt nur ein Entwurf.

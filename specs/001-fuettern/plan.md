@@ -44,3 +44,7 @@ Bestehende Tabelle `feedings` wird aus Kompatibilitätsgründen um `diaper` und 
 ## Zeitanzeigen
 
 Separate limitierte Supabase-Abfrage mit Filter `kind in (bottle, breast)` liefert die letzte Mahlzeit über alle Datensätze. Gemeinsames Refresh aktualisiert Liste und Mahlzeit; bestehende RLS gilt weiter. Ein Sekundenintervall aktualisiert nur Textknoten aus Zeitstempeln, keine sekündlichen API-Aufrufe oder Formular-Neurenderings.
+
+## Wiegen und gewähltes Icon
+
+Nullable Integer-Spalte `weight_g` und Typ `weight` in bestehender Tabelle; typabhängige Constraints und Spaltenrechte ergänzen. Seltene Arten in einem nativen Details-Element. Gemeinsame CRUD-/CSV-Pfade verwenden. Gewähltes SVG ist die Quelle für PNG-Rasterungen; neue Icon-URLs vermeiden alte Browser-Caches.
