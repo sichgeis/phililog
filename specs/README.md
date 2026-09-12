@@ -6,7 +6,7 @@ Zuerst klären wir **was** erreicht werden soll und woran wir den Erfolg erkenne
 
 Dieser Ablauf ist bewusst werkzeugunabhängig. Es ist kein SDD-Framework und keine zusätzliche CLI erforderlich.
 
-Die abgestimmte Architektur und das Budget von 0 € stehen im [README](../README.md#architektur-und-datenhaltung). Sie bilden die Randbedingungen für die folgenden Spezifikationen; die fachliche Beschreibung steht noch aus.
+Die abgestimmte Architektur und das Budget von 0 € stehen im [README](../README.md#architektur-und-datenhaltung). Sie bilden die Randbedingungen für die folgenden Spezifikationen; die fachliche Beschreibung läuft.
 
 ## Ablage
 
@@ -35,9 +35,10 @@ Statusfolge: `Entwurf` → `Abgestimmt` → `In Umsetzung` → `Abgeschlossen`. 
 
 ## Spezifikationsübersicht
 
-Noch keine Features spezifiziert oder zur Umsetzung freigegeben.
+Der MVP wurde zur Umsetzung beauftragt. Verbleibende Rückfragen und Prüfnachweise stehen in den Feature-Dokumenten.
 
 | ID | Feature / Link | Status |
 | --- | --- | --- |
+| 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung |
 
-**Nächster Schritt:** Gemeinsam den Umfang der ersten Produktspezifikation klären und als `001-<kurzer-name>` anlegen.
+Der nächste konkrete Schritt und der Fortschritt stehen in den [Aufgaben zu Feature 001](001-fuettern/tasks.md).
