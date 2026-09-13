@@ -27,7 +27,7 @@ Warme, ruhige Gestaltung mit großen Bedienelementen. Listenweise Historie mit N
 
 ## Bereitstellung
 
-GitHub-Actions-Workflow zum manuellen Pages-Deployment vorbereiten. Kein automatisches Deployment allein durch Push. Supabase-SQL-Migration und Einrichtungsanleitung gehören ins Repository. Kostenloser Betrieb und bestehende private Repository-Sichtbarkeit begrenzen die spätere Pages-Veröffentlichung; diese Entscheidung bleibt beim Auftraggeber.
+GitHub-Actions-Workflow zum manuellen Pages-Deployment vorbereiten. Kein automatisches Deployment allein durch Push. Supabase-SQL-Migration und Einrichtungsanleitung gehören ins Repository. Das Repository ist seit dem ausdrücklichen Auftrag vom 12. September 2026 öffentlich; Pages ist eingerichtet. Weitere Deployments benötigen den jeweiligen Auftrag.
 
 ## Kompakte Oberfläche
 

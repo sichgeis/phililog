@@ -1,6 +1,7 @@
 import './style.css';
+import { preserveFormState } from './render-state.ts';
 import { getSettings, saveSettings, getDailyReport, configured, supabase, listFeedings, allFeedings, latestMeal, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
-import { moods, type Mood, estimatedMilk, newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, elapsedLabel, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
+import { hasDraftChanges, sameInput, moods, type Mood, estimatedMilk, newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, elapsedLabel, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
 
 import { berlinDay, shiftDay, milliliters, type Settings, type BreastDefaults, type DailyReport } from './report.ts';
 
@@ -38,7 +39,7 @@ let epoch = 0;
 let refreshGeneration = 0;
 let loginEmail = '';
 let settings: Settings | null = null;
-let settingsDraft: { left: string; right: string } | null = null;
+let settingsDraft: { left: string; right: string; version: number } | null = null;
 let reportEnd = berlinDay();
 let reportRows: DailyReport[] | null = null;
 function currentDefaults(): BreastDefaults | null {
@@ -134,7 +135,7 @@ function estimateLabel(): string {
   try { const value = estimatedMilk(draft); return value === null ? 'ohne Schätzung' : `ca. ${value} ml`; } catch { return 'Bitte Menge prüfen'; }
 }
 function settingsView(): string {
-  return `<section class="card settings-card"><h1>Einstellungen</h1><h2>Still-Schätzung</h2><p>Gemeinsam für Julia und Christian. Der Standard wird bei neuen Einträgen pro Brust übernommen. Gespeicherte Mengen bleiben unverändert.</p>${settings ? `<form id="settings-form" novalidate><label for="breast-default-left">Linke Brust (ml)</label><input id="breast-default-left" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.left ?? settings.breast_left_ml)}" ${busy ? 'disabled' : ''}><label for="breast-default-right">Rechte Brust (ml)</label><input id="breast-default-right" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.right ?? settings.breast_right_ml)}" ${busy ? 'disabled' : ''}><p class="field-note">Bei beiden Brüsten werden die Werte addiert. Dies ist eure persönliche Schätzung.</p><button class="primary" ${busy ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : 'Einstellungen speichern'}</button></form>` : '<p>Einstellungen werden geladen …</p>'}</section>`;
+  return `<section class="card settings-card"><h1>Einstellungen</h1><h2>Still-Schätzung</h2><p>Gemeinsam für Julia und Christian. Der Standard wird bei neuen Einträgen pro Brust übernommen. Gespeicherte Mengen bleiben unverändert.</p>${settings ? `<form id="settings-form" novalidate><label for="breast-default-left">Linke Brust (ml)</label><input id="breast-default-left" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.left ?? settings.breast_left_ml)}" ${busy ? 'disabled' : ''}><label for="breast-default-right">Rechte Brust (ml)</label><input id="breast-default-right" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.right ?? settings.breast_right_ml)}" ${busy ? 'disabled' : ''}><p class="field-note">Bei beiden Brüsten werden die Werte addiert. Dies ist eure persönliche Schätzung.</p><button class="primary" ${busy ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : 'Einstellungen speichern'}</button></form>${settingsDraft ? `<p class="field-note">${settingsDraft.version !== settings?.version ? 'Die Serverwerte wurden inzwischen geändert. Deine Eingaben bleiben erhalten. Übernimm die Serverwerte, um die Änderung neu einzugeben.' : 'Ungespeicherte Einstellungen'}</p><button class="secondary" id="reset-settings" ${busy ? 'disabled' : ''}>Serverwerte übernehmen</button>` : ''}` : '<p>Einstellungen werden geladen …</p>'}</section>`;
 }
 function reportView(): string {
   const formatDay = (day: string) => new Date(`${day}T12:00:00Z`).toLocaleDateString('de-DE', { day: 'numeric', month: 'short', weekday: 'short', timeZone: 'Europe/Berlin' });
@@ -147,7 +148,7 @@ async function storeSettings() {
   try {
     const value = { left: milliliters(settingsDraft?.left ?? String(settings.breast_left_ml), false), right: milliliters(settingsDraft?.right ?? String(settings.breast_right_ml), false) };
     busy = true; error = ''; render();
-    const updated = await saveSettings(value, settings.version);
+    const updated = await saveSettings(value, settingsDraft?.version ?? settings.version);
     if (ownEpoch !== epoch) return;
     settings = updated; settingsDraft = null;
     if (!edit && !pending && !draft.side && !draft.breastStart && draft.estimateMode === 'auto') { draft.breastDefault = currentDefaults(); remember(); } notice = 'Standard gespeichert. Gilt für neue Einträge.';
@@ -155,8 +156,12 @@ async function storeSettings() {
   finally { if (ownEpoch === epoch) { busy = false; render(); } }
 }
 function bindReports() {
+  document.querySelector('#reset-settings')?.addEventListener('click', async () => {
+    if (busy || !await confirmAction('Eigene Einstellungswerte verwerfen und aktuelle Serverwerte übernehmen?')) return;
+    settingsDraft = null; error = ''; await refresh(); render();
+  });
   document.querySelector('#settings-form')?.addEventListener('submit', e => { e.preventDefault(); void storeSettings(); });
-  document.querySelector('#settings-form')?.addEventListener('input', () => { settingsDraft = { left: document.querySelector<HTMLInputElement>('#breast-default-left')!.value, right: document.querySelector<HTMLInputElement>('#breast-default-right')!.value }; });
+  document.querySelector('#settings-form')?.addEventListener('input', () => { settingsDraft = { version: settingsDraft?.version ?? settings!.version, left: document.querySelector<HTMLInputElement>('#breast-default-left')!.value, right: document.querySelector<HTMLInputElement>('#breast-default-right')!.value }; });
   const changeRange = (end: string) => { reportEnd = end; reportRows = null; void refresh(); render(); };
   document.querySelector('#report-prev')?.addEventListener('click', () => changeRange(shiftDay(reportEnd, -7)));
   document.querySelector('#report-next')?.addEventListener('click', () => changeRange(shiftDay(reportEnd, 7) > berlinDay() ? berlinDay() : shiftDay(reportEnd, 7)));
@@ -177,6 +182,7 @@ function aboutView(): string {
 }
 function render() {
   if (!userId) return renderLogin();
+  const restoreFormState = preserveFormState(app);
   app.innerHTML = `<main class="app-main">${authorized ? `<nav class="main-nav" aria-label="Hauptansichten"><button data-view="new" class="${view === 'new' ? 'active' : ''}" aria-current="${view === 'new' ? 'page' : 'false'}">${icon('plus')}Eintragen</button><button data-view="history" class="${view === 'history' ? 'active' : ''}" aria-current="${view === 'history' ? 'page' : 'false'}">${icon('book')}Logbuch</button><button data-view="report" class="${view === 'report' ? 'active' : ''}" aria-current="${view === 'report' ? 'page' : 'false'}">Tagesbericht</button></nav><div id="messages" aria-live="polite">${notice ? `<p class="message success">${icon('check')}${escape(notice)}</p>` : ''}${error ? `<p class="message error" role="alert">${escape(error)} <button id="refresh" class="text-button">Aktualisieren</button></p>` : ''}</div>${view === 'new' ? formView() : view === 'history' ? historyView() : view === 'report' ? reportView() : view === 'settings' ? settingsView() : aboutView()}` : `<section class="card access-card"><h1>${loading ? 'Euer Logbuch wird geöffnet …' : 'Zugang noch nicht freigeschaltet'}</h1><p>${escape(error || 'Dieses Konto muss für euer gemeinsames Logbuch freigeschaltet sein.')}</p><button id="refresh-access" class="secondary">Erneut prüfen</button></section>`}</main><footer class="app-footer"><span>phililog.</span>${authorized ? `<button class="text-button" data-view="about" aria-current="${view === 'about' ? 'page' : 'false'}">Über das Projekt</button><button class="text-button" data-view="settings">Einstellungen</button>` : ''}<button class="text-button logout" id="logout">Abmelden</button></footer>`;
   bindLogout();
   document.querySelector('#refresh-access')?.addEventListener('click', () => void enterSession(userId));
@@ -188,13 +194,14 @@ function render() {
     if (busy || pending) return;
     const entry = entries.find(e => e.id === button.dataset.edit) ?? (latest?.id === button.dataset.edit ? latest : null);
     if (!entry) return;
-    if ((edit || draft.breastStart || draft.amount || draft.weight || draft.mood || draft.estimateMode === 'manual' || draft.timeMode === 'custom') && !await confirmAction('Den aktuellen Entwurf verwerfen und diesen Eintrag bearbeiten?')) return;
+    if ((edit || hasDraftChanges(draft)) && !await confirmAction('Den aktuellen Entwurf verwerfen und diesen Eintrag bearbeiten?')) return;
     edit = entry; draft = draftFromFeeding(entry); view = 'new'; notice = ''; error = ''; remember(); render(); window.scrollTo(0, 0);
   }));
   document.querySelector('#load-more')?.addEventListener('click', () => void refresh(true));
   document.querySelector('#export')?.addEventListener('click', () => void exportEntries());
   bindForm();
   bindReports();
+  restoreFormState();
 }
 function switchView(next: typeof view) {
   if (busy) return;
@@ -203,7 +210,7 @@ function switchView(next: typeof view) {
 function bindLogout() {
   document.querySelector('#logout')?.addEventListener('click', async () => {
     if (busy) return;
-    if ((pending || edit || draft.breastStart || draft.amount || draft.weight || draft.mood || draft.estimateMode === 'manual') && !await confirmAction('Abmelden und den ungespeicherten Entwurf auf diesem Gerät löschen?')) return;
+    if ((pending || edit || settingsDraft || hasDraftChanges(draft)) && !await confirmAction('Abmelden und den ungespeicherten Entwurf auf diesem Gerät löschen?')) return;
     const key = storageKey();
     await supabase!.auth.signOut({ scope: 'local' });
     try { localStorage.removeItem(key); } catch { /* no local storage */ }
@@ -266,6 +273,7 @@ function captureForm() {
   const performer = document.querySelector<HTMLSelectElement>('#performed-by');
   if (performer) draft.performedBy = performer.value as Draft['performedBy'] || null;
   if (input('weight')) draft.weight = input('weight')!.value;
+  if (input('local-time')) draft.localTime = input('local-time')!.value;
   if (!input('duration')) return;
   if (draft.kind === 'bottle') {
     draft.bottleDuration = input('duration')!.value;
@@ -276,7 +284,6 @@ function captureForm() {
     draft.breastDuration = input('duration')!.value;
     draft.breastUnknown = false;
   }
-  if (input('local-time')) draft.localTime = input('local-time')!.value;
 }
 function celebrate() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -298,22 +305,24 @@ async function save() {
   captureForm();
   const ownEpoch = epoch;
   error = ''; notice = '';
+  let showCelebration = false;
   try {
     const input = pending?.input ?? feedingInput(draft);
     if (!edit && !pending) { pending = { id: crypto.randomUUID(), input }; remember(); }
     busy = true; render();
-    if (edit) await updateFeeding(edit, input);
-    else await createFeeding(pending!, userId);
+    const result = edit ? await updateFeeding(edit, input) : await createFeeding(pending!, userId);
+    const recovered = !edit && (!result || !sameInput(result, input));
     if (ownEpoch !== epoch) return;
-    notice = edit ? 'Änderungen gespeichert.' : 'Io triumphe! Eintrag festgehalten.';
+    notice = edit ? 'Änderungen gespeichert.' : !result ? 'Der Eintrag war gespeichert und wurde inzwischen gelöscht. Er wird nicht erneut angelegt.' : recovered ? 'Der Eintrag war bereits gespeichert und wurde inzwischen geändert. Die aktuelle Fassung bleibt erhalten.' : 'Io triumphe! Eintrag festgehalten.';
+    showCelebration = Boolean(result) && !recovered;
     edit = null; pending = null; draft = newDraft(currentDefaults()); remember();
   } catch (e) {
     if (ownEpoch !== epoch) return;
     error = friendlyError(e);
     // Definitive validation/permission rejections did not commit; allow correction.
-    if (['23514', '42501', 'PGRST205'].includes((e as { code?: string })?.code ?? '')) { pending = null; remember(); }
+    if (['23514', '42501', 'PGRST205', 'CREATE_COLLISION'].includes((e as { code?: string })?.code ?? '')) { pending = null; remember(); }
   } finally { if (ownEpoch === epoch) { busy = false; render(); } }
-  if (ownEpoch === epoch && !error) { celebrate(); await refresh(); }
+  if (ownEpoch === epoch && !error) { if (showCelebration) celebrate(); await refresh(); }
 }
 async function remove() {
   if (busy || !edit || !await confirmAction('Diesen Eintrag wirklich löschen? Das lässt sich nicht rückgängig machen.')) return;

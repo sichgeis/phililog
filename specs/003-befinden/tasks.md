@@ -10,3 +10,7 @@
 - [x] [Pages-Veröffentlichung 34773135229](https://github.com/sichgeis/phililog/actions/runs/34773135229) erfolgreich, App-Code `30a6270`.
 
 Abgeschlossen; keine offenen Implementierungsaufgaben.
+
+## Wartung
+
+Gemeinsamer Entwurfs- und Fokuserhalt einschließlich Befinden: [Wartungspaket](../004-wartung/tasks.md).

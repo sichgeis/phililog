@@ -22,3 +22,7 @@ Abgeschlossen. Keine offenen Implementierungsaufgaben; tatsächliche Bedienung a
 Migrationen 007/008 produktiv in einer Transaktion erfolgreich. Anschließende reine Ergebniskontrolle bestätigt `correction_complete=true` und `backup_protected=true`. Keine Familiendaten ins Repository exportiert; Originale ausschließlich im privaten Datenbankschema. Neue Einträge behalten die normale Kontozuordnung.
 
 Abgeschlossen: [Pages-Workflow 34750629555](https://github.com/sichgeis/phililog/actions/runs/34750629555) erfolgreich; veröffentlichter App-Code `1aa993d`.
+
+## Wartung
+
+Die zusätzliche Regression für konkurrierende Einstellungen nach Hintergrundaktualisierung ist im [Wartungspaket](../004-wartung/tasks.md) dokumentiert.

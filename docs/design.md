@@ -1,6 +1,10 @@
 # Gestaltung – Aquarellfarben der Geburtskarte
 
-## Gestaltungsauftrag
+## Aktueller Stand
+
+Umgesetzt ist die kompakte Aquarellgestaltung: seitenweite Blau-/Türkis-/Violettflächen, klare Eingabefelder und mindestens 44 px hohe Touch-Ziele. Das finale App-Icon ist **Φ 1 · Klar**, ein weißes Phi auf dem ursprünglichen Aquarell-Klecks. Alle nachfolgenden Vorschläge dokumentieren die Entstehung; es steht keine Icon-Auswahl mehr aus. Fokus bleibt bei Formularaktualisierungen erhalten.
+
+## Historischer Gestaltungsauftrag
 
 Am 12. September 2026 gewünscht: Die App soll die Blau-, Türkis- und Violetttöne sowie den Aquarellcharakter der Geburtskarte aufgreifen. Ein privates Referenzfoto wurde dazu angesehen. Das Foto und der individuelle Fußabdruck werden nicht als App-Asset verwendet und nicht ins Repository übernommen.
 
@@ -39,13 +43,13 @@ Alle drei Farbrichtungen wurden im Browser gerendert und visuell geprüft. Die V
 
 Auf Wunsch kombiniert [Entwurf 6](icon-proposals/io-bluete.html) das Monogramm mit großem I mit den fünf überlappenden Farbschichten der Blüte. Breitere transparente Blätter schaffen eine ruhige Mitte für die weißen, als Vektorpfade gezeichneten Buchstaben IO. Diese Blüteniteration bleibt ein ungewählter Entwurf.
 
-## Gewähltes App-Icon
+## Frühere Io-Auswahl (durch Phi ersetzt)
 
 Ausdrücklich ausgewählt wurde der ursprüngliche große Aquarell-Klecks aus Entwurf 2: ein Farbverlauf mit weißem **Io**, großem I und kleinem o. `public/icon.svg` ist die Vektorquelle; daraus wurden die PNGs für PWA und Apple gerendert und visuell geprüft. Neue Icon-Dateinamen helfen bei der Aktualisierung bestehender Browser-Caches.
 
 ## Schriftvarianten auf dem Aquarell-Klecks
 
-Erneuter Gestaltungsauftrag: drei Varianten mit serifenlosem I im Io-/IO-Schriftzug sowie je fünf Phi- und P-Varianten. Die [Vergleichsgalerie](icon-proposals/lettering/index.html) zeigt den identischen bestehenden Klecks mit weißen oder indigofarbenen Vektorzeichen in großen und kleinen Größen. Alle Zeichen sind als Pfade angelegt, ohne externe Schriftdateien. Die Auswahl ist offen; dies sind Entwürfe, keine Änderung des produktiven Icons.
+Erneuter Gestaltungsauftrag: drei Varianten mit serifenlosem I im Io-/IO-Schriftzug sowie je fünf Phi- und P-Varianten. Die [Vergleichsgalerie](icon-proposals/lettering/index.html) zeigt den identischen bestehenden Klecks mit weißen oder indigofarbenen Vektorzeichen in großen und kleinen Größen. Alle Zeichen sind als Pfade angelegt, ohne externe Schriftdateien. Die anschließende finale Phi-Auswahl ist unten dokumentiert. Die übrigen Zeichen bleiben historische Entwürfe.
 
 ## Finale Auswahl: Φ 1 · Klar
 

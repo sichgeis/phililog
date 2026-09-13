@@ -28,7 +28,7 @@ Für ein neues oder verlorenes Passwort kann ein Projektadministrator den Zugang
 
 Das Repository wurde am 12. September 2026 auf ausdrücklichen Wunsch öffentlich gemacht und GitHub Pages mit GitHub Actions als Quelle aktiviert. **GitHub Free unterstützt Pages für öffentliche Repositories.** Die Logbucheinträge bleiben in Supabase; Quellcode und Anmeldeseite dürfen öffentlich sein. [GitHub-Dokumentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
 
-Wenn das Hosting geklärt ist:
+Für eine ausdrücklich beauftragte Veröffentlichung:
 
 1. In GitHub unter Settings → Secrets and variables → Actions → Variables die öffentlichen Variablen `VITE_SUPABASE_URL` und `VITE_SUPABASE_PUBLISHABLE_KEY` anlegen.
 2. Unter Settings → Pages als Source „GitHub Actions“ wählen.
@@ -61,7 +61,7 @@ Die Testdatenbank wird beim Stoppen nicht automatisch gelöscht. `supabase db re
 
 ## Datensicherung und Grenzen
 
-- CSV-Export aufrufen und die Datei selbst sicher aufbewahren. CSV ist ein Datenexport; eine Importfunktion gibt es noch nicht.
+- CSV dient als lesbarer Ereignisexport. Für vollständige Sicherungen und den geprüften Restore-Ablauf siehe [Wiederherstellung](recovery.md). Eine CSV-Importfunktion gibt es nicht.
 - Supabase Free kann bei geringer Aktivität pausieren und bietet keine automatischen Backups. Vor produktiver Einrichtung die [aktuellen Tarifbedingungen](https://supabase.com/pricing) prüfen.
 - Auth-Sitzung und ungespeicherter Entwurf liegen auf dem eigenen Gerät. Entwürfe werden bei Abmeldung entfernt. Browserdatenlöschung kann sie verlieren. Laufende Stillzeiten werden erst beim Speichern gemeinsam sichtbar, nicht bereits beim Start auf dem anderen Handy.
 - Für einen Stillnachtrag werden Beginn und Ende aus Endzeit und Dauer abgeleitet. Nach einer Start-/Endmessung bleiben die genauen Zeitstempel erhalten; für eine manuelle Korrektur „Zeiten manuell angeben“ wählen.
@@ -77,3 +77,11 @@ Migration `202609130006_daily_report.sql` ergänzt die optionale Still-Schätzun
 ## Getrennte Standards und einmalige Bestandskorrektur
 
 Migration 007 initialisiert links/rechts aus dem bisherigen gemeinsamen Standard und erhält die Kompatibilität alter Clients. Migration 008 nur einmal und innerhalb einer Transaktion ausführen: Sie sichert die betroffenen Ereignisse in `private.events_before_20260913_correction` (keine Browserrechte) und korrigiert Zuordnungen und Stillmengen nach ausdrücklichem Nutzerauftrag. Die normalen Versions-/Änderungszeitstempel werden dabei aktualisiert. Die Sicherung enthält private Familiendaten und bleibt ausschließlich in der geschützten Datenbank; nicht ins Repository exportieren.
+
+## Wartung, Migrationen und automatische Prüfungen
+
+Push und Pull Request starten `Check`: Fachlogik-/DOM-Regressionen, TypeScript und Build sowie eine isolierte Supabase-Instanz mit allen Migrationen, RLS-/API-Tests und synthetischem Restore. Dafür werden keine Produktionsschlüssel benötigt. `Publish GitHub Pages` bleibt ausschließlich manuell.
+
+Migration 010 vor der neuen Oberfläche in einer Transaktion anwenden. Sie übernimmt vorhandene UUIDs in einen privaten minimalen Nachweis und verhindert ihre Wiederverwendung nach Löschen. Bereits früher gelöschte IDs können nicht nachträglich erfasst werden. Historische Migrationen 001–009 bleiben unverändert. Für jede manuelle Ausführung Dateiname, Prüfsumme, Datum und Ergebnis privat protokollieren; vorhandene CLI-Historie zusätzlich prüfen. Eine Fehlermeldung „Spalte existiert bereits“ ist Anlass zum Abgleich, nicht zum erneuten Ausführen historischer Korrekturen.
+
+Actions-Versionen am 13. September 2026 anhand der offiziellen Action-Manifeste geprüft: [checkout 7.0.1](https://github.com/actions/checkout/blob/v7.0.1/action.yml), [setup-node 7.0.0](https://github.com/actions/setup-node/blob/v7.0.0/action.yml), [upload-pages-artifact 5.0.0](https://github.com/actions/upload-pages-artifact/blob/v5.0.0/action.yml), [deploy-pages 5.0.1](https://github.com/actions/deploy-pages/blob/v5.0.1/action.yml). JavaScript-Actions verwenden Node 24, Upload bleibt eine Composite-Action mit dem Standardartefakt `github-pages`. Die Workflows nutzen aktuelle GitHub-gehostete Ubuntu-Runner.

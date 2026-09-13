@@ -25,7 +25,7 @@ Wir beschreiben das gewünschte Verhalten vor der Implementierung und leiten dar
 - [Vorlage für einen technischen Plan](specs/templates/plan.md)
 - [Vorlage für Aufgaben und Prüfnachweise](specs/templates/tasks.md)
 - [Regeln für Coding-Agenten](AGENTS.md)
-- [Gestaltungsvorschläge zur Geburtskarte](docs/design.md)
+- [Aktuelle Gestaltung und historische Entwürfe](docs/design.md)
 
 ## Einrichtung und lokaler Start
 
@@ -51,11 +51,12 @@ npm run preview
 npm run check
 ```
 
-Dies führt die Fachlogiktests sowie TypeScript-Prüfung und Produktionsbuild aus. Die tatsächlichen Supabase-Zugriffsregeln werden zusätzlich gegen eine lokale Docker-Instanz geprüft:
+Dies führt Fachlogik- und DOM-Regressionstests sowie TypeScript-Prüfung und Produktionsbuild aus. Push und PR starten dieselben Checks automatisch. Die tatsächlichen Supabase-Zugriffsregeln werden zusätzlich gegen eine lokale Docker-Instanz geprüft:
 
 ```sh
 npx supabase@2.117.0 start
 node scripts/test-local-supabase.mjs
+node scripts/test-restore.mjs
 ```
 
 Die Einrichtung und Testkonten sind in der [Anleitung](docs/setup.md) beschrieben. Produktive Anmeldung und PWA-Installation auf euren echten Smartphones bleiben separate Abnahmeprüfungen.
@@ -86,3 +87,7 @@ Die erste App-Version liegt im öffentlichen [GitHub-Repository](https://github.
 Noch nicht festgelegt.
 
 Am 13. September 2026 wurde der damalige Bestand auf ausdrücklichen Wunsch korrigiert: Flasche/Wickeln Christian, Stillen Julia; Still-Schätzung 25 ml je ausgewählter Brust (beide 50 ml, offen leer). Diese einmalige Korrektur verändert die automatische Zuordnung künftiger Einträge nicht.
+
+## Wartung und Betrieb
+
+[Architektur](docs/architecture.md), [vollständige Sicherung und geprüfte Wiederherstellung](docs/recovery.md) und [Wartungspaket](specs/004-wartung/spec.md). Der neue UUID-Nachweis benötigt Migration 010 vor dem nächsten manuellen Deployment. Einstellungsentwürfe behalten ihre Ausgangsversion; bei Konflikt Serverwerte ausdrücklich übernehmen und die gewünschte Änderung neu eingeben.

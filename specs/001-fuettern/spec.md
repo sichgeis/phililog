@@ -52,11 +52,11 @@ Nicht enthalten: Erinnerungstimer, Diagramme, Erinnerungen, dauerhafte persönli
 
 | AC-011 | REQ-017 | Klick auf Start hält den Beginn fest, Ende hält den Endzeitpunkt fest. Speichern ist während einer laufenden Messung gesperrt. Nach Beenden werden beide Zeitpunkte und die berechnete Dauer gespeichert; ein App-Neuladen während der Messung setzt den Beginn nicht zurück. |
 
-## Noch zu klären / Veröffentlichung
+## Veröffentlichung und verbleibende Geräteabnahme
 
-- Supabase-Projekt und öffentliche Browser-Konfiguration bereitstellen, zwei Konten anlegen und freischalten.
-- Kostenloses GitHub-Pages-Hosting benötigt bei GitHub Free ein öffentliches Quellcode-Repository. Das derzeit private Repository wird nicht ohne ausdrücklichen Auftrag öffentlich gestellt.
-- Produktive Anmeldung, Zugriffsregeln und PWA-Verhalten auf den tatsächlichen Smartphones vor Veröffentlichung prüfen.
+- Supabase-Projekt, öffentliche Browser-Konfiguration und beide freigeschalteten Konten sind eingerichtet.
+- Repository und GitHub Pages wurden am 12. September 2026 auf ausdrücklichen Wunsch veröffentlicht.
+- Anmeldung und Zugriffsregeln wurden geprüft; vollständige PWA-Installationsabnahme auf den tatsächlichen Smartphones bleibt gesondert.
 
 ## Namensschreibweise
 
@@ -100,3 +100,7 @@ Ausdrücklich zur Umsetzung und Veröffentlichung ausgewählt: **Φ 1 · Klar**,
 ## Aufgaben einer Person zuordnen – 13. September 2026
 
 Beauftragt: Neue Einträge aller Arten werden automatisch der angemeldeten Person zugeordnet. Historie und letzter Eintrag zeigen Namen sowie eine dezente Aquarellmarkierung: Julia violett, Christian türkis. Bearbeiten erlaubt die nachträgliche Auswahl beider Personen; Ersteller bleibt unverändert. Altbestand ist zunächst nicht zugeordnet, weil Ersteller und ausführende Person verschieden sein können. Zuordnung wird im Entwurf und CSV erhalten; Zugriffsschutz und Versionskonflikte gelten auch bei Personenwechsel.
+
+## Wartung – 13. September 2026
+
+Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes Wartungspaket](../004-wartung/spec.md).
