@@ -8,7 +8,7 @@ Stand: September 2026. Kleine statische PWA aus Vite, Vanilla TypeScript und CSS
 
 Die Ereignisse heißen aus historischen Gründen `public.feedings`, enthalten aber auch Wickeln und Wiegen. `family_settings` hält gemeinsame Standards. RLS prüft `private.members`; Versionsfilter schützen Ereignisse und Settings vor konkurrierendem Überschreiben. Private SECURITY-DEFINER-Funktionen haben einen festen leeren Suchpfad und eng begrenzte Aufgaben.
 
-Neue Einträge behalten bis zur eindeutigen Auflösung UUID und Payload im benutzergebundenen localStorage. Migration 010 ergänzt einen dauerhaften minimalen Nachweis aus UUID und Ersteller; Ereignislöschung entfernt diesen Nachweis nicht. Wiederholungen lesen die aktuelle Fassung oder bestätigen eine zwischenzeitliche Löschung. Dadurch bleiben fremde Korrekturen erhalten. Vor Migration 010 bereits gelöschte IDs sind nicht rekonstruierbar.
+Neue Einträge behalten bis zur eindeutigen Auflösung UUID und Payload im benutzergebundenen localStorage. Migration 011 ergänzt einen dauerhaften minimalen Nachweis aus UUID und Ersteller; Ereignislöschung entfernt diesen Nachweis nicht. Wiederholungen lesen die aktuelle Fassung oder bestätigen eine zwischenzeitliche Löschung. Dadurch bleiben fremde Korrekturen erhalten. Vor Migration 011 bereits gelöschte IDs sind nicht rekonstruierbar.
 
 Settings-Entwürfe behalten ihre ursprüngliche Version im Arbeitsspeicher. Hintergrundaktualisierungen dürfen diese Version nicht ersetzen. Bei Konflikt werden Serverwerte ausdrücklich übernommen und Änderungen neu eingegeben. Settings-Entwürfe überstehen Ansichtswechsel, jedoch keinen vollständigen Browser-Neustart; Ereignisentwürfe werden lokal gespeichert.
 

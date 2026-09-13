@@ -13,4 +13,4 @@ Abgeschlossen; keine offenen Implementierungsaufgaben.
 
 ## Wartung
 
-Gemeinsamer Entwurfs- und Fokuserhalt einschließlich Befinden: [Wartungspaket](../004-wartung/tasks.md).
+Gemeinsamer Entwurfs- und Fokuserhalt einschließlich Befinden: [Wartungspaket](../005-wartung/tasks.md).

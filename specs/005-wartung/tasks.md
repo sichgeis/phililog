@@ -17,7 +17,7 @@ Status: Abgeschlossen. Umsetzung, lokale Prüfung und GitHub-CI erfolgreich.
 - AC-005: `node scripts/test-restore.mjs` bestanden. Alle zehn unveränderten bzw. additiven Migrationen auf leerem Schema, synthetische Daten/Identität, vollständiger Schema-/Daten-Dump und Restore in separater Datenbank. Exakter Vergleich von acht Tabellen einschließlich Auth/Metadaten, anschließend RLS/Versionsschutz/gelöschte UUID geprüft. Testdatenbanken danach entfernt. Kein produktiver Export oder Zugriff.
 - Browser-Harness, lokale Supabase und synthetisches Konto: Windel-Toggle und Fokus überleben Hintergrundrefresh; manuelle Zeit `2026-09-12T12:34` bleibt mit Fokus erhalten. Logout fragt nach Verwerfen. 390/320 px ohne horizontalen Überlauf; 320-px-Screenshot visuell geprüft. CDP-Maus-/Tastaturaktivierung war teilweise wirkungslos; entsprechende Abläufe mit DOM-Aktionen geprüft. Screenshots lokal: `/private/tmp/phililog-maintenance-390.png`, `/private/tmp/phililog-maintenance-320.png`.
 
-## Grenzen
+## Grenzen des ursprünglichen Branchstands (vor Main-Integration)
 
 Migration 010 ist nur lokal angewandt; Produktion und Pages wurden nicht verändert. Vor dem späteren Deployment zuerst 010 transaktional anwenden. Schon vor 010 gelöschte IDs können nicht rekonstruiert werden. Wiederherstellung in einem neuen verwalteten Projekt und echte Smartphone-/Auth-Abnahme sind nicht als getestet behauptet.
 
@@ -34,3 +34,15 @@ Commit `77bfdf6` gepusht. App-Job auf Node 24 erfolgreich; frischer Supabase-Sta
 Implementierung `77bfdf6`, transaktionaler Erststart `a0378f3`, beide auf `codex/maintenance-reliability` gepusht. [GitHub Check 34775125420](https://github.com/sichgeis/phililog/actions/runs/34775125420) vollständig erfolgreich: Node-24-App-Job mit 27 Tests und Build sowie frischer Supabase-Start, alle Migrationen, API-/RLS-Regressionen und Restore. Auch checkout/setup-node in den neuen Versionen tatsächlich ausgeführt. Pages-Actions nur anhand ihrer offiziellen Manifeste geprüft, kein Deployment ausgelöst.
 
 Zusätzliche echte Browserprüfung: lokaler Einstellungsentwurf 21 ml, paralleler Serverwert 35 ml, Hintergrundrefresh erhält Entwurf/Fokus; Speichern meldet Konflikt. Bestätigte Übernahme zeigt 35 ml. Ursprünglichen lokalen Standard 20/35 danach wiederhergestellt und synthetisches Browserkonto abgemeldet.
+
+## Integration auf Main – beauftragt am 13. September 2026
+
+Basis `0cfde3d` enthält Layout und Kalenderwochen (`a723d3c`) mit bereits produktiver Migration 010. Wartungsspezifikation nach 005 und unveröffentlichte UUID-Migration nach 011 umnummeriert. Historische Prüfnachweise oben nennen noch die damalige Branch-Nummer 010; produktiv ist für den UUID-Nachweis ausschließlich 011 anzuwenden. Die bereits veröffentlichte 010 bleibt unverändert.
+
+Die zwei Implementierungen des Fokuserhalts wurden zusammengeführt: gemeinsame Funktion mit Textauswahl sowie offenen Bereichen anhand stabiler IDs. Neue Navigations-/Formularstruktur, Personenzuordnung, Kalenderwochen, Befinden-Abwahl, Stillstart-/Endfokus und Scrollen zu Speichermeldungen erhalten. Restore umfasst zusätzlich die drei privaten Layout-Sicherungstabellen und die Rollen-RPC.
+
+Lokale Integrationsprüfung bestanden: `npm run check` mit 32 Tests, TypeScript und Build; `test-local-supabase.mjs` einschließlich beider RPCs; `test-restore.mjs` mit elf Migrationen und exaktem Vergleich von elf Tabellen. Layout-CSS, Kalenderfunktionen und veröffentlichte Migration 010 sind gegenüber `0cfde3d` unverändert.
+
+Browser-Harness mit synthetischem Konto auf Port 5175: neues Layout/Person/Save-Beschriftung vorhanden, 390/320 px ohne Überlauf; Windel-Toggle und Fokus über Hintergrundrefresh erhalten. Manuelle Zeit, offener Zeitbereich und Eingabefokus bleiben erhalten. DOM-Aktionen nach Accessibility-Inspektion verwendet. Screenshot `/private/tmp/phililog-integrated-320.png`.
+
+Status der Integration: Lokale Prüfung abgeschlossen. Nächster Schritt: Integrationscommit in CI bestätigen und auf Main pushen.

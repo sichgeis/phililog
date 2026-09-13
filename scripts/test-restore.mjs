@@ -48,7 +48,13 @@ try {
       select id,kind,occurred_at,started_at,duration_minutes,amount_ml,side,created_by,created_at,updated_at,version,milk_type,urine,stool,held_success,weight_g,performed_by,estimated_ml
       from public.feedings where kind='bottle';
   `);
-  const tables = ['public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
+  sql(source, `
+    create table private.events_before_20260913_layout as select * from public.feedings;
+    create table private.settings_before_20260913_layout as select * from public.family_settings;
+    create table private.members_before_20260913_layout as select * from private.members;
+    revoke all on private.events_before_20260913_layout, private.settings_before_20260913_layout, private.members_before_20260913_layout from public, anon, authenticated;
+  `);
+  const tables = ['private.events_before_20260913_layout', 'private.settings_before_20260913_layout', 'private.members_before_20260913_layout', 'public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
   const snapshot = db => tables.map(table => sql(db, `select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from ${table} t;`));
   const before = snapshot(source);
   // Consistent custom-format dump includes schema, grants, policies, triggers and all data.
@@ -61,6 +67,7 @@ try {
     select set_config('request.jwt.claim.sub','${julia}',true);
     do $$ begin
       assert public.is_family_member();
+      assert public.current_family_person() = 'Julia';
       assert (select count(*)=4 from public.feedings);
       assert public.feeding_create_known('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee');
       update public.feedings set amount_ml=75 where id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' and version=1;
@@ -83,7 +90,7 @@ try {
       assert not has_table_privilege('authenticated','private.events_before_20260913_correction','select');
  assert not has_table_privilege('anon','public.feedings','select'); end $$;
     rollback;`);
-  console.log('Restore bestanden: alle 10 Migrationen auf leerer Datenbank, vollständiger synthetischer Dump/Restore, identische Daten und Metadaten, RLS, Versionsschutz und gelöschte UUID.');
+  console.log('Restore bestanden: alle 11 Migrationen auf leerer Datenbank, vollständiger synthetischer Dump/Restore, identische Daten und Metadaten, RLS, Versionsschutz und gelöschte UUID.');
 } finally {
   sql('postgres', `drop database if exists ${target} with (force); drop database if exists ${source} with (force);`);
 }

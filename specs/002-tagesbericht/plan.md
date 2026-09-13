@@ -12,4 +12,4 @@ Zwei positive Integer-Spalten `breast_left_ml`/`breast_right_ml`, aus bisherigem
 
 ## Wartung
 
-Settings-Entwürfe speichern die ursprüngliche Version gemeinsam mit beiden Werten. Hintergrundaktualisierungen ändern nur den Serverstand. Konfliktauflösung und Nachweise stehen in [004](../004-wartung/plan.md).
+Settings-Entwürfe speichern die ursprüngliche Version gemeinsam mit beiden Werten. Hintergrundaktualisierungen ändern nur den Serverstand. Konfliktauflösung und Nachweise stehen in [005](../005-wartung/plan.md).

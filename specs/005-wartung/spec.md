@@ -1,4 +1,4 @@
-# 004 – Wartung und zuverlässige Speicherung
+# 005 – Wartung und zuverlässige Speicherung
 
 Status: Abgeschlossen; Nachweise in [tasks.md](tasks.md).
 
@@ -11,3 +11,7 @@ Abgestimmt am 13. September 2026: Wartungspaket nach Maintenance-Review ausdrüc
 - REQ-005 / AC-005: Dokumentation beschreibt aktuellen Aufbau, Gestaltung, Migrationsnachweis und vollständige Wiederherstellung. Restore wird ausschließlich mit synthetischen Daten geprüft; historische produktive Migrationen werden weder geändert noch erneut angewandt.
 
 Grenze: Vor Einführung des UUID-Nachweises bereits gelöschte Einträge lassen sich nachträglich nicht erkennen. CSV ersetzt keine vollständige Sicherung.
+
+## Integration mit dem veröffentlichten Bedienlayout
+
+Am 13. September 2026 ausdrücklich beauftragt: Wartungspaket mit aktuellem `main` zusammenführen, prüfen und auf `main` pushen. Feature 004 und Migration 010 sind durch das bereits veröffentlichte Layout belegt. Wartung wird daher Feature 005 und der noch unveröffentlichte UUID-Nachweis Migration 011. Layout, Kalenderwochen und geschützte Personenzuordnung bleiben erhalten. Offene Formularbereiche werden anhand ihrer stabilen IDs erhalten, auch wenn sich die Reihenfolge durch einen Artwechsel ändert.

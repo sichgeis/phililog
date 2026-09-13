@@ -16,7 +16,7 @@ try {
   sql('create schema if not exists supabase_migrations; create table if not exists supabase_migrations.schema_migrations(version text primary key, statements text[], name text);');
   for (const file of readdirSync('supabase/migrations').filter(f => /^\d+_[a-z_]+\.sql$/.test(f)).sort()) {
     const version = file.split('_')[0];
-    // Each migration and its receipt commit together; LOCK TABLE in 008/010 is valid.
+    // Each migration and its receipt commit together; LOCK TABLE in 008/011 is valid.
     sql(`begin; ${readFileSync(`supabase/migrations/${file}`, 'utf8')}\ninsert into supabase_migrations.schema_migrations(version,name) values ('${version}','${file}'); commit;`);
     console.log(`Migration ${file} transaktional angewandt.`);
   }

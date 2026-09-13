@@ -25,4 +25,4 @@ Abgeschlossen: [Pages-Workflow 34750629555](https://github.com/sichgeis/phililog
 
 ## Wartung
 
-Die zusätzliche Regression für konkurrierende Einstellungen nach Hintergrundaktualisierung ist im [Wartungspaket](../004-wartung/tasks.md) dokumentiert.
+Die zusätzliche Regression für konkurrierende Einstellungen nach Hintergrundaktualisierung ist im [Wartungspaket](../005-wartung/tasks.md) dokumentiert.

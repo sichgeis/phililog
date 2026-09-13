@@ -37,6 +37,10 @@ ids.push(input.id);
 try {
   assert.ok((await anonymous.auth.signUp({ email: `blocked-${randomUUID()}@phililog.test`, password })).error, 'Public registration disabled');
   assert.equal((await julia.client.rpc('is_family_member')).data, true);
+  assert.deepEqual(await julia.client.rpc('current_family_person').then(({ data, error }) => ({ data, error })), { data: 'Julia', error: null });
+  assert.equal((await christian.client.rpc('current_family_person')).data, 'Christian');
+  assert.equal((await outsider.client.rpc('current_family_person')).data, null);
+  assert.ok((await anonymous.rpc('current_family_person')).error, 'Anonymous cannot read member role');
   assert.equal((await christian.client.rpc('is_family_member')).data, true);
   assert.equal((await outsider.client.rpc('is_family_member')).data, false);
   assert.ok((await anonymous.from('feedings').select()).error, 'Anonymous read denied');

@@ -92,4 +92,4 @@ Neue Einträge automatisch über geschützte Kontozuordnung; Namensmarkierungen 
 
 ## Wartung – 13. September 2026
 
-Aktuelle Implementierungs- und Betriebsnachweise stehen im [Wartungspaket](../004-wartung/tasks.md). Die vorherigen Abschnitte sind chronologische Nachweise, keine weiterhin offenen Icon-/Hostingentscheidungen. Repository und Pages sind öffentlich eingerichtet, Phi ist das aktuelle Icon. Die vollständige Smartphone-PWA-Abnahme bleibt separat.
+Aktuelle Implementierungs- und Betriebsnachweise stehen im [Wartungspaket](../005-wartung/tasks.md). Die vorherigen Abschnitte sind chronologische Nachweise, keine weiterhin offenen Icon-/Hostingentscheidungen. Repository und Pages sind öffentlich eingerichtet, Phi ist das aktuelle Icon. Die vollständige Smartphone-PWA-Abnahme bleibt separat.

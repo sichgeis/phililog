@@ -16,7 +16,7 @@ async function setup(t: any) {
   const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
   Object.assign(window, domain, report, {
-    configured: true,
+    configured: true, currentFamilyPerson: async () => 'Julia',
     supabase: { rpc: async () => ({ data: true }), auth: { onAuthStateChange() {}, signOut: async () => ({}) } },
     getSettings: async () => ({ ...settings }),
     saveSettings: async (values: any, version: number) => {
@@ -102,4 +102,38 @@ test('Ungewisse Übermittlung wiederholt dieselbe ID; fremde Korrektur und Lösc
     assert.match(ui.find('#messages').textContent, deleted ? /gelöscht/ : /inzwischen geändert/);
     assert.equal(ui.window.localStorage.getItem('phililog-draft:test-user')?.includes('"pending":null'), true);
   }
+});
+
+test('Neues Layout erhält Bereiche per ID bei Artwechsel, Stillfokus und Befinden-Abwahl', async t => {
+  const ui = await setup(t);
+  assert.match(ui.find('#time-options').textContent, /Julia/);
+  ui.find('#estimate-options').open = true;
+  ui.find('#mood-options').open = true;
+  ui.find('#time-options').open = false;
+  ui.find('[data-kind="bottle"]').click();
+  assert.equal(ui.find('#time-options').open, false, 'Stillmenge darf nicht den Zeitbereich öffnen');
+  assert.equal(ui.find('#mood-options').open, true);
+  ui.find('[data-mood="calm"]').click();
+  ui.find('#clear-mood').click();
+  assert.equal(ui.window.document.activeElement, ui.find('#mood-options summary'));
+  ui.find('[data-kind="breast"]').click();
+  ui.find('#start-breast').click();
+  assert.equal(ui.window.document.activeElement?.id, 'end-breast');
+  await ui.app.refresh();
+  assert.equal(ui.window.document.activeElement?.id, 'end-breast');
+  ui.find('#end-breast').click();
+  assert.equal(ui.window.document.activeElement?.id, 'clear-timer');
+});
+
+test('Kalenderwochen-Navigation bleibt mit Wartungsrefresh bedienbar', async t => {
+  const ui = await setup(t);
+  ui.app.switchView('report'); await ui.app.refresh();
+  const current = ui.find('.report-controls strong').textContent;
+  assert.equal(ui.find('#report-next').disabled, true);
+  ui.find('#report-prev').click(); await ui.app.refresh();
+  assert.notEqual(ui.find('.report-controls strong').textContent, current);
+  assert.equal(ui.find('#report-next').disabled, false);
+  ui.find('#report-today').click(); await ui.app.refresh();
+  assert.equal(ui.find('.report-controls strong').textContent, current);
+  assert.equal(ui.find('#report-next').disabled, true);
 });
