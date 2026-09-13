@@ -31,7 +31,7 @@ test('nur positive Flaschenmengen in 5-ml-Schritten sind zulässig', () => {
   }
 });
 test('Stillen speichert keine alte Flaschenmenge; unbekannte Dauer erlaubt', () => {
-  const input = feedingInput({ ...newDraft(), amount: '90', breastUnknown: true, side: 'both' }, now);
+  const input = feedingInput({ ...newDraft(25), amount: '90', breastUnknown: true, side: 'both' }, now);
   assert.equal(input.amount_ml, null);
   assert.equal(input.duration_minutes, null);
   assert.equal(input.started_at, null);

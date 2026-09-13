@@ -131,6 +131,7 @@ try {
     const bulk = Array.from({ length: 505 }, (_, i) => ({ ...payload, id: randomUUID(), created_by: julia.user.id, occurred_at: new Date(Date.UTC(2025, 0, 1, 0, i)).toISOString() }));
     ids.push(...bulk.map(row => row.id));
     assert.ifError((await admin.from('feedings').insert(bulk)).error);
+    const bulkReport = await julia.client.rpc('daily_report',{ first_day:'2025-01-01',last_day:'2025-01-01' }); assert.ifError(bulkReport.error); assert.ok(bulkReport.data[0].events >= 505);
     const page = await api.listFeedings();
     assert.equal(page.length, 30);
     const last = page.at(-1);
@@ -142,6 +143,34 @@ try {
     assert.equal(toCsv(exported).split('\r\n').length, exported.length + 2);
     await api.supabase.auth.signOut();
   } finally { await vite.close(); }
+  const originalSettings = await julia.client.from('family_settings').select().single(); assert.ifError(originalSettings.error);
+  try {
+    assert.deepEqual((await outsider.client.from('family_settings').select()).data, []);
+    assert.ok((await anonymous.from('family_settings').select()).error);
+    assert.deepEqual((await outsider.client.from('family_settings').update({ breast_ml: 99 }).eq('id',true).select()).data, []);
+    assert.ok((await julia.client.from('family_settings').update({ breast_ml: 0 }).eq('id',true)).error);
+    const changed = await julia.client.from('family_settings').update({ breast_ml: 35 }).eq('id',true).eq('version',originalSettings.data.version).select().single(); assert.ifError(changed.error);
+    assert.equal((await christian.client.from('family_settings').select().single()).data.breast_ml,35);
+    assert.deepEqual((await christian.client.from('family_settings').update({ breast_ml: 40 }).eq('version',originalSettings.data.version).select()).data,[]);
+    assert.ok((await outsider.client.rpc('daily_report',{ first_day:'2088-03-27',last_day:'2088-03-28' })).error);
+    assert.ok((await anonymous.rpc('daily_report',{ first_day:'2088-03-27',last_day:'2088-03-28' })).error);
+    assert.ok((await julia.client.rpc('daily_report',{ first_day:'2088-01-01',last_day:'2088-12-31' })).error);
+    // 2088-03-28 is the 23-hour DST-start day in Europe/Berlin.
+    const sample = (kind, time, extra = {}) => ({ id: randomUUID(), kind, occurred_at: time, started_at: null, duration_minutes: null, amount_ml: null, side: null, created_by: julia.user.id, ...extra });
+    const samples = [sample('bottle','2088-03-27T23:00:00Z',{ amount_ml:60 }), sample('breast','2088-03-28T12:00:00Z',{ estimated_ml:50 }), sample('breast','2088-03-28T13:00:00Z'), sample('diaper','2088-03-28T14:00:00Z',{ urine:true,stool:true,held_success:false }), sample('diaper','2088-03-28T15:00:00Z',{ urine:false,stool:false,held_success:false }), sample('bottle','2088-03-28T22:00:00Z',{ amount_ml:90 })];
+    ids.push(...samples.map(e=>e.id));
+    for (const row of samples) assert.ifError((await julia.client.from('feedings').insert(row)).error);
+    assert.ok((await julia.client.from('feedings').update({ estimated_ml:25 }).eq('id',samples[0].id)).error);
+    assert.ok((await julia.client.from('feedings').update({ estimated_ml:-1 }).eq('id',samples[1].id)).error);
+    const result = await christian.client.rpc('daily_report',{ first_day:'2088-03-27',last_day:'2088-03-29' }); assert.ifError(result.error);
+    assert.deepEqual(result.data.find(d=>d.day==='2088-03-28'),{day:'2088-03-28',bottle_ml:60,breast_ml:50,missing_estimates:1,diapers:2,wet:1,stool:1,events:5});
+    assert.equal(result.data.find(d=>d.day==='2088-03-29').bottle_ml,90);
+    assert.equal(result.data.find(d=>d.day==='2088-03-27').events,0);
+    assert.ifError((await christian.client.from('feedings').update({ estimated_ml:70 }).eq('id',samples[1].id)).error);
+    assert.equal((await julia.client.rpc('daily_report',{first_day:'2088-03-28',last_day:'2088-03-28'})).data[0].breast_ml,70);
+    assert.ifError((await christian.client.from('feedings').delete().eq('id',samples[1].id)).error);
+    assert.equal((await julia.client.rpc('daily_report',{first_day:'2088-03-28',last_day:'2088-03-28'})).data[0].breast_ml,0);
+  } finally { assert.ifError((await admin.from('family_settings').update({ breast_ml: originalSettings.data.breast_ml }).eq('id',true)).error); }
   console.log('Lokale Supabase-Prüfungen bestanden: erlaubte/verbotene CRUD-Zugriffe, Selbstfreischaltung, Validierung, Duplikatschutz, Versionskonflikte, echte Wiederholung und Export über 505 Einträge.');
 } finally {
   for (let offset = 0; offset < ids.length; offset += 100) {

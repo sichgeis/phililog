@@ -4,7 +4,13 @@ Ein gemeinsames Logbuch für den Alltag mit einem neugeborenen Baby. Es erfasst 
 
 ## Projektstatus
 
-Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält kompakte Fütterungs- und Wickeleingabe, Wiegen unter „Weitere Ereignisse“, Stillstart/-ende, Personenzuordnung zu Julia/Christian, Historie, Korrekturen, Löschen, CSV-Export und eine Projektinfo. Die App ist auf [GitHub Pages](https://sichgeis.github.io/phililog/) veröffentlicht und mit dem Supabase-Free-Projekt Philine-Log in Europa verbunden. Beide Elternkonten und der gemeinsame Datenzugriff wurden produktiv geprüft. [MVP-Spezifikation](specs/001-fuettern/spec.md).
+Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält kompakte Fütterungs- und Wickeleingabe, Wiegen unter „Weitere Ereignisse“, Stillstart/-ende, Personenzuordnung zu Julia/Christian, Historie, Korrekturen, Löschen, CSV-Export einen Tagesbericht, gemeinsame Einstellungen für Still-Schätzungen und eine Projektinfo. Die App ist auf [GitHub Pages](https://sichgeis.github.io/phililog/) veröffentlicht und mit dem Supabase-Free-Projekt Philine-Log in Europa verbunden. Beide Elternkonten und der gemeinsame Datenzugriff wurden produktiv geprüft. [MVP-Spezifikation](specs/001-fuettern/spec.md).
+
+## Tagesbericht und Still-Schätzung
+
+„Tagesbericht“ zeigt sieben Kalendertage in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge, erfasste Summe sowie Wickeln/Urin/Stuhl. Fehlende Schätzungen werden kenntlich gemacht. Über Datum und Pfeile sind frühere Tage erreichbar.
+
+Unter „Einstellungen“ im Footer gilt anfangs 25 ml pro Brust: Links/Rechts 25 ml, Beide 50 ml, offene Seite ohne automatische Menge. Die aufklappbare Stillmenge erlaubt eine eigene Gesamtmenge oder eine leere Angabe. Jeder Eintrag behält seine Schätzung; ein neuer Standard ändert gespeicherte Werte nicht. Bereits begonnene Entwürfe behalten ihren Standard; „Aktuellen Standard verwenden“ übernimmt ihn ausdrücklich. [Spezifikation](specs/002-tagesbericht/spec.md).
 
 ## Entwicklung
 

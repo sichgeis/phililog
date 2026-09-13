@@ -1,6 +1,8 @@
 import './style.css';
-import { configured, supabase, listFeedings, allFeedings, latestMeal, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
-import { newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, elapsedLabel, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
+import { getSettings, saveSettings, getDailyReport, configured, supabase, listFeedings, allFeedings, latestMeal, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
+import { estimatedMilk, newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, elapsedLabel, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
+
+import { berlinDay, shiftDay, milliliters, type Settings, type DailyReport } from './report.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const icons = {
@@ -19,7 +21,7 @@ const escape = (s: unknown): string => String(s ?? '').replace(/[&<>"']/g, c => 
 const timeLabel = (iso: string) => new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 const dateLabel = (iso: string) => new Date(iso).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
 let userId: string | null = null;
-let view: 'new' | 'history' | 'about' = 'new';
+let view: 'new' | 'history' | 'about' | 'report' | 'settings' = 'new';
 let draft = newDraft();
 let edit: Feeding | null = null;
 let pending: PendingCreate | null = null;
@@ -35,6 +37,10 @@ let authorized = false;
 let epoch = 0;
 let refreshGeneration = 0;
 let loginEmail = '';
+let settings: Settings | null = null;
+let settingsDraft: string | null = null;
+let reportEnd = berlinDay();
+let reportRows: DailyReport[] | null = null;
 
 function confirmAction(message: string): Promise<boolean> {
   return new Promise(resolve => {
@@ -65,6 +71,7 @@ function restore() {
       if (draft.breastUnknown) draft.breastDuration = '0';
       draft.bottleUnknown = false; draft.breastUnknown = false;
       edit = saved.edit ?? null;
+      if (edit && saved.draft.estimateMode === undefined) { draft.estimateMode = 'manual'; draft.estimate = edit.estimated_ml == null ? '' : String(edit.estimated_ml); }
       pending = saved.pending ?? null;
     }
   } catch { /* Ignore a damaged local draft. */ }
@@ -92,7 +99,7 @@ function renderLogin() {
 function details(entry: Feeding): string {
   if (entry.kind === 'weight') return `${entry.weight_g?.toLocaleString('de-DE')} g`;
   if (entry.kind === 'diaper') return [entry.urine ? 'Urin' : '', entry.stool ? 'Stuhl' : '', !entry.urine && !entry.stool ? 'Windel trocken' : '', entry.held_success ? 'Abhalten erfolgreich' : ''].filter(Boolean).join(' · ');
-  return [entry.started_at ? `${timeLabel(entry.started_at)}–${timeLabel(entry.occurred_at)}` : '', entry.amount_ml !== null ? `${entry.amount_ml} ml` : sideLabel(entry.side), entry.duration_minutes === null ? 'Dauer unbekannt' : `${entry.duration_minutes} Min.`, milkLabel(entry.milk_type)].filter(Boolean).join(' · ');
+  return [entry.started_at ? `${timeLabel(entry.started_at)}–${timeLabel(entry.occurred_at)}` : '', entry.amount_ml !== null ? `${entry.amount_ml} ml` : sideLabel(entry.side), entry.duration_minutes === null ? 'Dauer unbekannt' : `${entry.duration_minutes} Min.`, milkLabel(entry.milk_type), entry.kind === 'breast' && entry.estimated_ml != null ? `ca. ${entry.estimated_ml} ml geschätzt` : ''].filter(Boolean).join(' · ');
 }
 function entryCard(entry: Feeding, compact = false): string {
   return `<article class="entry ${compact ? 'compact' : ''}"><span class="entry-icon ${entry.kind}">${icon(entry.kind === 'bottle' ? 'bottle' : entry.kind === 'diaper' ? 'diaper' : entry.kind === 'weight' ? 'weight' : 'heart')}</span><div class="entry-content"><div class="entry-heading"><strong>${kindLabel(entry.kind)}</strong><time datetime="${escape(entry.occurred_at)}">${timeLabel(entry.occurred_at)}</time></div><p>${escape(details(entry))}</p><span class="person-badge ${entry.performed_by === 'Julia' ? 'person-julia' : entry.performed_by === 'Christian' ? 'person-christian' : 'person-unknown'}">${escape(entry.performed_by ?? 'Nicht zugeordnet')}</span>${compact ? `<span class="entry-date">${dateLabel(entry.occurred_at)}</span>` : ''}</div><button class="edit-button" data-edit="${entry.id}" aria-label="${kindLabel(entry.kind)} vom ${escape(dateLabel(entry.occurred_at))} um ${timeLabel(entry.occurred_at)} bearbeiten">${icon('arrow')}</button></article>`;
@@ -108,12 +115,48 @@ function formView(): string {
       ${diaper ? `<div class="field-block"><div class="field-header"><label>Was war in der Windel?</label></div><div class="diaper-toggles" role="group" aria-label="Windelinhalt"><button type="button" data-diaper="urine" aria-pressed="${draft.urine}" class="secondary ${draft.urine ? 'selected' : ''}">💧 Urin</button><button type="button" data-diaper="stool" aria-pressed="${draft.stool}" class="secondary ${draft.stool ? 'selected' : ''}">💩 Stuhl</button></div><p class="field-note">Beides möglich. Ohne Auswahl: Windel trocken.</p><button type="button" data-diaper="heldSuccess" aria-pressed="${draft.heldSuccess}" class="secondary held-toggle ${draft.heldSuccess ? 'selected' : ''}">${icon('check')} Abhalten erfolgreich</button></div>` : ''}
       ${bottle ? `<div class="field-block"><label for="milk-type">Milchart</label><select id="milk-type"><option value="pre" ${draft.milkType === 'pre' ? 'selected' : ''}>Pre-Nahrung</option><option value="breast_milk" ${draft.milkType === 'breast_milk' ? 'selected' : ''}>Muttermilch</option>${draft.milkType === '' ? '<option value="" selected>Nicht angegeben</option>' : ''}</select></div><div class="field-block"><div class="field-header"><label for="amount">Wie viel?</label><span class="field-hint">In 5-ml-Schritten</span></div><div class="stepper amount-stepper"><button type="button" data-step="amount:-5" aria-label="Menge um 5 Milliliter verringern">−</button><div class="unit-input"><input id="amount" name="amount" type="number" inputmode="numeric" min="5" step="5" placeholder="—" value="${escape(draft.amount)}" required><span>ml</span></div><button type="button" data-step="amount:5" aria-label="Menge um 5 Milliliter erhöhen">+</button></div><p class="field-note">Die tatsächlich getrunkene Menge.</p></div>` : diaper || weight ? '' : `<div class="field-block"><div class="field-header"><label>Welche Seite?</label><span class="field-hint">Optional</span></div><div class="segmented side-picker" role="group" aria-label="Stillseite">${[['', 'Offen'], ['left', 'Links'], ['right', 'Rechts'], ['both', 'Beide']].map(([value, label]) => `<button type="button" data-side="${value}" aria-pressed="${draft.side === value}" class="${draft.side === value ? 'active' : ''}">${label}</button>`).join('')}</div></div>`}
       ${draft.kind === 'breast' ? `<div class="timer-box"><div><span class="eyebrow">STILLZEIT FESTHALTEN</span><p>${draft.breastStart ? `Beginn ${timeLabel(draft.breastStart)}${draft.breastEnd ? ` · Ende ${timeLabel(draft.breastEnd)}` : ' · läuft'}` : 'Ein Klick zum Start. Einer zum Ende.'}</p>${draft.breastStart ? `<strong class="elapsed-timer" id="nursing-elapsed">${elapsedLabel(draft.breastStart, draft.breastEnd ? new Date(draft.breastEnd).getTime() : Date.now(), true)}</strong>` : ''}</div>${!draft.breastStart ? `<button type="button" id="start-breast" class="secondary">Stillen starten</button>` : !draft.breastEnd ? `<button type="button" id="end-breast" class="primary">Stillen beenden</button>` : '<span class="timer-done">Zeiten erfasst</span>'}${draft.breastStart ? '<button type="button" id="clear-timer" class="text-button">Zeiten manuell angeben</button>' : ''}</div>` : ''}
+      ${draft.kind === 'breast' ? `<details class="estimate-options" ${draft.estimateMode === 'manual' ? 'open' : ''}><summary>Stillmenge · ${estimateLabel()}</summary><p class="field-note">Optionale Schätzung für die gesamte Mahlzeit. ${draft.breastDefault === null ? 'Standard wird geladen.' : `Standard: ${draft.breastDefault} ml pro Brust; bei beiden doppelt.`}</p><label for="estimate">Geschätzte Gesamtmenge (ml)</label><input id="estimate" type="number" inputmode="numeric" min="0" step="1" value="${escape(draft.estimateMode === 'manual' ? draft.estimate : automaticEstimateValue())}" placeholder="Keine Schätzung"><p class="field-note">Leer lassen, wenn ihr keine Menge schätzen möchtet.</p><button type="button" id="estimate-default" class="text-button" ${!settings ? 'disabled' : ''}>Aktuellen Standard verwenden</button></details>` : ''}
       <div class="field-block duration-block" ${diaper || weight ? 'hidden' : ''}><div class="field-header"><label for="duration">Wie lange?</label><span class="field-hint">${timed ? 'Aus Start und Ende' : 'Vorschlag · anpassbar'}</span></div><div class="stepper"><button type="button" data-step="duration:-1" aria-label="Dauer um eine Minute verringern" ${timed ? 'disabled' : ''}>−</button><div class="unit-input"><input id="duration" name="duration" type="number" inputmode="numeric" min="0" step="1" placeholder="—" value="${timed && !draft.breastEnd ? '' : escape(bottle ? draft.bottleDuration : draft.breastDuration)}" ${timed ? 'disabled' : ''}><span>Min.</span></div><button type="button" data-step="duration:1" aria-label="Dauer um eine Minute erhöhen" ${timed ? 'disabled' : ''}>+</button></div>${!timed ? '<p class="field-note">0 Minuten = Dauer nicht bekannt</p>' : ''}</div>
       <div class="field-block time-block" ${timed ? 'hidden' : ''}><div class="field-header"><label>${weight ? 'Wann wurde gewogen?' : diaper ? 'Wann wurde gewickelt?' : 'Wann war die Mahlzeit zu Ende?'}</label></div><div class="segmented" role="group" aria-label="Zeitpunkt"><button type="button" data-time="now" aria-pressed="${draft.timeMode === 'now'}" class="${draft.timeMode === 'now' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Gerade eben</button><button type="button" data-time="custom" aria-pressed="${draft.timeMode === 'custom'}" class="${draft.timeMode === 'custom' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Anderer Zeitpunkt</button></div>${draft.timeMode === 'custom' ? `<label class="sr-only" for="local-time">Datum und Uhrzeit</label><input id="local-time" ${timed ? 'disabled' : ''} type="datetime-local" step="60" value="${escape(draft.localTime)}" required>` : '<p class="field-note">Die aktuelle Uhrzeit wird beim Speichern eingetragen.</p>'}</div>${edit ? `<div class="field-block"><label for="performed-by">Erledigt von</label><select id="performed-by">${!draft.performedBy ? '<option value="" selected>Nicht zugeordnet</option>' : ''}<option value="Julia" ${draft.performedBy === 'Julia' ? 'selected' : ''}>Julia</option><option value="Christian" ${draft.performedBy === 'Christian' ? 'selected' : ''}>Christian</option></select></div>` : '<p class="field-note">Wird dir zugeordnet · später änderbar</p>'}</fieldset>
       ${pending ? '<p class="pending-note">Die Bestätigung fehlt noch. „Erneut speichern“ prüft dieselbe Übermittlung, ohne einen zweiten Eintrag anzulegen.</p>' : ''}
       <button class="primary full save-button" type="submit" ${busy || (timed && !draft.breastEnd) ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : pending ? 'Erneut speichern' : edit ? 'Änderungen speichern' : 'Io triumphe'} ${icon('check')}</button>
       ${edit ? `<div class="edit-actions"><button type="button" id="cancel-edit" class="text-button" ${busy ? 'disabled' : ''}>Abbrechen</button><button type="button" id="delete-entry" class="text-button danger" ${busy ? 'disabled' : ''}>Eintrag löschen</button></div>` : ''}
       </form></section><aside class="aside"><section class="last-entry"><div class="section-title"><h2>${diaper || weight ? 'Letzter Eintrag' : 'Letzte Mahlzeit'}</h2></div>${diaper || weight ? (latest ? entryCard(latest, true) : '<p class="muted">Noch kein Eintrag vorhanden.</p>') : meal ? `<div class="meal-age"><strong id="meal-elapsed">${elapsedLabel(meal.occurred_at)}</strong><p>${kindLabel(meal.kind)} · Ende ${timeLabel(meal.occurred_at)}</p></div>` : `<p class="muted meal-age">${loading ? 'Mahlzeit wird geladen …' : 'Noch keine Mahlzeit eingetragen.'}</p>`}<button id="see-history" class="history-link">Zum Logbuch ${icon('arrow')}</button></section></aside></div>`;
+}
+function automaticEstimateValue(): string {
+  try { return String(estimatedMilk(draft) ?? ''); } catch { return ''; }
+}
+function estimateLabel(): string {
+  try { const value = estimatedMilk(draft); return value === null ? 'ohne Schätzung' : `ca. ${value} ml`; } catch { return 'Bitte Menge prüfen'; }
+}
+function settingsView(): string {
+  return `<section class="card settings-card"><h1>Einstellungen</h1><h2>Still-Schätzung</h2><p>Gemeinsam für Julia und Christian. Der Standard wird bei neuen Einträgen pro Brust übernommen. Gespeicherte Mengen bleiben unverändert.</p>${settings ? `<form id="settings-form" novalidate><label for="breast-default">Standard pro Brust (ml)</label><input id="breast-default" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft ?? settings.breast_ml)}" ${busy ? 'disabled' : ''}><p class="field-note">Links oder rechts: einmal. Beide: zweimal. Dies ist eure persönliche Schätzung.</p><button class="primary" ${busy ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : 'Einstellungen speichern'}</button></form>` : '<p>Einstellungen werden geladen …</p>'}</section>`;
+}
+function reportView(): string {
+  const formatDay = (day: string) => new Date(`${day}T12:00:00Z`).toLocaleDateString('de-DE', { day: 'numeric', month: 'short', weekday: 'short', timeZone: 'Europe/Berlin' });
+  const ml = (n: number) => `${n.toLocaleString('de-DE')} ml`;
+  return `<section class="daily-report"><h1>Tagesbericht</h1><div class="report-controls"><button class="secondary" id="report-prev" aria-label="Sieben Tage zurück">←</button><label>Bis einschließlich<input id="report-end" type="date" value="${reportEnd}"></label><button class="secondary" id="report-next" aria-label="Sieben Tage weiter" ${reportEnd >= berlinDay() ? 'disabled' : ''}>→</button></div><p class="field-note">Kalendertage in deutscher Zeit · Stillmengen sind Schätzungen.</p>${reportRows === null ? `<p>${loading ? 'Bericht wird geladen …' : 'Bericht konnte nicht geladen werden.'}</p>` : reportRows.map(row => `<article class="card daily-card"><h2>${formatDay(row.day)}</h2>${row.events ? `<dl class="milk-totals"><div><dt>Flasche</dt><dd>${ml(row.bottle_ml)}</dd></div><div><dt>Stillen · geschätzt</dt><dd>${row.breast_ml === 0 && row.missing_estimates ? '—' : `ca. ${ml(row.breast_ml)}`}</dd></div><div class="milk-total"><dt>Erfasste Summe · geschätzt</dt><dd>ca. ${ml(row.bottle_ml + row.breast_ml)}</dd></div></dl>${row.missing_estimates ? `<p class="missing-estimates">${row.missing_estimates} Stillmahlzeit${row.missing_estimates === 1 ? '' : 'en'} ohne Mengenangabe · Summe unvollständig</p>` : ''}<div class="diaper-counts"><span><b>${row.diapers}</b> × gewickelt</span><span><b>${row.wet}</b> × Urin</span><span><b>${row.stool}</b> × Stuhl</span></div>` : '<p class="field-note">Keine Einträge</p>'}</article>`).join('')}</section>`;
+}
+async function storeSettings() {
+  if (busy || !settings) return;
+  const ownEpoch = epoch;
+  try {
+    const value = milliliters(settingsDraft ?? String(settings.breast_ml), false);
+    busy = true; error = ''; render();
+    const updated = await saveSettings(value, settings.version);
+    if (ownEpoch !== epoch) return;
+    settings = updated; settingsDraft = null;
+    if (!edit && !pending && !draft.side && !draft.breastStart && draft.estimateMode === 'auto') { draft.breastDefault = updated.breast_ml; remember(); } notice = 'Standard gespeichert. Gilt für neue Einträge.';
+  } catch (e) { if (ownEpoch === epoch) error = friendlyError(e); }
+  finally { if (ownEpoch === epoch) { busy = false; render(); } }
+}
+function bindReports() {
+  document.querySelector('#settings-form')?.addEventListener('submit', e => { e.preventDefault(); void storeSettings(); });
+  document.querySelector<HTMLInputElement>('#breast-default')?.addEventListener('input', e => { settingsDraft = (e.target as HTMLInputElement).value; });
+  const changeRange = (end: string) => { reportEnd = end; reportRows = null; void refresh(); render(); };
+  document.querySelector('#report-prev')?.addEventListener('click', () => changeRange(shiftDay(reportEnd, -7)));
+  document.querySelector('#report-next')?.addEventListener('click', () => changeRange(shiftDay(reportEnd, 7) > berlinDay() ? berlinDay() : shiftDay(reportEnd, 7)));
+  document.querySelector<HTMLInputElement>('#report-end')?.addEventListener('change', e => { const value = (e.target as HTMLInputElement).value; if (/^\d{4}-\d{2}-\d{2}$/.test(value)) changeRange(value); });
 }
 function historyView(): string {
   let previous = '';
@@ -130,7 +173,7 @@ function aboutView(): string {
 }
 function render() {
   if (!userId) return renderLogin();
-  app.innerHTML = `<main class="app-main">${authorized ? `<nav class="main-nav" aria-label="Hauptansichten"><button data-view="new" class="${view === 'new' ? 'active' : ''}" aria-current="${view === 'new' ? 'page' : 'false'}">${icon('plus')}Neuer Eintrag</button><button data-view="history" class="${view === 'history' ? 'active' : ''}" aria-current="${view === 'history' ? 'page' : 'false'}">${icon('book')}Logbuch</button></nav><div id="messages" aria-live="polite">${notice ? `<p class="message success">${icon('check')}${escape(notice)}</p>` : ''}${error ? `<p class="message error" role="alert">${escape(error)} <button id="refresh" class="text-button">Aktualisieren</button></p>` : ''}</div>${view === 'new' ? formView() : view === 'history' ? historyView() : aboutView()}` : `<section class="card access-card"><h1>${loading ? 'Euer Logbuch wird geöffnet …' : 'Zugang noch nicht freigeschaltet'}</h1><p>${escape(error || 'Dieses Konto muss für euer gemeinsames Logbuch freigeschaltet sein.')}</p><button id="refresh-access" class="secondary">Erneut prüfen</button></section>`}</main><footer class="app-footer"><span>phililog.</span>${authorized ? `<button class="text-button" data-view="about" aria-current="${view === 'about' ? 'page' : 'false'}">Über das Projekt</button>` : ''}<button class="text-button logout" id="logout">Abmelden</button></footer>`;
+  app.innerHTML = `<main class="app-main">${authorized ? `<nav class="main-nav" aria-label="Hauptansichten"><button data-view="new" class="${view === 'new' ? 'active' : ''}" aria-current="${view === 'new' ? 'page' : 'false'}">${icon('plus')}Eintragen</button><button data-view="history" class="${view === 'history' ? 'active' : ''}" aria-current="${view === 'history' ? 'page' : 'false'}">${icon('book')}Logbuch</button><button data-view="report" class="${view === 'report' ? 'active' : ''}" aria-current="${view === 'report' ? 'page' : 'false'}">Tagesbericht</button></nav><div id="messages" aria-live="polite">${notice ? `<p class="message success">${icon('check')}${escape(notice)}</p>` : ''}${error ? `<p class="message error" role="alert">${escape(error)} <button id="refresh" class="text-button">Aktualisieren</button></p>` : ''}</div>${view === 'new' ? formView() : view === 'history' ? historyView() : view === 'report' ? reportView() : view === 'settings' ? settingsView() : aboutView()}` : `<section class="card access-card"><h1>${loading ? 'Euer Logbuch wird geöffnet …' : 'Zugang noch nicht freigeschaltet'}</h1><p>${escape(error || 'Dieses Konto muss für euer gemeinsames Logbuch freigeschaltet sein.')}</p><button id="refresh-access" class="secondary">Erneut prüfen</button></section>`}</main><footer class="app-footer"><span>phililog.</span>${authorized ? `<button class="text-button" data-view="about" aria-current="${view === 'about' ? 'page' : 'false'}">Über das Projekt</button><button class="text-button" data-view="settings">Einstellungen</button>` : ''}<button class="text-button logout" id="logout">Abmelden</button></footer>`;
   bindLogout();
   document.querySelector('#refresh-access')?.addEventListener('click', () => void enterSession(userId));
   document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view as typeof view)));
@@ -141,21 +184,22 @@ function render() {
     if (busy || pending) return;
     const entry = entries.find(e => e.id === button.dataset.edit) ?? (latest?.id === button.dataset.edit ? latest : null);
     if (!entry) return;
-    if ((edit || draft.breastStart || draft.amount || draft.weight || draft.timeMode === 'custom') && !await confirmAction('Den aktuellen Entwurf verwerfen und diesen Eintrag bearbeiten?')) return;
+    if ((edit || draft.breastStart || draft.amount || draft.weight || draft.estimateMode === 'manual' || draft.timeMode === 'custom') && !await confirmAction('Den aktuellen Entwurf verwerfen und diesen Eintrag bearbeiten?')) return;
     edit = entry; draft = draftFromFeeding(entry); view = 'new'; notice = ''; error = ''; remember(); render(); window.scrollTo(0, 0);
   }));
   document.querySelector('#load-more')?.addEventListener('click', () => void refresh(true));
   document.querySelector('#export')?.addEventListener('click', () => void exportEntries());
   bindForm();
+  bindReports();
 }
 function switchView(next: typeof view) {
   if (busy) return;
-  captureForm(); remember(); view = next; notice = ''; error = ''; render(); window.scrollTo(0, 0); if (next !== 'about') void refresh();
+  captureForm(); remember(); if (next === 'report') reportRows = null; view = next; notice = ''; error = ''; render(); window.scrollTo(0, 0); if (next !== 'about') void refresh();
 }
 function bindLogout() {
   document.querySelector('#logout')?.addEventListener('click', async () => {
     if (busy) return;
-    if ((pending || edit || draft.breastStart || draft.amount || draft.weight) && !await confirmAction('Abmelden und den ungespeicherten Entwurf auf diesem Gerät löschen?')) return;
+    if ((pending || edit || draft.breastStart || draft.amount || draft.weight || draft.estimateMode === 'manual') && !await confirmAction('Abmelden und den ungespeicherten Entwurf auf diesem Gerät löschen?')) return;
     const key = storageKey();
     await supabase!.auth.signOut({ scope: 'local' });
     try { localStorage.removeItem(key); } catch { /* no local storage */ }
@@ -184,6 +228,8 @@ function bindForm() {
     if (!draft.breastDuration) draft.breastDuration = '30';
     remember(); render();
   });
+  document.querySelector<HTMLInputElement>('#estimate')?.addEventListener('input', e => { draft.estimateMode = 'manual'; draft.estimate = (e.target as HTMLInputElement).value; remember(); });
+  document.querySelector('#estimate-default')?.addEventListener('click', () => { captureForm(); draft.breastDefault = settings!.breast_ml; draft.estimateMode = 'auto'; draft.estimate = ''; remember(); render(); });
   form.addEventListener('input', () => { captureForm(); remember(); });
   document.querySelectorAll<HTMLButtonElement>('[data-kind]').forEach(b => b.addEventListener('click', () => {
     captureForm(); draft.kind = b.dataset.kind as Draft['kind']; remember(); render();
@@ -203,7 +249,7 @@ function bindForm() {
     captureForm(); remember();
   }));
   form.addEventListener('submit', e => { e.preventDefault(); void save(); });
-  document.querySelector('#cancel-edit')?.addEventListener('click', () => { edit = null; draft = newDraft(); error = ''; remember(); render(); });
+  document.querySelector('#cancel-edit')?.addEventListener('click', () => { edit = null; draft = newDraft(settings?.breast_ml ?? null); error = ''; remember(); render(); });
   document.querySelector('#delete-entry')?.addEventListener('click', () => void remove());
 }
 function captureForm() {
@@ -251,7 +297,7 @@ async function save() {
     else await createFeeding(pending!, userId);
     if (ownEpoch !== epoch) return;
     notice = edit ? 'Änderungen gespeichert.' : 'Io triumphe! Eintrag festgehalten.';
-    edit = null; pending = null; draft = newDraft(); remember();
+    edit = null; pending = null; draft = newDraft(settings?.breast_ml ?? null); remember();
   } catch (e) {
     if (ownEpoch !== epoch) return;
     error = friendlyError(e);
@@ -265,7 +311,7 @@ async function remove() {
   busy = true; error = ''; render();
   try {
     await deleteFeeding(edit);
-    edit = null; draft = newDraft(); view = 'history'; notice = 'Eintrag gelöscht.'; remember();
+    edit = null; draft = newDraft(settings?.breast_ml ?? null); view = 'history'; notice = 'Eintrag gelöscht.'; remember();
   } catch (e) { error = friendlyError(e); }
   finally { busy = false; render(); }
   if (!error) await refresh();
@@ -291,13 +337,18 @@ async function refresh(more = false) {
   const ownRefresh = ++refreshGeneration;
   const last = more ? entries.at(-1) : undefined;
   try {
-    const [rows, recentMeal] = await Promise.all([
+    const [rows, recentMeal, currentSettings, dailyRows] = await Promise.all([
       listFeedings(PAGE_SIZE, last ? { time: last.occurred_at, id: last.id } : undefined),
       more ? Promise.resolve(meal) : latestMeal(),
+      getSettings(),
+      view === 'report' ? getDailyReport(shiftDay(reportEnd, -6), reportEnd) : Promise.resolve(null),
     ]);
     if (ownEpoch !== epoch || ownRefresh !== refreshGeneration) return;
     if (more) entries = [...entries, ...rows.filter(row => !entries.some(e => e.id === row.id))];
     else { entries = rows; latest = rows[0] ?? null; meal = recentMeal; }
+    settings = currentSettings;
+    if (!edit && !pending && (draft.breastDefault === null || (!draft.side && !draft.breastStart && draft.estimateMode === 'auto'))) { draft.breastDefault = settings.breast_ml; remember(); }
+    if (dailyRows) reportRows = dailyRows;
     hasMore = rows.length === PAGE_SIZE;
     error = '';
   } catch (e) { if (ownEpoch === epoch && ownRefresh === refreshGeneration) error = friendlyError(e); }
@@ -308,6 +359,7 @@ async function enterSession(id: string | null) {
   const previous = userId;
   const ownEpoch = ++epoch;
   if (previous && previous !== id) { try { localStorage.removeItem(storageKey()); } catch { /* no storage */ } }
+  settings = null; settingsDraft = null; reportRows = null; reportEnd = berlinDay();
   userId = id; authorized = false; entries = []; latest = null; meal = null; draft = newDraft(); pending = null; edit = null;
   error = ''; notice = ''; view = 'new'; busy = false; loading = Boolean(id);
   if (!id) { render(); return; }

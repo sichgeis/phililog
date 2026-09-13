@@ -69,3 +69,7 @@ Die Testdatenbank wird beim Stoppen nicht automatisch gelöscht. `supabase db re
 ## Produktiver Stand
 
 Seit 12. September 2026: [App](https://sichgeis.github.io/phililog/) und [Supabase-Projekt Philine-Log](https://supabase.com/dashboard/project/aiyjwwbdfjtflehtvedt) sind eingerichtet. Die eigene Organisation nutzt Free, das Projekt liegt in Europa. Beide Elternkonten sind administrativ erstellt und freigeschaltet. Öffentliche Registrierung und anonyme Anmeldung sind deaktiviert. GitHub-Variablen enthalten ausschließlich Projekt-URL und Publishable-Key. Der bestehende Masch-Tech-Bestand blieb erhalten, da für das neue Projekt keine Löschung nötig war.
+
+## Erweiterung Tagesbericht
+
+Migration `202609130006_daily_report.sql` ergänzt die optionale Still-Schätzung, gemeinsame Einstellungen mit anfangs 25 ml pro Brust sowie die geschützte Tagesaggregation. Vor der neuen Oberfläche ausrollen. Alte Stillereignisse bleiben ohne Schätzung. Berichtstage werden fest in Europe/Berlin berechnet; der Tagesbericht benötigt Internet. Änderungen des Standards wirken auf neue Entwürfe und führen zu keiner rückwirkenden Neuberechnung gespeicherter Mengen.
