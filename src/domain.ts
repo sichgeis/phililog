@@ -1,10 +1,10 @@
-import { milliliters } from './report.ts';
+import { milliliters, type BreastDefaults } from './report.ts';
 export type FeedingKind = 'bottle' | 'breast' | 'diaper' | 'weight';
 export type Person = 'Julia' | 'Christian';
 export type MilkType = 'pre' | 'breast_milk';
 export type Side = 'left' | 'right' | 'both';
 export interface Draft {
-  breastDefault: number | null;
+  breastDefault: BreastDefaults | null;
   estimateMode: 'auto' | 'manual';
   estimate: string;
   performedBy?: Person | null;
@@ -49,7 +49,8 @@ export interface Feeding extends FeedingInput {
   version: number;
 }
 export const PAGE_SIZE = 30;
-export function newDraft(breastDefault: number | null = null): Draft {
+export function newDraft(defaults: BreastDefaults | number | null = null): Draft {
+  const breastDefault = typeof defaults === 'number' ? { left: defaults, right: defaults } : defaults;
   return { breastDefault, estimateMode: 'auto', estimate: '', kind: 'breast', bottleDuration: '15', breastDuration: '30', bottleUnknown: false,
     breastUnknown: false, milkType: 'pre', urine: false, stool: false, heldSuccess: false, weight: '', amount: '', side: '', timeMode: 'now', localTime: '', exactTime: null, breastStart: null, breastEnd: null };
 }
@@ -147,5 +148,5 @@ export function estimatedMilk(draft: Draft): number | null {
   if (draft.estimateMode === 'manual') return draft.estimate === '' ? null : milliliters(draft.estimate);
   if (!draft.side) return null;
   if (draft.breastDefault === null) throw new Error('Bitte warten, bis der Still-Standard geladen ist, oder eine eigene Schätzung angeben.');
-  return milliliters(String(draft.breastDefault * (draft.side === 'both' ? 2 : 1)));
+  return milliliters(String(draft.side === 'both' ? draft.breastDefault.left + draft.breastDefault.right : draft.breastDefault[draft.side]));
 }

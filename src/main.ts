@@ -2,7 +2,7 @@ import './style.css';
 import { getSettings, saveSettings, getDailyReport, configured, supabase, listFeedings, allFeedings, latestMeal, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
 import { estimatedMilk, newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, elapsedLabel, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
 
-import { berlinDay, shiftDay, milliliters, type Settings, type DailyReport } from './report.ts';
+import { berlinDay, shiftDay, milliliters, type Settings, type BreastDefaults, type DailyReport } from './report.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const icons = {
@@ -38,9 +38,12 @@ let epoch = 0;
 let refreshGeneration = 0;
 let loginEmail = '';
 let settings: Settings | null = null;
-let settingsDraft: string | null = null;
+let settingsDraft: { left: string; right: string } | null = null;
 let reportEnd = berlinDay();
 let reportRows: DailyReport[] | null = null;
+function currentDefaults(): BreastDefaults | null {
+  return settings ? { left: settings.breast_left_ml, right: settings.breast_right_ml } : null;
+}
 
 function confirmAction(message: string): Promise<boolean> {
   return new Promise(resolve => {
@@ -67,6 +70,7 @@ function restore() {
     const saved = JSON.parse(localStorage.getItem(storageKey()) ?? 'null');
     if (saved && ['bottle', 'breast', 'diaper', 'weight'].includes(saved.draft?.kind)) {
       draft = { ...newDraft(), ...saved.draft };
+      if (typeof saved.draft.breastDefault === 'number') draft.breastDefault = { left: saved.draft.breastDefault, right: saved.draft.breastDefault };
       if (draft.bottleUnknown) draft.bottleDuration = '0';
       if (draft.breastUnknown) draft.breastDuration = '0';
       draft.bottleUnknown = false; draft.breastUnknown = false;
@@ -115,7 +119,7 @@ function formView(): string {
       ${diaper ? `<div class="field-block"><div class="field-header"><label>Was war in der Windel?</label></div><div class="diaper-toggles" role="group" aria-label="Windelinhalt"><button type="button" data-diaper="urine" aria-pressed="${draft.urine}" class="secondary ${draft.urine ? 'selected' : ''}">💧 Urin</button><button type="button" data-diaper="stool" aria-pressed="${draft.stool}" class="secondary ${draft.stool ? 'selected' : ''}">💩 Stuhl</button></div><p class="field-note">Beides möglich. Ohne Auswahl: Windel trocken.</p><button type="button" data-diaper="heldSuccess" aria-pressed="${draft.heldSuccess}" class="secondary held-toggle ${draft.heldSuccess ? 'selected' : ''}">${icon('check')} Abhalten erfolgreich</button></div>` : ''}
       ${bottle ? `<div class="field-block"><label for="milk-type">Milchart</label><select id="milk-type"><option value="pre" ${draft.milkType === 'pre' ? 'selected' : ''}>Pre-Nahrung</option><option value="breast_milk" ${draft.milkType === 'breast_milk' ? 'selected' : ''}>Muttermilch</option>${draft.milkType === '' ? '<option value="" selected>Nicht angegeben</option>' : ''}</select></div><div class="field-block"><div class="field-header"><label for="amount">Wie viel?</label><span class="field-hint">In 5-ml-Schritten</span></div><div class="stepper amount-stepper"><button type="button" data-step="amount:-5" aria-label="Menge um 5 Milliliter verringern">−</button><div class="unit-input"><input id="amount" name="amount" type="number" inputmode="numeric" min="5" step="5" placeholder="—" value="${escape(draft.amount)}" required><span>ml</span></div><button type="button" data-step="amount:5" aria-label="Menge um 5 Milliliter erhöhen">+</button></div><p class="field-note">Die tatsächlich getrunkene Menge.</p></div>` : diaper || weight ? '' : `<div class="field-block"><div class="field-header"><label>Welche Seite?</label><span class="field-hint">Optional</span></div><div class="segmented side-picker" role="group" aria-label="Stillseite">${[['', 'Offen'], ['left', 'Links'], ['right', 'Rechts'], ['both', 'Beide']].map(([value, label]) => `<button type="button" data-side="${value}" aria-pressed="${draft.side === value}" class="${draft.side === value ? 'active' : ''}">${label}</button>`).join('')}</div></div>`}
       ${draft.kind === 'breast' ? `<div class="timer-box"><div><span class="eyebrow">STILLZEIT FESTHALTEN</span><p>${draft.breastStart ? `Beginn ${timeLabel(draft.breastStart)}${draft.breastEnd ? ` · Ende ${timeLabel(draft.breastEnd)}` : ' · läuft'}` : 'Ein Klick zum Start. Einer zum Ende.'}</p>${draft.breastStart ? `<strong class="elapsed-timer" id="nursing-elapsed">${elapsedLabel(draft.breastStart, draft.breastEnd ? new Date(draft.breastEnd).getTime() : Date.now(), true)}</strong>` : ''}</div>${!draft.breastStart ? `<button type="button" id="start-breast" class="secondary">Stillen starten</button>` : !draft.breastEnd ? `<button type="button" id="end-breast" class="primary">Stillen beenden</button>` : '<span class="timer-done">Zeiten erfasst</span>'}${draft.breastStart ? '<button type="button" id="clear-timer" class="text-button">Zeiten manuell angeben</button>' : ''}</div>` : ''}
-      ${draft.kind === 'breast' ? `<details class="estimate-options" ${draft.estimateMode === 'manual' ? 'open' : ''}><summary>Stillmenge · ${estimateLabel()}</summary><p class="field-note">Optionale Schätzung für die gesamte Mahlzeit. ${draft.breastDefault === null ? 'Standard wird geladen.' : `Standard: ${draft.breastDefault} ml pro Brust; bei beiden doppelt.`}</p><label for="estimate">Geschätzte Gesamtmenge (ml)</label><input id="estimate" type="number" inputmode="numeric" min="0" step="1" value="${escape(draft.estimateMode === 'manual' ? draft.estimate : automaticEstimateValue())}" placeholder="Keine Schätzung"><p class="field-note">Leer lassen, wenn ihr keine Menge schätzen möchtet.</p><button type="button" id="estimate-default" class="text-button" ${!settings ? 'disabled' : ''}>Aktuellen Standard verwenden</button></details>` : ''}
+      ${draft.kind === 'breast' ? `<details class="estimate-options" ${draft.estimateMode === 'manual' ? 'open' : ''}><summary>Stillmenge · ${estimateLabel()}</summary><p class="field-note">Optionale Schätzung für die gesamte Mahlzeit. ${draft.breastDefault === null ? 'Standard wird geladen.' : `Standard: links ${draft.breastDefault.left} ml · rechts ${draft.breastDefault.right} ml; bei beiden zusammen.`}</p><label for="estimate">Geschätzte Gesamtmenge (ml)</label><input id="estimate" type="number" inputmode="numeric" min="0" step="1" value="${escape(draft.estimateMode === 'manual' ? draft.estimate : automaticEstimateValue())}" placeholder="Keine Schätzung"><p class="field-note">Leer lassen, wenn ihr keine Menge schätzen möchtet.</p><button type="button" id="estimate-default" class="text-button" ${!settings ? 'disabled' : ''}>Aktuellen Standard verwenden</button></details>` : ''}
       <div class="field-block duration-block" ${diaper || weight ? 'hidden' : ''}><div class="field-header"><label for="duration">Wie lange?</label><span class="field-hint">${timed ? 'Aus Start und Ende' : 'Vorschlag · anpassbar'}</span></div><div class="stepper"><button type="button" data-step="duration:-1" aria-label="Dauer um eine Minute verringern" ${timed ? 'disabled' : ''}>−</button><div class="unit-input"><input id="duration" name="duration" type="number" inputmode="numeric" min="0" step="1" placeholder="—" value="${timed && !draft.breastEnd ? '' : escape(bottle ? draft.bottleDuration : draft.breastDuration)}" ${timed ? 'disabled' : ''}><span>Min.</span></div><button type="button" data-step="duration:1" aria-label="Dauer um eine Minute erhöhen" ${timed ? 'disabled' : ''}>+</button></div>${!timed ? '<p class="field-note">0 Minuten = Dauer nicht bekannt</p>' : ''}</div>
       <div class="field-block time-block" ${timed ? 'hidden' : ''}><div class="field-header"><label>${weight ? 'Wann wurde gewogen?' : diaper ? 'Wann wurde gewickelt?' : 'Wann war die Mahlzeit zu Ende?'}</label></div><div class="segmented" role="group" aria-label="Zeitpunkt"><button type="button" data-time="now" aria-pressed="${draft.timeMode === 'now'}" class="${draft.timeMode === 'now' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Gerade eben</button><button type="button" data-time="custom" aria-pressed="${draft.timeMode === 'custom'}" class="${draft.timeMode === 'custom' ? 'active' : ''}" ${timed ? 'disabled' : ''}>Anderer Zeitpunkt</button></div>${draft.timeMode === 'custom' ? `<label class="sr-only" for="local-time">Datum und Uhrzeit</label><input id="local-time" ${timed ? 'disabled' : ''} type="datetime-local" step="60" value="${escape(draft.localTime)}" required>` : '<p class="field-note">Die aktuelle Uhrzeit wird beim Speichern eingetragen.</p>'}</div>${edit ? `<div class="field-block"><label for="performed-by">Erledigt von</label><select id="performed-by">${!draft.performedBy ? '<option value="" selected>Nicht zugeordnet</option>' : ''}<option value="Julia" ${draft.performedBy === 'Julia' ? 'selected' : ''}>Julia</option><option value="Christian" ${draft.performedBy === 'Christian' ? 'selected' : ''}>Christian</option></select></div>` : '<p class="field-note">Wird dir zugeordnet · später änderbar</p>'}</fieldset>
       ${pending ? '<p class="pending-note">Die Bestätigung fehlt noch. „Erneut speichern“ prüft dieselbe Übermittlung, ohne einen zweiten Eintrag anzulegen.</p>' : ''}
@@ -130,7 +134,7 @@ function estimateLabel(): string {
   try { const value = estimatedMilk(draft); return value === null ? 'ohne Schätzung' : `ca. ${value} ml`; } catch { return 'Bitte Menge prüfen'; }
 }
 function settingsView(): string {
-  return `<section class="card settings-card"><h1>Einstellungen</h1><h2>Still-Schätzung</h2><p>Gemeinsam für Julia und Christian. Der Standard wird bei neuen Einträgen pro Brust übernommen. Gespeicherte Mengen bleiben unverändert.</p>${settings ? `<form id="settings-form" novalidate><label for="breast-default">Standard pro Brust (ml)</label><input id="breast-default" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft ?? settings.breast_ml)}" ${busy ? 'disabled' : ''}><p class="field-note">Links oder rechts: einmal. Beide: zweimal. Dies ist eure persönliche Schätzung.</p><button class="primary" ${busy ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : 'Einstellungen speichern'}</button></form>` : '<p>Einstellungen werden geladen …</p>'}</section>`;
+  return `<section class="card settings-card"><h1>Einstellungen</h1><h2>Still-Schätzung</h2><p>Gemeinsam für Julia und Christian. Der Standard wird bei neuen Einträgen pro Brust übernommen. Gespeicherte Mengen bleiben unverändert.</p>${settings ? `<form id="settings-form" novalidate><label for="breast-default-left">Linke Brust (ml)</label><input id="breast-default-left" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.left ?? settings.breast_left_ml)}" ${busy ? 'disabled' : ''}><label for="breast-default-right">Rechte Brust (ml)</label><input id="breast-default-right" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.right ?? settings.breast_right_ml)}" ${busy ? 'disabled' : ''}><p class="field-note">Bei beiden Brüsten werden die Werte addiert. Dies ist eure persönliche Schätzung.</p><button class="primary" ${busy ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : 'Einstellungen speichern'}</button></form>` : '<p>Einstellungen werden geladen …</p>'}</section>`;
 }
 function reportView(): string {
   const formatDay = (day: string) => new Date(`${day}T12:00:00Z`).toLocaleDateString('de-DE', { day: 'numeric', month: 'short', weekday: 'short', timeZone: 'Europe/Berlin' });
@@ -141,18 +145,18 @@ async function storeSettings() {
   if (busy || !settings) return;
   const ownEpoch = epoch;
   try {
-    const value = milliliters(settingsDraft ?? String(settings.breast_ml), false);
+    const value = { left: milliliters(settingsDraft?.left ?? String(settings.breast_left_ml), false), right: milliliters(settingsDraft?.right ?? String(settings.breast_right_ml), false) };
     busy = true; error = ''; render();
     const updated = await saveSettings(value, settings.version);
     if (ownEpoch !== epoch) return;
     settings = updated; settingsDraft = null;
-    if (!edit && !pending && !draft.side && !draft.breastStart && draft.estimateMode === 'auto') { draft.breastDefault = updated.breast_ml; remember(); } notice = 'Standard gespeichert. Gilt für neue Einträge.';
+    if (!edit && !pending && !draft.side && !draft.breastStart && draft.estimateMode === 'auto') { draft.breastDefault = currentDefaults(); remember(); } notice = 'Standard gespeichert. Gilt für neue Einträge.';
   } catch (e) { if (ownEpoch === epoch) error = friendlyError(e); }
   finally { if (ownEpoch === epoch) { busy = false; render(); } }
 }
 function bindReports() {
   document.querySelector('#settings-form')?.addEventListener('submit', e => { e.preventDefault(); void storeSettings(); });
-  document.querySelector<HTMLInputElement>('#breast-default')?.addEventListener('input', e => { settingsDraft = (e.target as HTMLInputElement).value; });
+  document.querySelector('#settings-form')?.addEventListener('input', () => { settingsDraft = { left: document.querySelector<HTMLInputElement>('#breast-default-left')!.value, right: document.querySelector<HTMLInputElement>('#breast-default-right')!.value }; });
   const changeRange = (end: string) => { reportEnd = end; reportRows = null; void refresh(); render(); };
   document.querySelector('#report-prev')?.addEventListener('click', () => changeRange(shiftDay(reportEnd, -7)));
   document.querySelector('#report-next')?.addEventListener('click', () => changeRange(shiftDay(reportEnd, 7) > berlinDay() ? berlinDay() : shiftDay(reportEnd, 7)));
@@ -229,7 +233,7 @@ function bindForm() {
     remember(); render();
   });
   document.querySelector<HTMLInputElement>('#estimate')?.addEventListener('input', e => { draft.estimateMode = 'manual'; draft.estimate = (e.target as HTMLInputElement).value; remember(); });
-  document.querySelector('#estimate-default')?.addEventListener('click', () => { captureForm(); draft.breastDefault = settings!.breast_ml; draft.estimateMode = 'auto'; draft.estimate = ''; remember(); render(); });
+  document.querySelector('#estimate-default')?.addEventListener('click', () => { captureForm(); draft.breastDefault = currentDefaults(); draft.estimateMode = 'auto'; draft.estimate = ''; remember(); render(); });
   form.addEventListener('input', () => { captureForm(); remember(); });
   document.querySelectorAll<HTMLButtonElement>('[data-kind]').forEach(b => b.addEventListener('click', () => {
     captureForm(); draft.kind = b.dataset.kind as Draft['kind']; remember(); render();
@@ -249,7 +253,7 @@ function bindForm() {
     captureForm(); remember();
   }));
   form.addEventListener('submit', e => { e.preventDefault(); void save(); });
-  document.querySelector('#cancel-edit')?.addEventListener('click', () => { edit = null; draft = newDraft(settings?.breast_ml ?? null); error = ''; remember(); render(); });
+  document.querySelector('#cancel-edit')?.addEventListener('click', () => { edit = null; draft = newDraft(currentDefaults()); error = ''; remember(); render(); });
   document.querySelector('#delete-entry')?.addEventListener('click', () => void remove());
 }
 function captureForm() {
@@ -297,7 +301,7 @@ async function save() {
     else await createFeeding(pending!, userId);
     if (ownEpoch !== epoch) return;
     notice = edit ? 'Änderungen gespeichert.' : 'Io triumphe! Eintrag festgehalten.';
-    edit = null; pending = null; draft = newDraft(settings?.breast_ml ?? null); remember();
+    edit = null; pending = null; draft = newDraft(currentDefaults()); remember();
   } catch (e) {
     if (ownEpoch !== epoch) return;
     error = friendlyError(e);
@@ -311,7 +315,7 @@ async function remove() {
   busy = true; error = ''; render();
   try {
     await deleteFeeding(edit);
-    edit = null; draft = newDraft(settings?.breast_ml ?? null); view = 'history'; notice = 'Eintrag gelöscht.'; remember();
+    edit = null; draft = newDraft(currentDefaults()); view = 'history'; notice = 'Eintrag gelöscht.'; remember();
   } catch (e) { error = friendlyError(e); }
   finally { busy = false; render(); }
   if (!error) await refresh();
@@ -347,7 +351,7 @@ async function refresh(more = false) {
     if (more) entries = [...entries, ...rows.filter(row => !entries.some(e => e.id === row.id))];
     else { entries = rows; latest = rows[0] ?? null; meal = recentMeal; }
     settings = currentSettings;
-    if (!edit && !pending && (draft.breastDefault === null || (!draft.side && !draft.breastStart && draft.estimateMode === 'auto'))) { draft.breastDefault = settings.breast_ml; remember(); }
+    if (!edit && !pending && (draft.breastDefault === null || (!draft.side && !draft.breastStart && draft.estimateMode === 'auto'))) { draft.breastDefault = currentDefaults(); remember(); }
     if (dailyRows) reportRows = dailyRows;
     hasMore = rows.length === PAGE_SIZE;
     error = '';

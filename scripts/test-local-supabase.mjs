@@ -149,8 +149,12 @@ try {
     assert.ok((await anonymous.from('family_settings').select()).error);
     assert.deepEqual((await outsider.client.from('family_settings').update({ breast_ml: 99 }).eq('id',true).select()).data, []);
     assert.ok((await julia.client.from('family_settings').update({ breast_ml: 0 }).eq('id',true)).error);
-    const changed = await julia.client.from('family_settings').update({ breast_ml: 35 }).eq('id',true).eq('version',originalSettings.data.version).select().single(); assert.ifError(changed.error);
-    assert.equal((await christian.client.from('family_settings').select().single()).data.breast_ml,35);
+    const changed = await julia.client.from('family_settings').update({ breast_left_ml: 20, breast_right_ml: 35 }).eq('id',true).eq('version',originalSettings.data.version).select().single(); assert.ifError(changed.error);
+    assert.equal((await christian.client.from('family_settings').select().single()).data.breast_left_ml,20);
+    assert.equal((await christian.client.from('family_settings').select().single()).data.breast_right_ml,35);
+    assert.ok((await julia.client.from('family_settings').update({ breast_left_ml: -1, breast_right_ml: 40 }).eq('id',true)).error);
+    assert.equal((await christian.client.from('family_settings').select().single()).data.breast_right_ml,35);
+    assert.deepEqual((await outsider.client.from('family_settings').update({ breast_left_ml: 90, breast_right_ml: 90 }).eq('id',true).select()).data,[]);
     assert.deepEqual((await christian.client.from('family_settings').update({ breast_ml: 40 }).eq('version',originalSettings.data.version).select()).data,[]);
     assert.ok((await outsider.client.rpc('daily_report',{ first_day:'2088-03-27',last_day:'2088-03-28' })).error);
     assert.ok((await anonymous.rpc('daily_report',{ first_day:'2088-03-27',last_day:'2088-03-28' })).error);
@@ -170,7 +174,27 @@ try {
     assert.equal((await julia.client.rpc('daily_report',{first_day:'2088-03-28',last_day:'2088-03-28'})).data[0].breast_ml,70);
     assert.ifError((await christian.client.from('feedings').delete().eq('id',samples[1].id)).error);
     assert.equal((await julia.client.rpc('daily_report',{first_day:'2088-03-28',last_day:'2088-03-28'})).data[0].breast_ml,0);
-  } finally { assert.ifError((await admin.from('family_settings').update({ breast_ml: originalSettings.data.breast_ml }).eq('id',true)).error); }
+  } finally { assert.ifError((await admin.from('family_settings').update({ breast_left_ml: originalSettings.data.breast_left_ml, breast_right_ml: originalSettings.data.breast_right_ml }).eq('id',true)).error); }
+  const { readFileSync } = await import('node:fs');
+  const correction = readFileSync('supabase/migrations/202609130008_backfill_family_events.sql','utf8');
+  const seed = `begin;
+    alter table if exists private.events_before_20260913_correction rename to events_before_20260913_correction_test_original;
+    insert into public.feedings(id,kind,occurred_at,side,amount_ml,urine,stool,held_success,estimated_ml,created_by) values
+    ('11111111-1111-4111-8111-111111111111','breast','2089-01-01Z','both',null,null,null,null,99,'${julia.user.id}'),
+    ('22222222-2222-4222-8222-222222222222','breast','2089-01-01Z',null,null,null,null,null,99,'${julia.user.id}'),
+    ('33333333-3333-4333-8333-333333333333','bottle','2089-01-01Z',null,60,null,null,null,null,'${julia.user.id}'),
+    ('44444444-4444-4444-8444-444444444444','diaper','2089-01-01Z',null,null,true,true,false,null,'${julia.user.id}');
+    ${correction}
+    do $$ begin
+      assert (select estimated_ml = 50 and performed_by = 'Julia' and version=2 from public.feedings where id='11111111-1111-4111-8111-111111111111');
+      assert (select estimated_ml is null and performed_by = 'Julia' from public.feedings where id='22222222-2222-4222-8222-222222222222');
+      assert (select performed_by = 'Christian' and amount_ml=60 from public.feedings where id='33333333-3333-4333-8333-333333333333');
+      assert (select performed_by = 'Christian' and urine and stool from public.feedings where id='44444444-4444-4444-8444-444444444444');
+      assert (select estimated_ml = 99 from private.events_before_20260913_correction where id='11111111-1111-4111-8111-111111111111');
+      assert not has_table_privilege('authenticated','private.events_before_20260913_correction','select');
+    end $$;
+    rollback;`;
+  execFileSync('docker',['exec','-i','supabase_db_phililog','psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1'],{input:seed,stdio:['pipe','pipe','pipe']});
   console.log('Lokale Supabase-Prüfungen bestanden: erlaubte/verbotene CRUD-Zugriffe, Selbstfreischaltung, Validierung, Duplikatschutz, Versionskonflikte, echte Wiederholung und Export über 505 Einträge.');
 } finally {
   for (let offset = 0; offset < ids.length; offset += 100) {

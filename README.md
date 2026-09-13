@@ -10,7 +10,7 @@ Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Da
 
 „Tagesbericht“ zeigt sieben Kalendertage in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge, erfasste Summe sowie Wickeln/Urin/Stuhl. Fehlende Schätzungen werden kenntlich gemacht. Über Datum und Pfeile sind frühere Tage erreichbar.
 
-Unter „Einstellungen“ im Footer gilt anfangs 25 ml pro Brust: Links/Rechts 25 ml, Beide 50 ml, offene Seite ohne automatische Menge. Die aufklappbare Stillmenge erlaubt eine eigene Gesamtmenge oder eine leere Angabe. Jeder Eintrag behält seine Schätzung; ein neuer Standard ändert gespeicherte Werte nicht. Bereits begonnene Entwürfe behalten ihren Standard; „Aktuellen Standard verwenden“ übernimmt ihn ausdrücklich. [Spezifikation](specs/002-tagesbericht/spec.md).
+Unter „Einstellungen“ im Footer lassen sich linke und rechte Brust separat einstellen, anfangs jeweils 25 ml. Bei „Beide“ werden die Werte addiert; offene Seite bleibt ohne automatische Menge. Die aufklappbare Stillmenge erlaubt eine eigene Gesamtmenge oder eine leere Angabe. Jeder Eintrag behält seine Schätzung; ein neuer Standard ändert gespeicherte Werte nicht. Bereits begonnene Entwürfe behalten ihren Standard; „Aktuellen Standard verwenden“ übernimmt ihn ausdrücklich. [Spezifikation](specs/002-tagesbericht/spec.md).
 
 ## Entwicklung
 
@@ -80,3 +80,5 @@ Die erste App-Version liegt im öffentlichen [GitHub-Repository](https://github.
 ## Lizenz
 
 Noch nicht festgelegt.
+
+Am 13. September 2026 wurde der damalige Bestand auf ausdrücklichen Wunsch korrigiert: Flasche/Wickeln Christian, Stillen Julia; Still-Schätzung 25 ml je ausgewählter Brust (beide 50 ml, offen leer). Diese einmalige Korrektur verändert die automatische Zuordnung künftiger Einträge nicht.
