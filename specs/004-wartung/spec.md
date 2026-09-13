@@ -1,5 +1,7 @@
 # 004 – Wartung und zuverlässige Speicherung
 
+Status: Abgeschlossen; Nachweise in [tasks.md](tasks.md).
+
 Abgestimmt am 13. September 2026: Wartungspaket nach Maintenance-Review ausdrücklich zur Umsetzung einschließlich Tests, Commit und Push freigegeben. Produktionsdeployment benötigt einen separaten Auftrag. Architektur, Aquarellgestaltung und Produktumfang bleiben erhalten.
 
 - REQ-001 / AC-001: Ein Einstellungsentwurf behält seine Ausgangsversion auch bei Hintergrundaktualisierung. Eine fremde Änderung wird als Konflikt angezeigt. Eigene Werte bleiben sichtbar; „Serverwerte übernehmen“ verwirft sie ausdrücklich und startet mit der aktuellen Version.
