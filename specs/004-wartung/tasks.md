@@ -1,12 +1,12 @@
 # Aufgaben und Prüfnachweise
 
-Status: In Umsetzung; lokale Implementierung und Prüfung abgeschlossen, GitHub-CI nach Push noch zu bestätigen.
+Status: Abgeschlossen. Umsetzung, lokale Prüfung und GitHub-CI erfolgreich.
 
 - [x] Freigegebenen Umfang und Fehlerfälle spezifiziert.
 - [x] Settings, Wiederholung und Entwurfs-/Fokuserhalt umgesetzt und geprüft.
 - [x] CI für Push/PR und Actions aktualisiert; Deployment bleibt manuell.
 - [x] Dokumentation konsolidiert und synthetischen Restore abgeschlossen.
-- [ ] Commit, Push und erster GitHub-CI-Lauf bestätigt.
+- [x] Commits und Push auf `codex/maintenance-reliability`; GitHub-CI erfolgreich.
 
 ## Nachweise am [Betriebsdatum privat]
 
@@ -23,8 +23,14 @@ Migration 010 ist nur lokal angewandt; Produktion und Pages wurden nicht veränd
 
 Die bestehende lokale Testinstanz hatte unvollständige CLI-Metadaten; `migration up --local` stoppte an einer bereits vorhandenen Spalte. Danach ausschließlich 010 direkt transaktional angewandt. Die frische komplette Migrationsfolge wurde unabhängig im Restore-Test erfolgreich geprüft; 001–009 bleiben unverändert.
 
-Nächster Schritt: Den korrigierten transaktionalen Erststart in GitHub CI bestätigen.
+Keine offenen Aufgaben im freigegebenen Wartungspaket. Veröffentlichung bleibt separat zu beauftragen.
 
 ## Erster CI-Lauf
 
 Commit (historischer Commit) gepusht. App-Job auf Node 24 erfolgreich; frischer Supabase-Start scheiterte an `LOCK TABLE` der historischen Migration 008 ohne Transaktion. Die Datei bleibt unverändert. `start-test-supabase.mjs` startet deshalb die Plattform ohne automatische Anwendung und führt jede Migration mit Nachweis explizit transaktional aus. Er verweigert die Anwendung auf bereits vorhandene PhiliLog-Tabellen.
+
+## Abschluss
+
+Implementierung (historischer Commit), transaktionaler Erststart (historischer Commit), beide auf `codex/maintenance-reliability` gepusht. GitHub Check 34775125420 (historischer Prüfnachweis) vollständig erfolgreich: Node-24-App-Job mit 27 Tests und Build sowie frischer Supabase-Start, alle Migrationen, API-/RLS-Regressionen und Restore. Auch checkout/setup-node in den neuen Versionen tatsächlich ausgeführt. Pages-Actions nur anhand ihrer offiziellen Manifeste geprüft, kein Deployment ausgelöst.
+
+Zusätzliche echte Browserprüfung: lokaler Einstellungsentwurf 21 ml, paralleler Serverwert 35 ml, Hintergrundrefresh erhält Entwurf/Fokus; Speichern meldet Konflikt. Bestätigte Übernahme zeigt 35 ml. Ursprünglichen lokalen Standard 20/35 danach wiederhergestellt und synthetisches Browserkonto abgemeldet.
