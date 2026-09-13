@@ -45,4 +45,6 @@ Lokale Integrationsprüfung bestanden: `npm run check` mit 32 Tests, TypeScript 
 
 Browser-Harness mit synthetischem Konto auf Port 5175: neues Layout/Person/Save-Beschriftung vorhanden, 390/320 px ohne Überlauf; Windel-Toggle und Fokus über Hintergrundrefresh erhalten. Manuelle Zeit, offener Zeitbereich und Eingabefokus bleiben erhalten. DOM-Aktionen nach Accessibility-Inspektion verwendet. Screenshot `/private/tmp/phililog-integrated-320.png`.
 
-Status der Integration: Lokale Prüfung abgeschlossen. Nächster Schritt: Integrationscommit in CI bestätigen und auf Main pushen.
+Integrationscommit `ddb59a3`: [GitHub Check 34784505499](https://github.com/sichgeis/phililog/actions/runs/34784505499) vollständig erfolgreich, einschließlich frischem transaktionalem Start aller elf Migrationen, API-/RLS-Tests, Restore und 32 App-Tests/Build auf Node 24. Browser-KW-Wechsel 37 → 36 → Heute (37) zusätzlich bestätigt, Screenshot visuell geprüft; Testkonto danach abgemeldet.
+
+Integration abgeschlossen; dieser Stand wird im ausdrücklich beauftragten Fast-Forward auf Main übernommen und gepusht. Keine offenen Integrationsaufgaben. Das Wartungspaket ist damit mit dem neuen Layout kompatibel. Für eine spätere Veröffentlichung bleibt ausschließlich die produktive Migration **011** vor dem manuellen Pages-Deployment erforderlich; diese Betriebsaktionen sind nicht Teil des Merge-Auftrags.
