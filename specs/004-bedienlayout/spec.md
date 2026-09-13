@@ -1,6 +1,6 @@
 # 004 – Anordnung und Bedienbarkeit
 
-Status: Lokal abgeschlossen; Prüfnachweise in tasks.md. Abgestimmt am 13. September 2026 durch ausdrücklichen Umsetzungsauftrag zum Designreview, ausgenommen dessen Punkt 2 (Trennung Stillen/Nachtragen).
+Status: Abgeschlossen und veröffentlicht; Prüfnachweise in tasks.md. Abgestimmt am 13. September 2026 durch ausdrücklichen Umsetzungsauftrag zum Designreview, ausgenommen dessen Punkt 2 (Trennung Stillen/Nachtragen).
 
 ## Umfang und Anforderungen
 

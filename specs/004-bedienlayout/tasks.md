@@ -1,6 +1,6 @@
 # Umsetzung und Prüfnachweise
 
-Stand: Lokal abgeschlossen am 13. September 2026; produktive Migration anschließend beauftragt und abgeschlossen; Veröffentlichung ausdrücklich freigegeben.
+Stand: Lokal abgeschlossen am 13. September 2026; produktive Migration anschließend beauftragt und abgeschlossen; Veröffentlichung abgeschlossen.
 
 - [x] Umfang samt Ausnahme Stillablauf und KW-Navigation abgestimmt.
 - [x] Formular, Navigation, Logbuch, Bearbeitung und Auswahlzustände umgesetzt.
@@ -21,6 +21,6 @@ Grenzen: Keine vollständige Barrierefreiheitszertifizierung und keine physische
 - [x] Erneute Prüfung: 25 Tests, TypeScript, Build und `git diff --check` erfolgreich.
 - [x] Vor Migration konsistente Sicherungen von Einträgen, Einstellungen und Mitgliedszuordnung unter `private.*_before_20260913_layout` erstellt; sämtliche Rechte für public/anon/authenticated entzogen. Keine Familiendaten ins Repository exportiert.
 - [x] Migration 010 gezielt produktiv ausgeführt, ohne frühere Migrationen erneut anzuwenden. Transaktion mit kurzen Schreibsperren und Vorher-/Nachher-Prüfsummen bestätigt unveränderte Originaltabellen. Ablauf zuvor lokal mit Rollback erprobt. Funktionsrechte nach Migration geprüft.
-- [ ] GitHub-Pages-Veröffentlichung und produktive Leseprüfung abschließen. Commit, Push auf main und Veröffentlichung sind nun ausdrücklich freigegeben.
+- [x] App-Commit `a723d3c` auf main integriert; [GitHub-Pages-Deployment 34784106523](https://github.com/sichgeis/phililog/actions/runs/34784106523) erfolgreich. CI-Tests und Build erfolgreich. Produktive Leseprüfung: neues Layout, Speicherbeschriftung und Personenzuordnung sichtbar; Rollen-, Eintrags- und Einstellungsabfragen mit HTTP 200 und ohne UI-Fehler. KW-Navigation und Heute-Button sichtbar, produktiver Tagesbericht mit HTTP 200. Keine produktiven Testeinträge angelegt.
 
-Nächster Schritt: GitHub-Pages-Deployment ausführen und verifizieren.
+Keine offenen Implementierungsaufgaben. Der abschließende Dokumentationsstand wird ebenfalls auf main gepusht und ausgerollt; Anwendungsartefakte bleiben identisch.

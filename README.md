@@ -18,7 +18,7 @@ Unter „Einstellungen“ über das Zahnrad oder im Footer lassen sich linke und
 
 ## Überarbeitetes Bedienlayout
 
-Letzte Mahlzeit oberhalb der Eingabe, kompakte Zusatzangaben, erreichbare Speicherleiste, einheitliche Auswahlzustände und größere Personenauswahl. Das Logbuch hebt Menge und Dauer hervor. Hauptnavigation und Einstellungen bleiben beim Scrollen erreichbar. Der Stillablauf bleibt unverändert. [Spezifikation und Prüfnachweise](specs/004-bedienlayout/spec.md). Die Oberfläche ist umgesetzt und zur Veröffentlichung freigegeben. Migration 010 ist nach Sicherung der App-Daten produktiv eingespielt.
+Letzte Mahlzeit oberhalb der Eingabe, kompakte Zusatzangaben, erreichbare Speicherleiste, einheitliche Auswahlzustände und größere Personenauswahl. Das Logbuch hebt Menge und Dauer hervor. Hauptnavigation und Einstellungen bleiben beim Scrollen erreichbar. Der Stillablauf bleibt unverändert. [Spezifikation und Prüfnachweise](specs/004-bedienlayout/spec.md). Die Oberfläche ist auf GitHub Pages veröffentlicht. Migration 010 ist nach Sicherung der App-Daten produktiv eingespielt.
 
 ## Entwicklung
 
