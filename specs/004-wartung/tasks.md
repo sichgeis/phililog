@@ -23,4 +23,8 @@ Migration 010 ist nur lokal angewandt; Produktion und Pages wurden nicht veränd
 
 Die bestehende lokale Testinstanz hatte unvollständige CLI-Metadaten; `migration up --local` stoppte an einer bereits vorhandenen Spalte. Danach ausschließlich 010 direkt transaktional angewandt. Die frische komplette Migrationsfolge wurde unabhängig im Restore-Test erfolgreich geprüft; 001–009 bleiben unverändert.
 
-Nächster Schritt: Commit und Push erstellen und den GitHub-CI-Lauf prüfen.
+Nächster Schritt: Den korrigierten transaktionalen Erststart in GitHub CI bestätigen.
+
+## Erster CI-Lauf
+
+Commit `77bfdf6` gepusht. App-Job auf Node 24 erfolgreich; frischer Supabase-Start scheiterte an `LOCK TABLE` der historischen Migration 008 ohne Transaktion. Die Datei bleibt unverändert. `start-test-supabase.mjs` startet deshalb die Plattform ohne automatische Anwendung und führt jede Migration mit Nachweis explizit transaktional aus. Er verweigert die Anwendung auf bereits vorhandene PhiliLog-Tabellen.

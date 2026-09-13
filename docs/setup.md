@@ -44,10 +44,12 @@ Voraussetzungen: Node.js ab 22.12 und Docker. Diese Schritte betreffen nur den l
 
 ```sh
 npm ci
-npx supabase@2.117.0 start
+node scripts/start-test-supabase.mjs # nur beim ersten Start einer leeren Testdatenbank
 node scripts/test-local-supabase.mjs --configure-preview
 npm run dev
 ```
+
+Für eine bereits eingerichtete lokale Datenbank stattdessen `npx supabase@2.117.0 start` verwenden. Der Erststart kopiert nur die Plattformkonfiguration und wendet anschließend jede Migration samt Nachweis in einer expliziten Transaktion an. So funktionieren auch die Tabellensperren der unveränderten Migration 008. Vorhandene PhiliLog-Tabellen führen zum sicheren Abbruch; der Erststart ist kein Reset oder Reparaturwerkzeug.
 
 Das Testskript erstellt ausschließlich in der lokalen Instanz synthetische Konten, prüft erlaubte/verbotene API-Zugriffe und schreibt auf Wunsch eine ignorierte `.env.local` mit öffentlicher lokaler Konfiguration. Der lokale Testzugang wird im Terminal genannt und ist ausschließlich für erfundene Testdaten vorgesehen. Keine echten Baby-Daten in der lokalen Testinstanz erfassen.
 
