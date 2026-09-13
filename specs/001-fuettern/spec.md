@@ -96,3 +96,7 @@ Icon-Auswahl: ursprünglicher großer Aquarell-Klecks aus Entwurf 2 mit großem 
 ## Finale Icon-Auswahl – 12. September 2026
 
 Ausdrücklich zur Umsetzung und Veröffentlichung ausgewählt: **Φ 1 · Klar**, erstes Icon der zweiten Zeile der Schriftgalerie. Dieses große weiße Phi ersetzt das Io auf dem unveränderten Aquarell-Klecks als Browser-, PWA- und Apple-Icon.
+
+## Aufgaben einer Person zuordnen – 13. September 2026
+
+Beauftragt: Neue Einträge aller Arten werden automatisch der angemeldeten Person zugeordnet. Historie und letzter Eintrag zeigen Namen sowie eine dezente Aquarellmarkierung: Julia violett, Christian türkis. Bearbeiten erlaubt die nachträgliche Auswahl beider Personen; Ersteller bleibt unverändert. Altbestand ist zunächst nicht zugeordnet, weil Ersteller und ausführende Person verschieden sein können. Zuordnung wird im Entwurf und CSV erhalten; Zugriffsschutz und Versionskonflikte gelten auch bei Personenwechsel.

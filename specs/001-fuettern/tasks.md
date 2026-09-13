@@ -85,3 +85,7 @@ Beide additive Migrationen 002 und 003 in einer Transaktion im produktiven Supab
 ## Φ 1 als App-Icon – 12. September 2026
 
 Ausgewählte Variante unverändert implementiert. SVG sowie PNGs für Browser/PWA/Apple aktualisiert, mit neuen Phi-URLs. 512-px-Rasterung visuell geprüft; PNG-Maße 192/512/180 px und Manifest-Zieldateien im Build geprüft. `npm run check`: 16 Tests, TypeScript und Build erfolgreich. Veröffentlichung beauftragt. Keine Änderung an Fachlogik oder Datenbank.
+
+## Personenzuordnung – 13. September 2026
+
+Neue Einträge automatisch über geschützte Kontozuordnung; Namensmarkierungen in Lavendel/Türkis, Personenauswahl beim Bearbeiten und CSV-Spalte umgesetzt. Altbestand bleibt nicht zugeordnet. 17 Fachlogiktests und Build erfolgreich. Lokale Supabase-Prüfungen: automatische Zuordnung beider Konten, gemeinsamer Personenwechsel, unveränderter Ersteller, Versionskonflikt, ungültige Person, Fremdzugriff und verbotene INSERT-Zuordnung geprüft; übrige CRUD-/Exportprüfungen erfolgreich. Browser mit synthetischem Konto: Wickeln als Julia speichern, auf Christian ändern und im Logbuch anzeigen; 390 px ohne horizontalen Überlauf, Screenshot `/private/tmp/phililog-person.png` visuell geprüft. Wegen wirkungsloser CDP-Klicks teilweise DOM-Formularaktionen verwendet. Migration 005 produktiv erfolgreich; Spaltenexistenz separat über information_schema bestätigt, keine echten Einträge für Tests verwendet.

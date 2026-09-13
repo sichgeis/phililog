@@ -52,3 +52,7 @@ Nullable Integer-Spalte `weight_g` und Typ `weight` in bestehender Tabelle; typa
 ## Phi-Icon
 
 Ausgewählte Vektorvorlage unverändert übernehmen und mit Browser-Harness in 192, 512 und 180 Pixeln rendern. Neue Phi-Dateinamen für Favicon, Manifest und Apple-Verweis verwenden; generische Altdateien aktualisieren.
+
+## Ausführende Person
+
+Nullable `performed_by` mit Julia/Christian-Constraint. INSERT-Trigger ermittelt Person aus geschützter Mitgliedschaft anhand auth.uid(), ohne neue API für Kontoinformationen. Nur UPDATE-Spaltenrecht für nachträgliche Zuordnung; Altbestand NULL. Ersteller unverändert. Unzugeordnetes Bearbeiten erhält NULL, neue Eingaben lassen das Feld weg.

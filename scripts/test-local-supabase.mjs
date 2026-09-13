@@ -49,6 +49,16 @@ try {
   const created = await julia.client.from('feedings').insert(input).select().single();
   assert.ifError(created.error);
   assert.equal(created.data.version, 1);
+  assert.equal(created.data.performed_by, 'Julia');
+  const personId = randomUUID(); ids.push(personId);
+  const own = await christian.client.from('feedings').insert({ ...input, id: personId, created_by: christian.user.id }).select().single();
+  assert.ifError(own.error); assert.equal(own.data.performed_by, 'Christian');
+  const reassigned = await julia.client.from('feedings').update({ performed_by: 'Julia' }).eq('id', personId).eq('version', 1).select().single();
+  assert.ifError(reassigned.error); assert.equal(reassigned.data.performed_by, 'Julia'); assert.equal(reassigned.data.created_by, christian.user.id); assert.equal(reassigned.data.version, 2);
+  assert.deepEqual((await christian.client.from('feedings').update({ performed_by: 'Christian' }).eq('id', personId).eq('version', 1).select()).data, []);
+  assert.ok((await julia.client.from('feedings').update({ performed_by: 'Other' }).eq('id', personId)).error);
+  assert.deepEqual((await outsider.client.from('feedings').update({ performed_by: 'Christian' }).eq('id', personId).select()).data, []);
+  assert.ok((await christian.client.from('feedings').insert({ ...input, id: randomUUID(), created_by: christian.user.id, performed_by: 'Julia' })).error, 'Cannot override automatic assignment on insert');
   assert.equal((await julia.client.from('feedings').insert(input)).error?.code, '23505', 'Same ID cannot duplicate');
   assert.equal((await christian.client.from('feedings').select().eq('id', input.id)).data.length, 1, 'Shared logbook');
   assert.deepEqual((await outsider.client.from('feedings').update({ amount_ml: 70 }).eq('id', input.id).select()).data, [], 'Outsider update denied');

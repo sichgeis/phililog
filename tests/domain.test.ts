@@ -125,3 +125,17 @@ test('Wiegen erfasst nur positives Grammgewicht und Zeitpunkt, inklusive Bearbei
   assert.equal(sameInput(input, { ...input, weight_g: 3550 }), false);
   assert.equal(feedingInput({ ...newDraft(), weight: '3500' }, now).weight_g, null);
 });
+
+test('Personenzuordnung bleibt bei Korrektur und CSV erhalten; neue Einträge nutzen die Serverzuordnung', () => {
+  const input = feedingInput(newDraft(), now);
+  assert.equal(input.performed_by, undefined);
+  const entry = { ...input, performed_by: 'Julia' as const, id: 'id', created_by: 'creator', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
+  const draft = draftFromFeeding(entry);
+  assert.equal(draft.performedBy, 'Julia');
+  draft.performedBy = 'Christian';
+  assert.equal(feedingInput(draft, now).performed_by, 'Christian');
+  assert.match(toCsv([entry]), /Erledigt von/); assert.match(toCsv([entry]), /Julia/);
+  assert.equal(sameInput(entry, input), true);
+  assert.equal(sameInput(entry, { ...input, performed_by: 'Christian' }), false);
+  assert.equal(feedingInput(draftFromFeeding({ ...entry, performed_by: null }), now).performed_by, null);
+});
