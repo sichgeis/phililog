@@ -12,9 +12,13 @@ Bei Stillen, Flasche und Wickeln könnt ihr optional Quengelig, Schläfrig, Ruhi
 
 ## Tagesbericht und Still-Schätzung
 
-„Tagesbericht“ zeigt sieben Kalendertage in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge, erfasste Summe sowie Wickeln/Urin/Stuhl. Fehlende Schätzungen werden kenntlich gemacht. Über Datum und Pfeile sind frühere Tage erreichbar.
+„Tagesbericht“ zeigt sieben Kalendertage in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge, erfasste Summe sowie Wickeln/Urin/Stuhl. Fehlende Schätzungen werden kenntlich gemacht. Die Navigation zeigt die Kalenderwoche samt Jahr, Wochenpfeile, das heutige Datum und „Heute“. Wochen beginnen montags; die laufende Woche reicht bis heute. Eine freie Datumsauswahl entfällt.
 
-Unter „Einstellungen“ im Footer lassen sich linke und rechte Brust separat einstellen, anfangs jeweils 25 ml. Bei „Beide“ werden die Werte addiert; offene Seite bleibt ohne automatische Menge. Die aufklappbare Stillmenge erlaubt eine eigene Gesamtmenge oder eine leere Angabe. Jeder Eintrag behält seine Schätzung; ein neuer Standard ändert gespeicherte Werte nicht. Bereits begonnene Entwürfe behalten ihren Standard; „Aktuellen Standard verwenden“ übernimmt ihn ausdrücklich. [Spezifikation](specs/002-tagesbericht/spec.md).
+Unter „Einstellungen“ über das Zahnrad oder im Footer lassen sich linke und rechte Brust separat einstellen, anfangs jeweils 25 ml. Bei „Beide“ werden die Werte addiert; offene Seite bleibt ohne automatische Menge. Die aufklappbare Stillmenge erlaubt eine eigene Gesamtmenge oder eine leere Angabe. Jeder Eintrag behält seine Schätzung; ein neuer Standard ändert gespeicherte Werte nicht. Bereits begonnene Entwürfe behalten ihren Standard; „Aktuellen Standard verwenden“ übernimmt ihn ausdrücklich. [Spezifikation](specs/002-tagesbericht/spec.md).
+
+## Überarbeitetes Bedienlayout
+
+Letzte Mahlzeit oberhalb der Eingabe, kompakte Zusatzangaben, erreichbare Speicherleiste, einheitliche Auswahlzustände und größere Personenauswahl. Das Logbuch hebt Menge und Dauer hervor. Hauptnavigation und Einstellungen bleiben beim Scrollen erreichbar. Der Stillablauf bleibt unverändert. [Spezifikation und Prüfnachweise](specs/004-bedienlayout/spec.md). Die Oberfläche ist umgesetzt und zur Veröffentlichung freigegeben. Migration 010 ist nach Sicherung der App-Daten produktiv eingespielt.
 
 ## Entwicklung
 

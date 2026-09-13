@@ -100,3 +100,7 @@ Ausdrücklich zur Umsetzung und Veröffentlichung ausgewählt: **Φ 1 · Klar**,
 ## Aufgaben einer Person zuordnen – [Betriebsdatum privat]
 
 Beauftragt: Neue Einträge aller Arten werden automatisch der angemeldeten Person zugeordnet. Historie und letzter Eintrag zeigen Namen sowie eine dezente Aquarellmarkierung: Person A violett, Person B türkis. Bearbeiten erlaubt die nachträgliche Auswahl beider Personen; Ersteller bleibt unverändert. Altbestand ist zunächst nicht zugeordnet, weil Ersteller und ausführende Person verschieden sein können. Zuordnung wird im Entwurf und CSV erhalten; Zugriffsschutz und Versionskonflikte gelten auch bei Personenwechsel.
+
+## Bedienlayout – [Betriebsdatum privat]
+
+Die ausdrücklich beauftragte [Layoutüberarbeitung](../004-bedienlayout/spec.md) präzisiert die Anordnung, Speicherbeschriftung und Touch-Bedienung. Der Stillablauf bleibt erhalten. Letzte Mahlzeit steht oberhalb, Zusatzangaben sind aufklappbar; AC-012 gilt für die normale Kerneingabe.
