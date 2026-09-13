@@ -4,7 +4,7 @@
 - [x] Datenbank, Einstellungen, Schätzungen und Tagesbericht implementiert.
 - [x] Fachlogik, lokale Datenbank und mobile Browseransichten geprüft.
 - [x] Migration 006 produktiv ausgeführt: „Success. No rows returned“. Keine bestehenden Ereignisse verändert.
-- [ ] Pages-Veröffentlichung abschließen.
+- [x] Pages-Veröffentlichung erfolgreich: [Workflow 34750264479](https://github.com/sichgeis/phililog/actions/runs/34750264479), App-Code `dc43655`.
 
 ## Prüfung am 13. September 2026
 
@@ -13,4 +13,4 @@
 - Browser-Harness ausschließlich lokal mit synthetischen Daten: 25 ml links, 50 ml beide, Neuladen erhält Entwurf; Speicherung 50 ml, Standard auf 35, neuer Eintrag 70 ml; alter Eintrag bleibt 50 ml. Bearbeitung auf 45 ml führt zum Bericht mit 115 ml Still-Schätzung. Fehlende Altschätzungen markiert. Frühere Siebentage-Spanne korrekt geladen. Standard nach Prüfung lokal wieder auf 25 gesetzt.
 - Darstellung bei 390 px und 320 px ohne horizontalen Überlauf geprüft. Screenshots `/private/tmp/phililog-report.png`, `/private/tmp/phililog-report-320.png`, `/private/tmp/phililog-settings-320.png`. Teilweise DOM-Formularaktionen nach zuvor wirkungslosen CDP-Klicks; keine echte Smartphone-Installation behauptet.
 
-Nächster Schritt: Erfolgreichen Pages-Workflow bestätigen.
+Abgeschlossen. Keine offenen Implementierungsaufgaben; tatsächliche Bedienung auf euren Smartphones bleibt euer Praxisfeedback.

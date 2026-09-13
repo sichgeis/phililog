@@ -1,6 +1,6 @@
 # Tagesbericht und Still-Schätzung
 
-Status: Abgestimmt – Umsetzung und Veröffentlichung am 13. September 2026 ausdrücklich beauftragt.
+Status: Abgeschlossen – Umsetzung und Veröffentlichung am 13. September 2026 ausdrücklich beauftragt und erfolgreich abgeschlossen.
 
 - REQ-001: Gemeinsame Einstellungen für Julia und Christian enthalten 25 ml als anfänglichen Standard pro Brust. Positive ganze Milliliter; Änderungen gelten nur für neue Entwürfe, nicht rückwirkend für gespeicherte Ereignisse.
 - REQ-002: Stillereignisse erhalten optional eine geschätzte Gesamtmenge. Links/rechts verwenden einmal den Standard, beide zweimal. Bei offener Seite keine automatische Schätzung. Die optionale Rückfrage blieb unbeantwortet; diese konservative Annahme wurde vor Umsetzung angekündigt. Ein dezenter aufklappbarer Bereich erlaubt eine eigene Gesamtmenge oder eine leere Angabe. Bearbeitung erhält die gespeicherte Menge und erlaubt Änderung/Entfernung.
