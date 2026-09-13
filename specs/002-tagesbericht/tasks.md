@@ -21,4 +21,4 @@ Abgeschlossen. Keine offenen Implementierungsaufgaben; tatsächliche Bedienung a
 
 Migrationen 007/008 produktiv in einer Transaktion erfolgreich. Anschließende reine Ergebniskontrolle bestätigt `correction_complete=true` und `backup_protected=true`. Keine Familiendaten ins Repository exportiert; Originale ausschließlich im privaten Datenbankschema. Neue Einträge behalten die normale Kontozuordnung.
 
-Nächster Schritt: Pages-Veröffentlichung bestätigen.
+Abgeschlossen: Pages-Workflow 34750629555 (historischer Prüfnachweis) erfolgreich; veröffentlichter App-Code (historischer Commit).
