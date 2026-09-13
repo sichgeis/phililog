@@ -69,3 +69,7 @@ Seit [Betriebsdatum privat]: [App](https://sichgeis.github.io/phililog/) und das
 ## Erweiterung Tagesbericht
 
 Migration `202609130006_daily_report.sql` ergänzt die optionale Still-Schätzung, gemeinsame Einstellungen mit anfangs 25 ml pro Brust sowie die geschützte Tagesaggregation. Vor der neuen Oberfläche ausrollen. Alte Stillereignisse bleiben ohne Schätzung. Berichtstage werden fest in Europe/Berlin berechnet; der Tagesbericht benötigt Internet. Änderungen des Standards wirken auf neue Entwürfe und führen zu keiner rückwirkenden Neuberechnung gespeicherter Mengen.
+
+## Getrennte Standards und einmalige Bestandskorrektur
+
+Migration 007 initialisiert links/rechts aus dem bisherigen gemeinsamen Standard und erhält die Kompatibilität alter Clients. Migration 008 nur einmal und innerhalb einer Transaktion ausführen: Sie sichert die betroffenen Ereignisse in eine separat dokumentierte private Sicherung bzw. Ausführungsquittung (keine Browserrechte) und korrigiert Zuordnungen und Stillmengen nach ausdrücklichem Nutzerauftrag. Die normalen Versions-/Änderungszeitstempel werden dabei aktualisiert. Die Sicherung enthält private Familiendaten und bleibt ausschließlich in der geschützten Datenbank; nicht ins Repository exportieren.

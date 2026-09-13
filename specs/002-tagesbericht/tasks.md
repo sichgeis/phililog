@@ -14,3 +14,11 @@
 - Darstellung bei 390 px und 320 px ohne horizontalen Überlauf geprüft. Screenshots `/private/tmp/phililog-report.png`, `/private/tmp/phililog-report-320.png`, `/private/tmp/phililog-settings-320.png`. Teilweise DOM-Formularaktionen nach zuvor wirkungslosen CDP-Klicks; keine echte Smartphone-Installation behauptet.
 
 Abgeschlossen. Keine offenen Implementierungsaufgaben; tatsächliche Bedienung auf euren Smartphones bleibt euer Praxisfeedback.
+
+## Getrennte Standards und Bestandskorrektur
+
+21 Fachlogiktests und Build erfolgreich. Lokale Supabase prüft getrennte Werte, atomare Validierung, Fremdzugriff und Versionskonflikte. Die Bestandsmigration wurde mit synthetischen Ereignissen innerhalb einer zurückgerollten Transaktion geprüft: Zuordnung, 50 ml bei beiden, NULL bei offener Seite, Erhalt anderer Felder und geschützte Originalsicherung. Mobile Browserprüfung bei 320 px: links 20, rechts 35, beide 55 ml; Settings ohne horizontalen Überlauf, Screenshot `/private/tmp/phililog-separate-settings.png`.
+
+Migrationen 007/008 produktiv in einer Transaktion erfolgreich. Anschließende reine Ergebniskontrolle bestätigt `correction_complete=true` und `backup_protected=true`. Keine Familiendaten ins Repository exportiert; Originale ausschließlich im privaten Datenbankschema. Neue Einträge behalten die normale Kontozuordnung.
+
+Nächster Schritt: Pages-Veröffentlichung bestätigen.

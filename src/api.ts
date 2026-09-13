@@ -62,12 +62,12 @@ export function friendlyError(error: unknown): string {
 }
 
 export async function getSettings(): Promise<import('./report.ts').Settings> {
-  const { data, error } = await supabase!.from('family_settings').select('breast_ml,version').eq('id', true).single();
+  const { data, error } = await supabase!.from('family_settings').select('breast_left_ml,breast_right_ml,version').eq('id', true).single();
   if (error) throw error;
   return data;
 }
-export async function saveSettings(breastMl: number, version: number): Promise<import('./report.ts').Settings> {
-  const { data, error } = await supabase!.from('family_settings').update({ breast_ml: breastMl }).eq('id', true).eq('version', version).select('breast_ml,version').maybeSingle();
+export async function saveSettings(defaults: import('./report.ts').BreastDefaults, version: number): Promise<import('./report.ts').Settings> {
+  const { data, error } = await supabase!.from('family_settings').update({ breast_left_ml: defaults.left, breast_right_ml: defaults.right }).eq('id', true).eq('version', version).select('breast_left_ml,breast_right_ml,version').maybeSingle();
   if (error) throw error;
   if (!data) throw new Error('Die Einstellungen wurden inzwischen geändert. Bitte aktualisieren und erneut speichern.');
   return data;

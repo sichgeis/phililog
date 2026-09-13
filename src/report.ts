@@ -1,4 +1,5 @@
-export interface Settings { breast_ml: number; version: number }
+export interface BreastDefaults { left: number; right: number }
+export interface Settings { breast_left_ml: number; breast_right_ml: number; version: number }
 export interface DailyReport { day: string; bottle_ml: number; breast_ml: number; missing_estimates: number; diapers: number; wet: number; stool: number; events: number }
 export function berlinDay(date = new Date()): string {
   const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date);
