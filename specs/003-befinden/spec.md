@@ -47,3 +47,7 @@ Kein eigener Ereignistyp „Quengeln“, keine automatische Ableitung aus andere
 ## Entscheidung
 
 Vier Zustände und erneutes Tippen zum Abwählen bestätigt. Gilt für Stillen, Flasche und Wickeln.
+
+## Bedienlayout – 13. September 2026
+
+[Feature 004](../004-bedienlayout/spec.md) ergänzt eine ausdrückliche Abwahl und bündelt optionale Angaben. Die vier Optionen, Entwurfserhalt und Speichersemantik bleiben unverändert.

@@ -77,3 +77,9 @@ Migration `202609130006_daily_report.sql` ergänzt die optionale Still-Schätzun
 ## Getrennte Standards und einmalige Bestandskorrektur
 
 Migration 007 initialisiert links/rechts aus dem bisherigen gemeinsamen Standard und erhält die Kompatibilität alter Clients. Migration 008 nur einmal und innerhalb einer Transaktion ausführen: Sie sichert die betroffenen Ereignisse in `private.events_before_20260913_correction` (keine Browserrechte) und korrigiert Zuordnungen und Stillmengen nach ausdrücklichem Nutzerauftrag. Die normalen Versions-/Änderungszeitstempel werden dabei aktualisiert. Die Sicherung enthält private Familiendaten und bleibt ausschließlich in der geschützten Datenbank; nicht ins Repository exportieren.
+
+## Bedienlayout und aktuelle Person
+
+Vor Veröffentlichung des Layouts aus Feature 004 Migration `202609130010_current_family_person.sql` einspielen. Die RPC liefert ausschließlich den Namen der eigenen freigeschalteten Rolle. Sie verändert weder Einträge noch die automatische Personenzuordnung. Die App benötigt die RPC beim Öffnen des Logbuchs; die Migration daher vor der Oberfläche veröffentlichen. Lokal mit Mitglieder-, Fremd- und anonymem Konto geprüft.
+
+Am 13. September 2026 nach ausdrücklichem Auftrag produktiv eingespielt. Vorher wurden die App-Tabellen konsistent in `private.events_before_20260913_layout`, `private.settings_before_20260913_layout` und `private.members_before_20260913_layout` gesichert und alle Rechte für public/anon/authenticated entzogen. Die Migration wurde mit Vorher-/Nachher-Prüfsummen in einer Transaktion ausgeführt; Originaltabellen blieben unverändert. Diese Kopien sind eine Sicherung der App-Daten innerhalb derselben Datenbank, kein vollständiges externes Projektbackup einschließlich Auth.

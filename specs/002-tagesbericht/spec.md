@@ -15,3 +15,7 @@ Abnahme: 25/50 ml bei einer/beiden Brüsten, 35/70 für neue Entwürfe nach Änd
 Explizit beauftragt: Links und rechts erhalten getrennte gemeinsame Standardwerte. Beide starten mit dem bisherigen gemeinsamen Wert; beide Brüste addieren die zwei Standards. Einzelne neue Einträge und aktive Entwürfe behalten weiterhin ihre Momentaufnahme.
 
 Einmalige ausdrückliche Bestandskorrektur: vorhandene Flaschen-/Wickelereignisse Christian, Stillereignisse Julia zuordnen. Stillmengen pauschal 25 ml links/rechts bzw. 50 ml bei beiden; dies überschreibt für den heutigen Bestand auch abweichende bisherige Zuordnungen/Schätzungen. Wiegen bleibt unverändert. Für offene Seite bleibt die Menge leer (Nutzerantwort bestätigt). Vor Änderung Sicherung der betroffenen Originalzeilen in einer ausschließlich administrativ zugänglichen privaten Datenbanktabelle.
+
+## Kalenderwochen – 13. September 2026
+
+Beauftragt in [Feature 004](../004-bedienlayout/spec.md): freie Datumsauswahl durch ISO-KW/Wochenjahr, Pfeile, heutiges Datum und „Heute“ ersetzen. Wochen Montag–Sonntag, laufende Woche bis heute, keine zukünftigen Wochen. Unvollständige Summen direkt am Ergebnis kennzeichnen.
