@@ -54,7 +54,7 @@ npm run check
 Dies führt Fachlogik- und DOM-Regressionstests sowie TypeScript-Prüfung und Produktionsbuild aus. Push und PR starten dieselben Checks automatisch. Die tatsächlichen Supabase-Zugriffsregeln werden zusätzlich gegen eine lokale Docker-Instanz geprüft:
 
 ```sh
-npx supabase@2.117.0 start
+node scripts/start-test-supabase.mjs # erstmalige leere lokale Testdatenbank
 node scripts/test-local-supabase.mjs
 node scripts/test-restore.mjs
 ```
