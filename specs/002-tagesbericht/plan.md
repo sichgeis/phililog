@@ -9,3 +9,7 @@ Fachlogiktests für Momentaufnahme, Mengen und CSV; lokale Supabase für Zugriff
 ## Getrennte Standards
 
 Zwei positive Integer-Spalten `breast_left_ml`/`breast_right_ml`, aus bisherigem Standard initialisiert. Atomare gemeinsame Speicherung mit bestehender Version/RLS. Altes Feld für während des Rollouts geöffnete Clients erhalten; ein Legacy-UPDATE setzt beide neuen Werte. Entwurf speichert ein Paar; alte numerische Entwurfswerte werden auf beide Seiten kopiert. Separate einmalige Bestandsmigration mit privater Sicherung und kurzen Schreibsperren; regulärer Ersteller-/Versionsschutz bleibt wirksam.
+
+## Wartung
+
+Settings-Entwürfe speichern die ursprüngliche Version gemeinsam mit beiden Werten. Hintergrundaktualisierungen ändern nur den Serverstand. Konfliktauflösung und Nachweise stehen in [004](../004-wartung/plan.md).

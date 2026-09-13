@@ -47,3 +47,7 @@ Kein eigener Ereignistyp „Quengeln“, keine automatische Ableitung aus andere
 ## Entscheidung
 
 Vier Zustände und erneutes Tippen zum Abwählen bestätigt. Gilt für Stillen, Flasche und Wickeln.
+
+## Wartung – [Betriebsdatum privat]
+
+Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes Wartungspaket](../004-wartung/spec.md).

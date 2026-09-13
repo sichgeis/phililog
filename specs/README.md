@@ -41,6 +41,7 @@ Der MVP wurde zur Umsetzung beauftragt. Verbleibende Rückfragen und Prüfnachwe
 | --- | --- | --- |
 | 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung |
 | 002 | [Tagesbericht und Still-Schätzung](002-tagesbericht/spec.md) | Abgeschlossen |
+| 004 | [Wartung und zuverlässige Speicherung](004-wartung/spec.md) | In Umsetzung |
 | 003 | [Befinden nach einem Ereignis](003-befinden/spec.md) | Abgeschlossen |
 
 Der nächste konkrete Schritt und der Fortschritt stehen in den [Aufgaben zu Feature 001](001-fuettern/tasks.md).

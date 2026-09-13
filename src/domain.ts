@@ -155,3 +155,9 @@ export function estimatedMilk(draft: Draft): number | null {
   if (draft.breastDefault === null) throw new Error('Bitte warten, bis der Still-Standard geladen ist, oder eine eigene Schätzung angeben.');
   return milliliters(String(draft.side === 'both' ? draft.breastDefault.left + draft.breastDefault.right : draft.breastDefault[draft.side]));
 }
+
+export function hasDraftChanges(draft: Draft): boolean {
+  const baseline = newDraft(draft.breastDefault);
+  return (Object.keys(draft) as (keyof Draft)[]).some(key =>
+    key !== 'breastDefault' && draft[key] !== baseline[key]);
+}

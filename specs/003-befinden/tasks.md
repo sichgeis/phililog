@@ -10,3 +10,7 @@
 - [x] Pages-Veröffentlichung 34773135229 (historischer Prüfnachweis) erfolgreich, App-Code (historischer Commit).
 
 Abgeschlossen; keine offenen Implementierungsaufgaben.
+
+## Wartung
+
+Gemeinsamer Entwurfs- und Fokuserhalt einschließlich Befinden: [Wartungspaket](../004-wartung/tasks.md).

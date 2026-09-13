@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { PAGE_SIZE, sameInput, type Feeding, type FeedingInput, type PendingCreate } from './domain.ts';
+import { PAGE_SIZE, type Feeding, type FeedingInput, type PendingCreate } from './domain.ts';
 
 const url = import.meta.env?.VITE_SUPABASE_URL;
 const key = import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -31,13 +31,18 @@ export async function allFeedings(): Promise<Feeding[]> {
     cursor = { time: last.occurred_at, id: last.id };
   }
 }
-export async function createFeeding(pending: PendingCreate, userId: string): Promise<Feeding> {
+export async function createFeeding(pending: PendingCreate, userId: string): Promise<Feeding | null> {
   const { data, error } = await supabase!.from('feedings').insert({ id: pending.id, ...pending.input, created_by: userId }).select().single();
   if (!error) return data as Feeding;
   // A response can be lost after commit. Read the same UUID before deciding whether retry failed.
   if (error.code === '23505') {
-    const { data: existing, error: readError } = await supabase!.from('feedings').select('*').eq('id', pending.id).single();
-    if (!readError && existing.created_by === userId && sameInput(existing as Feeding, pending.input)) return existing as Feeding;
+    const { data: existing, error: readError } = await supabase!.from('feedings').select('*').eq('id', pending.id).maybeSingle();
+    if (readError) throw readError;
+    if (existing?.created_by === userId) return existing as Feeding;
+    const { data: known, error: receiptError } = await supabase!.rpc('feeding_create_known', { entry_id: pending.id });
+    if (receiptError) throw receiptError;
+    if (!existing && known) return null;
+    throw Object.assign(new Error('Diese Eintrags-ID gehört nicht zu deiner Speicherung. Bitte den Eintrag prüfen.'), { code: 'CREATE_COLLISION' });
   }
   throw error;
 }
@@ -69,7 +74,7 @@ export async function getSettings(): Promise<import('./report.ts').Settings> {
 export async function saveSettings(defaults: import('./report.ts').BreastDefaults, version: number): Promise<import('./report.ts').Settings> {
   const { data, error } = await supabase!.from('family_settings').update({ breast_left_ml: defaults.left, breast_right_ml: defaults.right }).eq('id', true).eq('version', version).select('breast_left_ml,breast_right_ml,version').maybeSingle();
   if (error) throw error;
-  if (!data) throw new Error('Die Einstellungen wurden inzwischen geändert. Bitte aktualisieren und erneut speichern.');
+  if (!data) throw new Error('Die Einstellungen wurden inzwischen geändert. Deine Eingaben bleiben erhalten. Bitte Serverwerte übernehmen und die Änderung erneut eingeben.');
   return data;
 }
 export async function getDailyReport(first: string, last: string): Promise<import('./report.ts').DailyReport[]> {
