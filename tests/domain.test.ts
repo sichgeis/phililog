@@ -139,3 +139,16 @@ test('Personenzuordnung bleibt bei Korrektur und CSV erhalten; neue Einträge nu
   assert.equal(sameInput(entry, { ...input, performed_by: 'Christian' }), false);
   assert.equal(feedingInput(draftFromFeeding({ ...entry, performed_by: null }), now).performed_by, null);
 });
+
+test('Optionales Befinden bleibt bei Bearbeitung/CSV erhalten und gehört nicht zu Wiegen', () => {
+ const initial = feedingInput(newDraft(), now);
+ assert.equal(initial.mood_after,null);
+ const input = feedingInput({...newDraft(),mood:'sleepy'},now);
+ const entry = {...input,id:'id',created_by:'creator',created_at:now.toISOString(),updated_at:now.toISOString(),version:1};
+ assert.equal(draftFromFeeding(entry).mood,'sleepy');
+ assert.match(toCsv([entry]),/Schläfrig/);
+ assert.equal(sameInput(input,{...input,mood_after:'calm'}),false);
+ assert.equal(sameInput(initial,{...initial,mood_after:undefined}),true);
+ assert.equal(feedingInput({...draftFromFeeding(entry),mood:null},now).mood_after,null);
+ assert.equal(feedingInput({...newDraft(),kind:'weight',weight:'3500',mood:'calm'},now).mood_after,null);
+});

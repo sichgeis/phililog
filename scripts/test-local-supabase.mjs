@@ -195,6 +195,17 @@ try {
     end $$;
     rollback;`;
   execFileSync('docker',['exec','-i','supabase_db_phililog','psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1'],{input:seed,stdio:['pipe','pipe','pipe']});
+  const moodId = randomUUID(); ids.push(moodId);
+  const moodRow = await julia.client.from('feedings').insert({ ...input, id:moodId,mood_after:'fussy' }).select().single();
+  assert.ifError(moodRow.error); assert.equal(moodRow.data.mood_after,'fussy');
+  for (const mood of ['sleepy','calm','alert',null]) {
+    const changed = await christian.client.from('feedings').update({mood_after:mood}).eq('id',moodId).select().single();
+    assert.ifError(changed.error);assert.equal(changed.data.mood_after,mood);
+  }
+  assert.deepEqual((await julia.client.from('feedings').update({mood_after:'fussy'}).eq('id',moodId).eq('version',1).select()).data,[]);
+  assert.ok((await julia.client.from('feedings').update({mood_after:'invalid'}).eq('id',moodId)).error);
+  assert.ok((await julia.client.from('feedings').update({kind:'weight',amount_ml:null,duration_minutes:null,weight_g:3500,mood_after:'calm'}).eq('id',moodId)).error);
+  assert.deepEqual((await outsider.client.from('feedings').update({mood_after:'calm'}).eq('id',moodId).select()).data,[]);
   console.log('Lokale Supabase-Prüfungen bestanden: erlaubte/verbotene CRUD-Zugriffe, Selbstfreischaltung, Validierung, Duplikatschutz, Versionskonflikte, echte Wiederholung und Export über 505 Einträge.');
 } finally {
   for (let offset = 0; offset < ids.length; offset += 100) {

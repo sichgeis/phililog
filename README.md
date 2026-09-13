@@ -4,7 +4,11 @@ Ein gemeinsames Logbuch für den Alltag mit einem neugeborenen Baby. Es erfasst 
 
 ## Projektstatus
 
-Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält kompakte Fütterungs- und Wickeleingabe, Wiegen unter „Weitere Ereignisse“, Stillstart/-ende, Personenzuordnung zu Julia/Christian, Historie, Korrekturen, Löschen, CSV-Export einen Tagesbericht, gemeinsame Einstellungen für Still-Schätzungen und eine Projektinfo. Die App ist auf [GitHub Pages](https://sichgeis.github.io/phililog/) veröffentlicht und mit dem Supabase-Free-Projekt Philine-Log in Europa verbunden. Beide Elternkonten und der gemeinsame Datenzugriff wurden produktiv geprüft. [MVP-Spezifikation](specs/001-fuettern/spec.md).
+Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält kompakte Fütterungs- und Wickeleingabe, Wiegen unter „Weitere Ereignisse“, Stillstart/-ende, Personenzuordnung zu Julia/Christian, Historie, Korrekturen, Löschen, CSV-Export, einen Tagesbericht, gemeinsame Einstellungen für Still-Schätzungen und eine Projektinfo. Die App ist auf [GitHub Pages](https://sichgeis.github.io/phililog/) veröffentlicht und mit dem Supabase-Free-Projekt Philine-Log in Europa verbunden. Beide Elternkonten und der gemeinsame Datenzugriff wurden produktiv geprüft. [MVP-Spezifikation](specs/001-fuettern/spec.md).
+
+## Befinden danach
+
+Bei Stillen, Flasche und Wickeln könnt ihr optional Quengelig, Schläfrig, Ruhig oder Aufmerksam auswählen. Ein anderer Button ersetzt die Auswahl; erneutes Tippen entfernt sie. Die Angabe bleibt beim Ereignis, erscheint im Logbuch und CSV und kann später geändert werden. Jeder neue Eintrag startet ohne Vorauswahl. [Spezifikation](specs/003-befinden/spec.md).
 
 ## Tagesbericht und Still-Schätzung
 
