@@ -60,3 +60,20 @@ export function friendlyError(error: unknown): string {
   if (code === 'PGRST205') return 'Die Datenbank ist noch nicht eingerichtet.';
   return 'Das hat gerade nicht geklappt. Bitte die Verbindung prüfen und erneut versuchen.';
 }
+
+export async function getSettings(): Promise<import('./report.ts').Settings> {
+  const { data, error } = await supabase!.from('family_settings').select('breast_ml,version').eq('id', true).single();
+  if (error) throw error;
+  return data;
+}
+export async function saveSettings(breastMl: number, version: number): Promise<import('./report.ts').Settings> {
+  const { data, error } = await supabase!.from('family_settings').update({ breast_ml: breastMl }).eq('id', true).eq('version', version).select('breast_ml,version').maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Die Einstellungen wurden inzwischen geändert. Bitte aktualisieren und erneut speichern.');
+  return data;
+}
+export async function getDailyReport(first: string, last: string): Promise<import('./report.ts').DailyReport[]> {
+  const { data, error } = await supabase!.rpc('daily_report', { first_day: first, last_day: last });
+  if (error) throw error;
+  return data;
+}

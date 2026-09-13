@@ -40,5 +40,6 @@ Der MVP wurde zur Umsetzung beauftragt. Verbleibende Rückfragen und Prüfnachwe
 | ID | Feature / Link | Status |
 | --- | --- | --- |
 | 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung |
+| 002 | [Tagesbericht und Still-Schätzung](002-tagesbericht/spec.md) | In Umsetzung |
 
 Der nächste konkrete Schritt und der Fortschritt stehen in den [Aufgaben zu Feature 001](001-fuettern/tasks.md).
