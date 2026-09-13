@@ -49,6 +49,16 @@ try {
   const created = await caregiver_a.client.from('feedings').insert(input).select().single();
   assert.ifError(created.error);
   assert.equal(created.data.version, 1);
+  assert.equal(created.data.performed_by, 'caregiver_a');
+  const personId = randomUUID(); ids.push(personId);
+  const own = await caregiver_b.client.from('feedings').insert({ ...input, id: personId, created_by: caregiver_b.user.id }).select().single();
+  assert.ifError(own.error); assert.equal(own.data.performed_by, 'caregiver_b');
+  const reassigned = await caregiver_a.client.from('feedings').update({ performed_by: 'caregiver_a' }).eq('id', personId).eq('version', 1).select().single();
+  assert.ifError(reassigned.error); assert.equal(reassigned.data.performed_by, 'caregiver_a'); assert.equal(reassigned.data.created_by, caregiver_b.user.id); assert.equal(reassigned.data.version, 2);
+  assert.deepEqual((await caregiver_b.client.from('feedings').update({ performed_by: 'caregiver_b' }).eq('id', personId).eq('version', 1).select()).data, []);
+  assert.ok((await caregiver_a.client.from('feedings').update({ performed_by: 'Other' }).eq('id', personId)).error);
+  assert.deepEqual((await outsider.client.from('feedings').update({ performed_by: 'caregiver_b' }).eq('id', personId).select()).data, []);
+  assert.ok((await caregiver_b.client.from('feedings').insert({ ...input, id: randomUUID(), created_by: caregiver_b.user.id, performed_by: 'caregiver_a' })).error, 'Cannot override automatic assignment on insert');
   assert.equal((await caregiver_a.client.from('feedings').insert(input)).error?.code, '23505', 'Same ID cannot duplicate');
   assert.equal((await caregiver_b.client.from('feedings').select().eq('id', input.id)).data.length, 1, 'Shared logbook');
   assert.deepEqual((await outsider.client.from('feedings').update({ amount_ml: 70 }).eq('id', input.id).select()).data, [], 'Outsider update denied');
