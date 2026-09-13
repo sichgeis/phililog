@@ -50,4 +50,8 @@ Vier Zustände und erneutes Tippen zum Abwählen bestätigt. Gilt für Stillen, 
 
 ## Wartung – [Betriebsdatum privat]
 
-Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes Wartungspaket](../004-wartung/spec.md).
+Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes Wartungspaket](../005-wartung/spec.md).
+
+## Bedienlayout – [Betriebsdatum privat]
+
+[Feature 004](../004-bedienlayout/spec.md) ergänzt eine ausdrückliche Abwahl und bündelt optionale Angaben. Die vier Optionen, Entwurfserhalt und Speichersemantik bleiben unverändert.

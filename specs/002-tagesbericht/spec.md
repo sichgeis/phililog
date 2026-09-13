@@ -18,4 +18,8 @@ Einmalige ausdrückliche Bestandskorrektur: vorhandene Flaschen-/Wickelereigniss
 
 ## Wartung – [Betriebsdatum privat]
 
-Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes Wartungspaket](../004-wartung/spec.md).
+Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes Wartungspaket](../005-wartung/spec.md).
+
+## Kalenderwochen – [Betriebsdatum privat]
+
+Beauftragt in [Feature 004](../004-bedienlayout/spec.md): freie Datumsauswahl durch ISO-KW/Wochenjahr, Pfeile, heutiges Datum und „Heute“ ersetzen. Wochen Montag–Sonntag, laufende Woche bis heute, keine zukünftigen Wochen. Unvollständige Summen direkt am Ergebnis kennzeichnen.

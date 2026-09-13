@@ -103,4 +103,8 @@ Beauftragt: Neue Einträge aller Arten werden automatisch der angemeldeten Perso
 
 ## Wartung – [Betriebsdatum privat]
 
-Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes Wartungspaket](../004-wartung/spec.md).
+Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes Wartungspaket](../005-wartung/spec.md).
+
+## Bedienlayout – [Betriebsdatum privat]
+
+Die ausdrücklich beauftragte [Layoutüberarbeitung](../004-bedienlayout/spec.md) präzisiert die Anordnung, Speicherbeschriftung und Touch-Bedienung. Der Stillablauf bleibt erhalten. Letzte Mahlzeit steht oberhalb, Zusatzangaben sind aufklappbar; AC-012 gilt für die normale Kerneingabe.

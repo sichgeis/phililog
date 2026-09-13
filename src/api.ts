@@ -82,3 +82,9 @@ export async function getDailyReport(first: string, last: string): Promise<impor
   if (error) throw error;
   return data;
 }
+
+export async function currentFamilyPerson(): Promise<import('./domain.ts').Person | null> {
+  const { data, error } = await supabase!.rpc('current_family_person');
+  if (error) throw error;
+  return data === 'caregiver_a' || data === 'caregiver_b' ? data : null;
+}
