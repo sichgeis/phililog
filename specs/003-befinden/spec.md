@@ -2,7 +2,7 @@
 
 ## Abstimmungsstand
 
-- Stand: Abgestimmt, [Betriebsdatum privat].
+- Stand: Abgeschlossen, [Betriebsdatum privat].
 - Auftrag: Vier Optionen einschließlich Abwahl am [Betriebsdatum privat] bestätigt; Umsetzung und Veröffentlichung ausdrücklich beauftragt.
 
 ## Ziel und Umfang

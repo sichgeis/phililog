@@ -7,6 +7,6 @@
 - [x] Browser-Harness mit synthetischem Konto: Wechsel/Abwahl, Neuladen, Speicherung, Rücksetzen beim neuen Eintrag, nachträgliches Entfernen und Typwechsel zu Wiegen geprüft. Native Leertaste aktiviert Button und erhält Fokus. Teils DOM-Klicks/Formularaktionen verwendet.
 - [x] Layout 390/320 px visuell geprüft, kein horizontaler Überlauf. Screenshots `/private/tmp/phililog-mood390.png`, `/private/tmp/phililog-mood320.png`.
 - [x] Migration 009 produktiv erfolgreich: „Success. No rows returned“. Bestehende Einträge unverändert.
-- [ ] Pages-Veröffentlichung abschließen.
+- [x] Pages-Veröffentlichung 34773135229 (historischer Prüfnachweis) erfolgreich, App-Code (historischer Commit).
 
-Nächster Schritt: Erfolgreiche Migration und Veröffentlichung bestätigen.
+Abgeschlossen; keine offenen Implementierungsaufgaben.
