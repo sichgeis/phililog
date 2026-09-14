@@ -44,5 +44,6 @@ Der MVP wurde zur Umsetzung beauftragt. Verbleibende Rückfragen und Prüfnachwe
 | 003 | [Befinden nach einem Ereignis](003-befinden/spec.md) | Abgeschlossen |
 | 004 | [Anordnung und Bedienbarkeit](004-bedienlayout/spec.md) | Abgeschlossen |
 | 005 | [Wartung und zuverlässige Speicherung](005-wartung/spec.md) | Abgeschlossen |
+| 006 | [Temperatur und persönliche Speichereffekte](006-temperatur-und-effekte/spec.md) | Abgeschlossen |
 
 Der nächste konkrete Schritt und der Fortschritt stehen in den [Aufgaben zu Feature 001](001-fuettern/tasks.md).

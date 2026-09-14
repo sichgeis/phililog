@@ -152,3 +152,21 @@ test('Optionales Befinden bleibt bei Bearbeitung/CSV erhalten und gehört nicht 
  assert.equal(feedingInput({...draftFromFeeding(entry),mood:null},now).mood_after,null);
  assert.equal(feedingInput({...newDraft(),kind:'weight',weight:'3500',mood:'calm'},now).mood_after,null);
 });
+
+
+test('Temperatur akzeptiert Komma/Punkt, prüft Grenzen und erhält Wert in Bearbeitung/CSV', () => {
+  const draft = { ...newDraft(), kind: 'temperature' as const, temperature: '37,2', mood: 'calm' as const };
+  const value = feedingInput(draft, now);
+  assert.equal(value.temperature_c, 37.2);
+  assert.equal(value.duration_minutes, null);
+  assert.equal(value.mood_after, null);
+  assert.equal(value.estimated_ml, null);
+  for (const temperature of ['25', '45.0', '37.2']) assert.doesNotThrow(() => feedingInput({ ...draft, temperature }));
+  for (const temperature of ['', '24.9', '45.1', '37.22', 'NaN', '3e1', '37,2x']) assert.throws(() => feedingInput({ ...draft, temperature }), /Temperatur/);
+  const entry = { ...value, id: 'temperature-test', version: 1 } as Feeding;
+  assert.equal(feedingInput(draftFromFeeding(entry)).temperature_c, 37.2);
+  assert.match(toCsv([entry]), /Temperatur \(°C\)/);
+  assert.match(toCsv([entry]), /"37,2"/);
+  assert.equal(sameInput(value, { ...value, temperature_c: 37.3 }), false);
+  assert.equal(feedingInput({ ...draft, kind: 'diaper' }).temperature_c, null);
+});
