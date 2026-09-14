@@ -10,7 +10,7 @@ Stand: Lokal abgeschlossen am 14. September 2026. Produktive Migration und Verö
 - [x] Browser-Harness gegen lokale App und echte lokale Supabase, synthetisches Konto christian@phililog.test. Menü bei 390 × 844 px ohne überlappende Optionen; Temperatur bei 320 × 740 px ohne horizontalen Überlauf. Dezimalkomma 37,2 über native Eingabe gespeichert; Erfolg bestätigt. Keine API-Mocks in der Browserprüfung; DOM-Tests ersetzen ausschließlich ihre API. Screenshots unter /private/tmp visuell geprüft.
 - [x] README und bestehende Spezifikationen aktualisiert. `git diff --check` erfolgreich.
 
-Grenzen: Keine physische Smartphone-/PWA-Abnahme. Keine offene Implementierungsarbeit. Veröffentlichung läuft; nächster Schritt: GitHub-Pages-Deployment und produktive Oberfläche prüfen.
+Grenzen: Keine physische Smartphone-/PWA-Abnahme. Keine offene Implementierungsarbeit. Veröffentlichung und produktive Leseprüfung abgeschlossen; keine offenen Aufgaben.
 
 
 ## Produktive Migration und Veröffentlichung
@@ -21,3 +21,7 @@ Grenzen: Keine physische Smartphone-/PWA-Abnahme. Keine offene Implementierungsa
 - [x] Migrationen erfolgreich; bidirektionaler Vergleich aller Originalzeilen bestätigte unveränderte Daten. UUID-Nachweise vollständig. Temperaturrechte, RLS und Schutz von Sicherung/UUID-Tabelle/RPC anschließend geprüft.
 - Migration 011 SHA-256: `f0dd23b884a03d3e178e0a353c4e78a2797f58aac1479dd9ceab9c7f49bc3b42`.
 - Migration 012 SHA-256: `f3224deefe6d243450539b13cfe9993373bee630efbab63e102e907a3db4cec4`.
+
+- [x] Commit `9e089199a69373e7bd8e7cfbfcf20150c83823c1` auf main gepusht. CI erfolgreich. [GitHub-Pages-Deployment 34817768491](https://github.com/sichgeis/phililog/actions/runs/34817768491) mit Tests, Build und Veröffentlichung erfolgreich.
+- [x] Produktive Browser-Leseprüfung: neues Asset `/phililog/assets/index-BsqtRKCv.js` geladen; oberes Zahnrad fehlt, Footer-Einstellungen vorhanden, geöffnetes Mehr-Menü zeigt Wiegen und Temperatur. Mitglieds-/Personenabfrage, Eintragsabfragen und Einstellungen mit HTTP 200, keine sichtbaren API-Fehler. Keine produktiven Testeinträge angelegt.
+- [x] Abschließender Dokumentationsstand separat auf main gepusht; Anwendungsartefakte identisch mit dem veröffentlichten Commit.
