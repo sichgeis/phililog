@@ -41,7 +41,7 @@ Der MVP wurde zur Umsetzung beauftragt. Verbleibende Rückfragen und Prüfnachwe
 | --- | --- | --- |
 | 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung |
 | 002 | [Tagesbericht und Still-Schätzung](002-tagesbericht/spec.md) | Abgeschlossen |
-| 003 | [Befinden nach einem Ereignis](003-befinden/spec.md) | Abgeschlossen |
+| 003 | [Befinden nach einem Ereignis](003-befinden/spec.md) | Abgeschlossen (Erweiterung lokal) |
 | 004 | [Anordnung und Bedienbarkeit](004-bedienlayout/spec.md) | Abgeschlossen |
 | 005 | [Wartung und zuverlässige Speicherung](005-wartung/spec.md) | Abgeschlossen |
 | 006 | [Temperatur und persönliche Speichereffekte](006-temperatur-und-effekte/spec.md) | Abgeschlossen |

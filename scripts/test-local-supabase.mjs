@@ -227,7 +227,7 @@ try {
   const moodId = randomUUID(); ids.push(moodId);
   const moodRow = await caregiver_a.client.from('feedings').insert({ ...input, id:moodId,mood_after:'fussy' }).select().single();
   assert.ifError(moodRow.error); assert.equal(moodRow.data.mood_after,'fussy');
-  for (const mood of ['sleepy','calm','alert',null]) {
+  for (const mood of ['sleepy','calm','alert','angry','asleep',null]) {
     const changed = await caregiver_b.client.from('feedings').update({mood_after:mood}).eq('id',moodId).select().single();
     assert.ifError(changed.error);assert.equal(changed.data.mood_after,mood);
   }
