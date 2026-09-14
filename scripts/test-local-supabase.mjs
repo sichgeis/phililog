@@ -74,6 +74,18 @@ try {
   assert.deepEqual(stale.data, [], 'Stale updates rejected');
   assert.deepEqual((await julia.client.from('feedings').delete().eq('id', input.id).eq('version', 1).select()).data, [], 'Stale delete rejected');
   assert.ok((await julia.client.from('feedings').update({ created_by: christian.user.id }).eq('id', input.id)).error, 'Creator immutable');
+  const temperatureId = randomUUID(); ids.push(temperatureId);
+  const temperature = { ...input, id: temperatureId, kind: 'temperature', amount_ml: null, duration_minutes: null, temperature_c: 37.2 };
+  const measured = await julia.client.from('feedings').insert(temperature).select().single();
+  assert.ifError(measured.error); assert.equal(measured.data.temperature_c, 37.2);
+  const corrected = await christian.client.from('feedings').update({ temperature_c: 37.4 }).eq('id', temperatureId).eq('version', 1).select().single();
+  assert.ifError(corrected.error); assert.equal(corrected.data.temperature_c, 37.4);
+  assert.deepEqual((await outsider.client.from('feedings').select().eq('id', temperatureId)).data, []);
+  assert.deepEqual((await outsider.client.from('feedings').update({ temperature_c: 38 }).eq('id', temperatureId).select()).data, []);
+  for (const temperature_c of [null, 24.9, 45.1, 37.22]) assert.ok((await julia.client.from('feedings').insert({ ...temperature, id: randomUUID(), temperature_c })).error, 'Invalid temperature denied');
+  for (const extra of [{ amount_ml: 65 }, { mood_after: 'calm' }, { weight_g: 3500 }]) assert.ok((await julia.client.from('feedings').insert({ ...temperature, id: randomUUID(), ...extra })).error, 'Unrelated measurement details denied');
+  assert.ok((await julia.client.from('feedings').insert({ ...input, id: randomUUID(), temperature_c: 37.2 })).error, 'Temperature only on temperature events');
+  assert.deepEqual((await christian.client.from('feedings').delete().eq('id', temperatureId).eq('version', 2).select('id')).data, [{ id: temperatureId }]);
   const breast = { ...input, id: randomUUID(), kind: 'breast', started_at: '2026-09-12T08:15:00Z', amount_ml: null, side: 'left', duration_minutes: 30 };
   ids.push(breast.id);
   assert.ifError((await julia.client.from('feedings').insert(breast)).error);

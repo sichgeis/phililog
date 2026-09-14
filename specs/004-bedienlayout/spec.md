@@ -24,3 +24,7 @@ Status: Abgeschlossen und veröffentlicht; Prüfnachweise in tasks.md. Abgestimm
 ## Grenzen
 
 Umsetzung und produktive Migration am 13. September 2026 nach Screenshot-Abnahme beauftragt; vorher nach Möglichkeit Sicherung. Commit, Push auf main und Veröffentlichung anschließend ausdrücklich freigegeben. Keine Datenkorrektur. Physische Smartphone-/PWA-Abnahme bleibt gesondert.
+
+## Ergänzung vom 14. September 2026
+
+[Feature 006](../006-temperatur-und-effekte/spec.md) ergänzt Temperatur unter „Mehr“, entfernt das obere Einstellungszahnrad und erweitert Christians Speichereffekt. Die übrigen Abläufe bleiben gültig.

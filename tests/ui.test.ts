@@ -7,7 +7,7 @@ import * as domain from '../src/domain.ts';
 import * as report from '../src/report.ts';
 
 // Execute the real entry point and handlers in a disposable DOM. Only the API is substituted.
-async function setup(t: any) {
+async function setup(t: any, person = 'Julia', reduced = false) {
   const window = new Window({ url: 'http://localhost:5173' });
   t.after(() => window.happyDOM.close());
   window.document.body.innerHTML = '<div id="app"></div>';
@@ -16,7 +16,8 @@ async function setup(t: any) {
   const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
   Object.assign(window, domain, report, {
-    configured: true, currentFamilyPerson: async () => 'Julia',
+    configured: true, currentFamilyPerson: async () => person,
+    matchMedia: () => ({ matches: reduced }),
     supabase: { rpc: async () => ({ data: true }), auth: { onAuthStateChange() {}, signOut: async () => ({}) } },
     getSettings: async () => ({ ...settings }),
     saveSettings: async (values: any, version: number) => {
@@ -136,4 +137,55 @@ test('Kalenderwochen-Navigation bleibt mit Wartungsrefresh bedienbar', async t =
   ui.find('#report-today').click(); await ui.app.refresh();
   assert.equal(ui.find('.report-controls strong').textContent, current);
   assert.equal(ui.find('#report-next').disabled, true);
+});
+
+
+test('Temperatur unter Mehr, Footer-Einstellungen und Dezimaleingabe bleiben erhalten', async t => {
+  const ui = await setup(t);
+  assert.equal(ui.window.document.querySelector('.navigation-bar [data-view="settings"]'), null);
+  assert.ok(ui.find('footer [data-view="settings"]'));
+  assert.ok(ui.find('#extra-events [data-kind="temperature"]'));
+  ui.find('[data-kind="temperature"]').click();
+  assert.equal(ui.window.document.querySelector('#mood-options'), null);
+  assert.equal(ui.find('.duration-block').hidden, true);
+  ui.input('#temperature', '37,2');
+  await ui.app.refresh();
+  assert.equal(ui.find('#temperature').value, '37,2');
+  let saved: any;
+  ui.setCreate(async p => { saved = p.input; return p.input; });
+  await ui.app.save();
+  assert.equal(saved.temperature_c, 37.2);
+  assert.equal(saved.duration_minutes, null);
+  assert.match(ui.find('#messages').textContent, /Io triumphe/);
+});
+
+for (const kind of ['bottle', 'diaper']) test(`Christian erhält Sterne und Regenbogen nach ${kind}`, async t => {
+  const ui = await setup(t, 'Christian');
+  ui.find(`[data-kind="${kind}"]`).click();
+  if (kind === 'bottle') ui.input('#amount', '65');
+  await ui.app.save();
+  assert.equal(ui.window.document.querySelectorAll('.star-celebration i').length, 72);
+  assert.equal(ui.find('.celebration-rainbow').textContent, '🌈');
+});
+
+test('Julias Konfetti bleibt erhalten; Fehler haben keinen Effekt', async t => {
+  const ui = await setup(t);
+  ui.find('[data-kind="bottle"]').click();
+  await ui.app.save();
+  assert.equal(ui.window.document.querySelector('.watercolor-celebration'), null);
+  ui.input('#amount', '65');
+  ui.setCreate(async () => { throw new Error('Verbindung fehlgeschlagen'); });
+  await ui.app.save();
+  assert.equal(ui.window.document.querySelector('.watercolor-celebration'), null);
+  ui.setCreate(async p => p.input);
+  await ui.app.save();
+  assert.equal(ui.window.document.querySelectorAll('.watercolor-celebration i').length, 24);
+  assert.equal(ui.window.document.querySelector('.star-celebration'), null);
+});
+
+test('Christian erhält bei reduzierter Bewegung eine ruhige Grafik', async t => {
+  const ui = await setup(t, 'Christian', true);
+  ui.find('[data-kind="diaper"]').click();
+  await ui.app.save();
+  assert.ok(ui.find('.star-celebration.reduced-celebration .celebration-rainbow'));
 });

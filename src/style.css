@@ -66,7 +66,7 @@ button:disabled{cursor:default}
 .extra-events{position:relative;margin:0;font-size:13px;font-weight:400}
 .extra-events summary{margin:0;min-height:44px;padding:8px;list-style:none}
 .extra-events summary::after{content:' ▾'}
-.extra-events button{position:absolute;right:0;top:100%;z-index:4;width:160px;margin:0;background:#fffefd;box-shadow:0 6px 18px #30385f20}
+.extra-events-menu{position:absolute;right:0;top:100%;z-index:4;width:180px;padding:6px;background:#fffefd;border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 18px #30385f20}.extra-events-menu button{position:static;width:100%;margin:0;box-shadow:none;justify-content:flex-start}.extra-events-menu button+button{margin-top:6px}.entry-icon.temperature{background:#fff0de;color:#976026}
 .kind-button{font-size:14px;min-height:48px;flex-wrap:nowrap;gap:6px}
 .kind-button>svg:first-child{width:20px;height:20px}
 .kind-button>svg:last-child:not(:first-child){display:block;width:14px;height:14px;margin-left:0}
@@ -175,3 +175,11 @@ form:has(input:focus,select:focus) .save-bar{position:static}
 .field-header{flex-wrap:wrap}
 .kind-button span,.navigation-bar .main-nav button{overflow-wrap:anywhere}
 .timing-fields:has(.duration-block[hidden])>.time-options{grid-column:1/-1}
+
+/* Christian: großer Sternenregen mit ruhiger Regenbogenblende. */
+.star-celebration{background:radial-gradient(ellipse at 50% 0%,#ffc8ed40,transparent 70%)}
+.star-celebration i{width:auto;height:auto;font-style:normal;font-size:var(--size);line-height:1;top:-55px;border-radius:0;text-shadow:0 2px 9px #fff,0 0 18px currentColor;animation:star-fall 2300ms var(--delay) ease-in forwards}
+.celebration-rainbow{position:absolute;top:10%;left:50%;font-size:clamp(150px,48vw,330px);line-height:1.2;transform:translateX(-50%);filter:drop-shadow(0 0 26px #ffdb8d);animation:rainbow-glow 3000ms ease-out forwards}
+@keyframes star-fall{10%{opacity:1}80%{opacity:1}100%{transform:translate(var(--drift),110vh) rotate(220deg);opacity:0}}
+@keyframes rainbow-glow{0%{opacity:0;transform:translateX(-50%) scale(.8)}20%,65%{opacity:1}100%{opacity:0;transform:translateX(-50%) scale(1.08)}}
+@media(prefers-reduced-motion:reduce){.star-celebration.reduced-celebration{display:block;background:none}.reduced-celebration i{display:none}.reduced-celebration .celebration-rainbow{animation:none;font-size:100px;top:15%}.reduced-celebration .celebration-rainbow::after{content:' ✦ ★ ✦';display:block;font-size:32px;text-align:center;color:#9b6800}}

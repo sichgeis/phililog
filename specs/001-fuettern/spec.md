@@ -108,3 +108,7 @@ Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes War
 ## Bedienlayout – 13. September 2026
 
 Die ausdrücklich beauftragte [Layoutüberarbeitung](../004-bedienlayout/spec.md) präzisiert die Anordnung, Speicherbeschriftung und Touch-Bedienung. Der Stillablauf bleibt erhalten. Letzte Mahlzeit steht oberhalb, Zusatzangaben sind aufklappbar; AC-012 gilt für die normale Kerneingabe.
+
+## Ergänzung vom 14. September 2026
+
+[Feature 006](../006-temperatur-und-effekte/spec.md) ergänzt Temperatur unter „Mehr“, entfernt das obere Einstellungszahnrad und erweitert Christians Speichereffekt. Die übrigen Abläufe bleiben gültig.
