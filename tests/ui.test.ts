@@ -189,3 +189,25 @@ test('Christian erhält bei reduzierter Bewegung eine ruhige Grafik', async t =>
   await ui.app.save();
   assert.ok(ui.find('.star-celebration.reduced-celebration .celebration-rainbow'));
 });
+
+
+for (const mood of ['angry', 'asleep']) test(`${mood}: Auswahl, Wechsel, Abwahl, Entwurf und Speicherung`, async t => {
+ const ui = await setup(t);
+ ui.find('[data-kind="diaper"]').click();
+ assert.equal(ui.window.document.querySelectorAll('[data-mood]').length, 6);
+ ui.find('[data-mood="calm"]').click();
+ ui.find(`[data-mood="${mood}"]`).click();
+ assert.equal(ui.find('[data-mood="calm"]').getAttribute('aria-pressed'), 'false');
+ assert.equal(ui.find(`[data-mood="${mood}"]`).getAttribute('aria-pressed'), 'true');
+ ui.find(`[data-mood="${mood}"]`).click();
+ assert.equal(ui.find(`[data-mood="${mood}"]`).getAttribute('aria-pressed'), 'false');
+ ui.find(`[data-mood="${mood}"]`).click();
+ await ui.app.refresh();
+ assert.equal(ui.find(`[data-mood="${mood}"]`).getAttribute('aria-pressed'), 'true');
+ assert.equal(JSON.parse(ui.window.localStorage.getItem('phililog-draft:test-user')!).draft.mood, mood);
+ let saved: any;
+ ui.setCreate(async p => { saved = p.input; return p.input; });
+ await ui.app.save();
+ assert.equal(saved.mood_after, mood);
+ assert.equal(ui.window.document.querySelector('[data-mood][aria-pressed="true"]'), null);
+});

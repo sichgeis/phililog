@@ -1,6 +1,6 @@
 import { milliliters, type BreastDefaults } from './report.ts';
 export type FeedingKind = 'bottle' | 'breast' | 'diaper' | 'weight' | 'temperature';
-export const moods = { fussy: { label: 'Quengelig', icon: '😣' }, sleepy: { label: 'Schläfrig', icon: '😴' }, calm: { label: 'Ruhig', icon: '😌' }, alert: { label: 'Aufmerksam', icon: '👀' } } as const;
+export const moods = { fussy: { label: 'Quengelig', icon: '😣' }, sleepy: { label: 'Schläfrig', icon: '😴' }, calm: { label: 'Ruhig', icon: '😌' }, alert: { label: 'Aufmerksam', icon: '👀' }, angry: { label: 'Zornig', icon: '😠' }, asleep: { label: 'Eingeschlafen', icon: '💤' } } as const;
 export type Mood = keyof typeof moods;
 export type Person = 'Julia' | 'Christian';
 export type MilkType = 'pre' | 'breast_milk';

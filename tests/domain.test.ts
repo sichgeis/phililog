@@ -170,3 +170,19 @@ test('Temperatur akzeptiert Komma/Punkt, prüft Grenzen und erhält Wert in Bear
   assert.equal(sameInput(value, { ...value, temperature_c: 37.3 }), false);
   assert.equal(feedingInput({ ...draft, kind: 'diaper' }).temperature_c, null);
 });
+
+
+for (const [mood, label] of [['angry', 'Zornig'], ['asleep', 'Eingeschlafen']] as const) {
+ test(`${label} bleibt in Bearbeitung, Export und Wiederholungsvergleich erhalten`, () => {
+  const input = feedingInput({ ...newDraft(), mood }, now);
+  const entry = { ...input, id: 'mood-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
+  assert.equal(input.mood_after, mood);
+  assert.equal(feedingInput(draftFromFeeding(entry), now).mood_after, mood);
+  assert.ok(toCsv([entry]).includes(label));
+  assert.equal(sameInput(input, { ...input }), true);
+  assert.equal(sameInput(input, { ...input, mood_after: mood === 'angry' ? 'asleep' : 'angry' }), false);
+  assert.equal(feedingInput({ ...draftFromFeeding(entry), mood: null }, now).mood_after, null);
+  assert.equal(feedingInput({ ...newDraft(), kind: 'temperature', temperature: '37,2', mood }, now).mood_after, null);
+  assert.equal(feedingInput({ ...newDraft(), kind: 'weight', weight: '3500', mood }, now).mood_after, null);
+ });
+}

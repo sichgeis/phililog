@@ -8,7 +8,9 @@ Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Da
 
 ## Befinden danach
 
-Bei Stillen, Flasche und Wickeln könnt ihr optional Quengelig, Schläfrig, Ruhig oder Aufmerksam auswählen. Ein anderer Button ersetzt die Auswahl; erneutes Tippen entfernt sie. Die Angabe bleibt beim Ereignis, erscheint im Logbuch und CSV und kann später geändert werden. Jeder neue Eintrag startet ohne Vorauswahl. [Spezifikation](specs/003-befinden/spec.md).
+Bei Stillen, Flasche und Wickeln könnt ihr optional Quengelig, Schläfrig, Ruhig, Aufmerksam, Zornig oder Eingeschlafen auswählen. Ein anderer Button ersetzt die Auswahl; erneutes Tippen entfernt sie. Die Angabe bleibt beim Ereignis, erscheint im Logbuch und CSV und kann später geändert werden. Jeder neue Eintrag startet ohne Vorauswahl. [Spezifikation](specs/003-befinden/spec.md).
+
+Migration 013 für Zornig und Eingeschlafen ist produktiv eingespielt; die Veröffentlichung der Oberfläche läuft.
 
 ## Tagesbericht und Still-Schätzung
 
