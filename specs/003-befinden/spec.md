@@ -2,7 +2,7 @@
 
 ## Abstimmungsstand
 
-- Stand: Erweiterung lokal abgeschlossen, 14. September 2026; noch nicht veröffentlicht.
+- Stand: Erweiterung abgeschlossen und veröffentlicht, 14. September 2026.
 - Auftrag: Vier Optionen einschließlich Abwahl am 13. September 2026 bestätigt; Umsetzung und Veröffentlichung ausdrücklich beauftragt.
 
 ## Ziel und Umfang
