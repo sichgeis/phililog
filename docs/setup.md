@@ -90,6 +90,6 @@ Vor Veröffentlichung des Layouts aus Feature 004 Migration `202609130010_curren
 
 Am [Betriebsdatum privat] nach ausdrücklichem Auftrag produktiv eingespielt. Vorher wurden die App-Tabellen konsistent in eine separat dokumentierte private Sicherung bzw. Ausführungsquittung, eine separat dokumentierte private Sicherung bzw. Ausführungsquittung und eine separat dokumentierte private Sicherung bzw. Ausführungsquittung gesichert und alle Rechte für public/anon/authenticated entzogen. Die Migration wurde mit Vorher-/Nachher-Prüfsummen in einer Transaktion ausgeführt; Originaltabellen blieben unverändert. Diese Kopien sind eine Sicherung der App-Daten innerhalb derselben Datenbank, kein vollständiges externes Projektbackup einschließlich Auth.
 
-## Temperatur-Erweiterung (lokal geprüft, [Betriebsdatum privat])
+## Temperatur-Erweiterung (veröffentlicht, [Betriebsdatum privat])
 
 Vor Veröffentlichung der Temperatur-Oberfläche Migration `202609140012_temperature.sql` einmalig einspielen, nachdem vorherige Migrationen vorhanden sind. Sie ergänzt die Messwertspalte, Constraints und Spaltenrechte. Migrationen 011 und 012 wurden am [Betriebsdatum privat] produktiv in einer Transaktion angewendet. Interne Sicherung der betroffenen Tabellen im privaten Schema, unveränderte Originaldaten und erhaltene Rechte/RLS wurden geprüft. Anschließend den PostgREST-Schemacache bei Bedarf mit `NOTIFY pgrst, 'reload schema';` aktualisieren.

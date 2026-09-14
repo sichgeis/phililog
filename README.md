@@ -100,4 +100,4 @@ Am [Betriebsdatum privat] wurde der damalige Bestand auf ausdrücklichen Wunsch 
 
 Unter „Mehr“ stehen Wiegen und Temperatur. Die Körpertemperatur wird in °C mit einer Nachkommastelle erfasst, im Logbuch angezeigt und im CSV exportiert; Komma und Punkt sind als Eingabe möglich. Einstellungen sind ausschließlich im Footer erreichbar. Person B erhält nach erfolgreichem Speichern einen großen Sternenregen mit Regenbogen, Person A weiterhin Aquarellkonfetti. Bei reduzierter Bewegung erscheint für Person B eine ruhige Grafik.
 
-Lokal umgesetzt und geprüft. Migrationen 011 und 012 sind seit [Betriebsdatum privat] nach interner Sicherung produktiv eingespielt; die Veröffentlichung wurde beauftragt. [Umfang und Prüfnachweise](specs/006-temperatur-und-effekte/spec.md).
+Am [Betriebsdatum privat] veröffentlicht. Migrationen 011 und 012 sind nach interner Sicherung produktiv eingespielt. Erfolgreiches Deployment (historischer Prüfnachweis). [Umfang und Prüfnachweise](specs/006-temperatur-und-effekte/spec.md).
