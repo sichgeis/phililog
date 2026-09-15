@@ -97,7 +97,7 @@ Die veröffentlichte Temperatur-Oberfläche verwendet Migration `202609140012_te
 
 ## Migrationsübersicht
 
-Stand: [Betriebsdatum privat], einschließlich Sonnenbad-Veröffentlichung. Nur fehlende Migrationen ausführen; die manuelle SQL-Historie wird durch Schema und dokumentierte Prüfnachweise ergänzt.
+Stand: [Betriebsdatum privat], einschließlich Massage und Babygymnastik. Nur fehlende Migrationen ausführen; die manuelle SQL-Historie wird durch Schema und dokumentierte Prüfnachweise ergänzt.
 
 | Migrationen | Inhalt | Produktiver Stand / Nachweis |
 | --- | --- | --- |
@@ -108,6 +108,7 @@ Stand: [Betriebsdatum privat], einschließlich Sonnenbad-Veröffentlichung. Nur 
 | 011–012 | Dauerhafter UUID-Nachweis, Temperatur | Eingespielt; [Feature 006](../specs/006-temperatur-und-effekte/tasks.md) |
 | 013 | Zornig und Eingeschlafen | Eingespielt; [Feature 003](../specs/003-befinden/tasks.md) |
 | 014 | Sonnenbad | Produktiv am [Betriebsdatum privat]; [Feature 007](../specs/007-sonnenbad/tasks.md) |
+| 015 | Massage und Babygymnastik | Produktiv am [Betriebsdatum privat]; [Feature 008](../specs/008-massage-babygymnastik/tasks.md) |
 
 Migration 014 erweitert ausschließlich Arten- und Detailconstraints; vorhandene Ereignisse, Spaltenrechte und RLS bleiben unverändert. Vor dem zugehörigen Frontend ausrollen. Interne Sicherungen vor Migrationen ersetzen keinen vollständigen externen Sicherungssatz; siehe [recovery.md](recovery.md).
 
@@ -125,3 +126,7 @@ Administrativen Zugang nur für das jeweilige Zielprojekt mit minimalen Rechten 
 Administrationsskripte lesen den Token direkt aus dieser Datei in den Prozessspeicher und setzen den Authorization-Header für `https://api.supabase.com`. Tokenwerte nicht ausgeben oder als Prozessargument übergeben. API-Zugriff ersetzt den SQL-Editor; Sicherung, Transaktion, Bestandsvergleich und Prüfung der tatsächlich fehlenden Migrationen bleiben erforderlich. Kein pauschales `db push` auf die unvollständige historische CLI-Migrationsliste.
 
 Widerruf und Erneuerung erfolgen in den Access-Token-Einstellungen. Die Einrichtung allein ändert keine produktiven Daten. Migration 014 wurde am [Betriebsdatum privat] über diesen Zugang erfolgreich angewendet; die Schreibrechte sind damit ebenfalls bestätigt.
+
+## Massage und Babygymnastik
+
+Migration 015 erweitert nur die Arten- und Detailconstraints. Am [Betriebsdatum privat] per Management API transaktional angewendet; private interne Sicherung eine separat dokumentierte private Sicherung bzw. Ausführungsquittung, exakter Bestandsvergleich und erhaltener RLS-/Sicherungsschutz bestätigt. Keine produktiven Testeinträge. Die interne Kopie ersetzt kein externes Backup.
