@@ -10,7 +10,7 @@ Stand: Lokal implementiert, mobile Sichtprüfung offen. Nicht veröffentlicht.
 - [x] `git diff --check` erfolgreich.
 - [ ] Mobile Browser-Sichtprüfung: Browser-Harness konnte keine Verbindung herstellen. Diagnose bestätigt deaktiviertes Chrome Remote Debugging. Keine Browserprüfung oder Screenshots für dieses Feature behauptet. Lokaler Testserver nach Prüfung beendet.
 
-Nächster Schritt: Chrome Remote Debugging aktivieren und Sonnenbad bei 320/390 px mit lokalem synthetischem Konto visuell prüfen.
+Nächster Schritt: Vom Kontoinhaber erstellten Management-API-Token über `python3 scripts/setup-supabase-access.py` einrichten und prüfen; damit produktive Migration und Veröffentlichung fortsetzen.
 
 Grenzen: Keine physische Smartphone-Abnahme; Commit und Push abgeschlossen; produktive Migration und Veröffentlichung warten auf Browserzugang. Für Veröffentlichung zuerst Migration 014 anwenden.
 
@@ -24,3 +24,9 @@ Grenzen: Keine physische Smartphone-Abnahme; Commit und Push abgeschlossen; prod
 
 - [x] Commit `40551e215db20030cfdbf90b8889dec46f956792` auf main gepusht. [CI 34972773232](https://github.com/sichgeis/phililog/actions/runs/34972773232) erfolgreich: App sowie isolierte Datenbank mit allen Migrationen, API/RLS-Tests und Restore.
 - [ ] Veröffentlichung noch nicht gestartet: Chrome Remote Debugging deaktiviert; Nutzer um Aktivierung gebeten. Migration 014 ist vorbereitet, aber nicht produktiv ausgeführt. Bestehende Live-Version bleibt erhalten.
+
+## API-Zugang statt Browseradministration
+
+Am 15. September 2026 beauftragt. Offizielle PAT-/Management-API-Dokumentation geprüft. Verdeckte Token-Eingabe, lokale Ablage außerhalb Git und reiner SELECT-1-Zugriffstest vorbereitet; noch kein Token erstellt oder produktiver API-Zugang bestätigt. Ablauf in [setup.md](../../docs/setup.md#browserunabhängiger-administrationszugang).
+
+Einrichtungshilfe mit ausschließlich synthetischen Tokens und ersetztem API-Aufruf geprüft: Dateirechte 0600/0700, keine Tokenausgabe, vorhandener Token bei API-Fehler unverändert. `npm run check` mit 45 Tests und Build erfolgreich. Reale Tokenprüfung steht aus.
