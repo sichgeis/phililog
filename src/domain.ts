@@ -133,7 +133,7 @@ export function feedingInput(draft: Draft, now = new Date()): FeedingInput {
   }
   const start = timed ? new Date(draft.breastStart!) : draft.kind === 'breast' && duration !== null ? new Date(time.getTime() - duration * 60000) : null;
   if (start && (!Number.isFinite(start.getTime()) || start > time)) throw new Error('Der Beginn muss vor dem Ende liegen.');
-  return { mood_after: draft.kind === 'weight' || draft.kind === 'temperature' || isActivity(draft.kind) ? null : draft.mood, estimated_ml: estimatedMilk(draft), ...(draft.performedBy !== undefined ? { performed_by: draft.performedBy } : {}), kind: draft.kind, occurred_at: time.toISOString(), started_at: start?.toISOString() ?? null, duration_minutes: duration,
+  return { mood_after: draft.kind === 'weight' || draft.kind === 'temperature' ? null : draft.mood, estimated_ml: estimatedMilk(draft), ...(draft.performedBy !== undefined ? { performed_by: draft.performedBy } : {}), kind: draft.kind, occurred_at: time.toISOString(), started_at: start?.toISOString() ?? null, duration_minutes: duration,
     amount_ml: amount, side: draft.kind === 'breast' ? draft.side || null : null, milk_type: bottle ? draft.milkType || null : null,
     urine: diaper ? draft.urine : null, stool: diaper ? draft.stool : null, held_success: diaper ? draft.heldSuccess : null, temperature_c: draft.kind === 'temperature' ? temperatureC(draft.temperature) : null, weight_g: draft.kind === 'weight' ? positiveInteger(draft.weight, 'Gewicht') : null };
 }

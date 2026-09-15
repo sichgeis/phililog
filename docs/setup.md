@@ -108,6 +108,7 @@ Stand: [Betriebsdatum privat], einschließlich Massage und Babygymnastik. Nur fe
 | 011–012 | Dauerhafter UUID-Nachweis, Temperatur | Eingespielt; [Feature 006](../specs/006-temperatur-und-effekte/tasks.md) |
 | 013 | Zornig und Eingeschlafen | Eingespielt; [Feature 003](../specs/003-befinden/tasks.md) |
 | 014 | Sonnenbad | Produktiv am [Betriebsdatum privat]; [Feature 007](../specs/007-sonnenbad/tasks.md) |
+| 016 | Befinden bei Aktivitäten | Produktiv am [Betriebsdatum privat]; [Feature 003](../specs/003-befinden/tasks.md) |
 | 015 | Massage und Babygymnastik | Produktiv am [Betriebsdatum privat]; [Feature 008](../specs/008-massage-babygymnastik/tasks.md) |
 
 Migration 014 erweitert ausschließlich Arten- und Detailconstraints; vorhandene Ereignisse, Spaltenrechte und RLS bleiben unverändert. Vor dem zugehörigen Frontend ausrollen. Interne Sicherungen vor Migrationen ersetzen keinen vollständigen externen Sicherungssatz; siehe [recovery.md](recovery.md).
@@ -130,3 +131,7 @@ Widerruf und Erneuerung erfolgen in den Access-Token-Einstellungen. Die Einricht
 ## Massage und Babygymnastik
 
 Migration 015 erweitert nur die Arten- und Detailconstraints. Am [Betriebsdatum privat] per Management API transaktional angewendet; private interne Sicherung eine separat dokumentierte private Sicherung bzw. Ausführungsquittung, exakter Bestandsvergleich und erhaltener RLS-/Sicherungsschutz bestätigt. Keine produktiven Testeinträge. Die interne Kopie ersetzt kein externes Backup.
+
+## Befinden bei Aktivitäten
+
+Migration 016 erweitert ausschließlich den Befinden-Constraint um Sonnenbad, Massage und Babygymnastik. Am [Betriebsdatum privat] produktiv über die Management API angewendet, nach Schemaabgleich und mit transaktionaler Sicherung in eine separat dokumentierte private Sicherung bzw. Ausführungsquittung sowie eine separat dokumentierte private Sicherung bzw. Ausführungsquittung. Exakter Bestandsvergleich, RLS und fehlende Browserrechte auf die Sicherung bestätigt. Keine produktiven Testeinträge.

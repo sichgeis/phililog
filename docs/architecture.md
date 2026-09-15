@@ -21,9 +21,9 @@ Settings-Entwürfe behalten ihre ursprüngliche Version im Arbeitsspeicher. Hint
 | diaper | Urin, Stuhl, erfolgreiches Abhalten und optionales Befinden |
 | weight | Gewicht in Gramm |
 | temperature | Körpertemperatur in °C |
-| sunbath | Optionale Dauer in Minuten |
-| massage | Optionale Dauer in Minuten |
-| gymnastics | Optionale Dauer in Minuten |
+| sunbath | Optionale Dauer in Minuten und Befinden |
+| massage | Optionale Dauer in Minuten und Befinden |
+| gymnastics | Optionale Dauer in Minuten und Befinden |
 
 Alle Arten nutzen Zeitpunkt, Person und gemeinsame CRUD-/Versions-/UUID-Logik. Sonnenbad, Massage und Babygymnastik haben jeweils ein eigenes leeres Dauerfeld im Entwurf; Still- und Flaschendauern werden nicht übernommen. Letzte Mahlzeit und Berichtssummen filtern ausdrücklich ihre Ereignisarten; die allgemeine Ereigniszahl berücksichtigt auch zusätzliche Ereignisse. Eine Schemaerweiterung muss vor der dazugehörigen Oberfläche produktiv verfügbar sein. Migrationsstand und Nachweise stehen in [setup.md](setup.md).
 
