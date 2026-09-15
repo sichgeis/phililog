@@ -1,6 +1,6 @@
 # Aufgaben und Prüfnachweise
 
-Stand: Implementiert und mobil geprüft. Migration 014 produktiv angewendet; Frontend-Veröffentlichung läuft.
+Stand: Abgeschlossen und veröffentlicht am 15. September 2026. Migration 014 produktiv angewendet.
 
 - [x] Umfang aus Nutzerauftrag dokumentiert.
 - [x] Sonnenbad unter Mehr mit Sonnensymbol, Zeitpunkt und eigener optionaler Dauer. Keine fachfremden Felder. Wiederherstellung älterer Entwürfe bleibt durch newDraft-Defaults möglich.
@@ -10,7 +10,7 @@ Stand: Implementiert und mobil geprüft. Migration 014 produktiv angewendet; Fro
 - [x] `git diff --check` erfolgreich.
 - [x] Mobile Browser-Sichtprüfung am 15.09.2026 mit Browser-Harness, echter lokaler Supabase und synthetischem Konto: Sonnenbad-Formular bei 390 × 844 und 320 × 740 ohne horizontalen Überlauf, leere optionale Dauer. Screenshots visuell geprüft. Speichern mit 3 Minuten ergibt HTTP 201; Logbuch zeigt Sonnenbad, 3 Min. und Christian. Keine Mocks.
 
-Nächster Schritt: Pages-Veröffentlichung abschließen und ausgelieferte Oberfläche prüfen.
+Keine offene Aufgabe für Feature 007. Physische Geräteabnahme bleibt separat in Feature 001.
 
 Grenzen: Keine physische Smartphone-Abnahme. Interne produktive Sicherung ersetzt keinen vollständigen externen Sicherungssatz.
 
@@ -24,7 +24,8 @@ Grenzen: Keine physische Smartphone-Abnahme. Interne produktive Sicherung ersetz
 
 - [x] Commit `40551e215db20030cfdbf90b8889dec46f956792` auf main gepusht. [CI 34972773232](https://github.com/sichgeis/phililog/actions/runs/34972773232) erfolgreich: App sowie isolierte Datenbank mit allen Migrationen, API/RLS-Tests und Restore.
 - [x] Migration 014 am 15.09.2026 per Management API produktiv angewendet: transaktionale interne Sicherung im privaten Schema, exakter Bestandsvergleich erfolgreich; RLS und Schutz der Sicherung separat bestätigt. SHA256 der Migration: `b201434ccbf4989636c2ba5577c1616faabfb1ad5fe99d60597813dd826c9b1e`. Keine produktiven Testeinträge erzeugt.
-- [ ] Pages-Veröffentlichung abschließen.
+- [x] [Pages-Deployment 34975768139](https://github.com/sichgeis/phililog/actions/runs/34975768139) für Commit `b150d609c5e0741690a1e52640e41d0d925da040` erfolgreich. Live-App lädt `index-DChtvCiJ.js` und `index-B6V3ifpB.css` mit HTTP 200; Sonnenbad und Temperatur sind als Ereignisoptionen vorhanden. Produktionsprüfung ausschließlich lesend.
+- [x] [CI 34975768031](https://github.com/sichgeis/phililog/actions/runs/34975768031) erfolgreich, einschließlich isolierter Datenbank-/Restore-Prüfung. `npm run check` abschließend erneut erfolgreich (45 Tests, TypeScript, Build). Lokaler Testserver und eigener Testtab beendet.
 
 ## API-Zugang statt Browseradministration
 

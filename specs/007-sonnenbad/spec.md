@@ -1,6 +1,6 @@
 # 007 – Sonnenbad im Logbuch
 
-Status: Implementiert und geprüft; Veröffentlichung läuft. Abgestimmt durch ausdrücklichen Implementierungsauftrag am 15. September 2026.
+Status: Abgeschlossen und veröffentlicht am 15. September 2026. Abgestimmt durch ausdrücklichen Implementierungsauftrag am 15. September 2026.
 
 - REQ-001 / AC-001: „Sonnenbad“ mit Sonnensymbol unter „Mehr“ neben Wiegen und Temperatur. Keine weitere Hauptkategorie. Während einer laufenden Stillmessung bleibt der Wechsel gesperrt.
 - REQ-002 / AC-002: Zeitpunkt (gerade eben oder Nachtrag) und optionale Dauer in ganzen Minuten erfassen. Keine voreingestellte Dauer; leer oder 0 bedeutet unbekannt, negative/gebrochene Werte werden abgewiesen. Keine Still-, Milch-, Wickel-, Gewichts-, Temperatur- oder Befindenfelder. Personenzuordnung wie bei anderen Ereignissen.
