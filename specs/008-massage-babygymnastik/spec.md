@@ -1,6 +1,6 @@
 # 008 – Massage und Babygymnastik
 
-Status: Abgestimmt durch ausdrücklichen Umsetzungs- und Veröffentlichungsauftrag am [Betriebsdatum privat].
+Status: Abgeschlossen und veröffentlicht am [Betriebsdatum privat]. Abgestimmt durch ausdrücklichen Umsetzungs- und Veröffentlichungsauftrag am [Betriebsdatum privat].
 
 - REQ-001 / AC-001: Massage und Babygymnastik (Gymnastik-/Sportübung für das Baby) unter „Mehr“ mit eigenem Symbol auswählen. Laufendes Stillen sperrt den Wechsel wie bei anderen Ereignissen.
 - REQ-002 / AC-002: Zeitpunkt und optionale Dauer in ganzen Minuten nach dem bestehenden Sonnenbad-Muster. Leer oder 0 bedeutet unbekannt; negative, gebrochene und zu große Werte ablehnen. Eigene leere Dauer je Art, keine fachfremden Felder oder Befinden.

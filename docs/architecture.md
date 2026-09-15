@@ -6,7 +6,7 @@ Stand: September 2026. Kleine statische PWA aus Vite, Vanilla TypeScript und CSS
 
 `main.ts` verwaltet Sitzung, Ansichten und Formularzustand. `domain.ts` validiert Ereignisse, erkennt Entwürfe und erzeugt CSV; `report.ts` behandelt Schätzungen und deutsche Berichtstage. `api.ts` kapselt Supabase-Aufrufe. `render-state.ts` erhält Fokus, Textauswahl und offene Formularbereiche beim synchronen Neuaufbau. Der Sekunden-Timer aktualisiert nur die beiden Zeitanzeigen.
 
-Die Ereignisse heißen aus historischen Gründen `public.feedings`, enthalten auch Wickeln, Wiegen, Temperatur und Sonnenbad. `family_settings` hält gemeinsame Standards. RLS prüft `private.members`; Versionsfilter schützen Ereignisse und Settings vor konkurrierendem Überschreiben. Private SECURITY-DEFINER-Funktionen haben einen festen leeren Suchpfad und eng begrenzte Aufgaben.
+Die Ereignisse heißen aus historischen Gründen `public.feedings`, enthalten auch Wickeln, Wiegen, Temperatur, Sonnenbad, Massage und Babygymnastik. `family_settings` hält gemeinsame Standards. RLS prüft `private.members`; Versionsfilter schützen Ereignisse und Settings vor konkurrierendem Überschreiben. Private SECURITY-DEFINER-Funktionen haben einen festen leeren Suchpfad und eng begrenzte Aufgaben.
 
 Neue Einträge behalten bis zur eindeutigen Auflösung UUID und Payload im benutzergebundenen localStorage. Die produktiv eingespielte Migration 011 ergänzt einen dauerhaften minimalen Nachweis aus UUID und Ersteller; Ereignislöschung entfernt diesen Nachweis nicht. Wiederholungen lesen die aktuelle Fassung oder bestätigen eine zwischenzeitliche Löschung. Dadurch bleiben fremde Korrekturen erhalten. Vor Migration 011 bereits gelöschte IDs sind nicht rekonstruierbar.
 
@@ -22,8 +22,10 @@ Settings-Entwürfe behalten ihre ursprüngliche Version im Arbeitsspeicher. Hint
 | weight | Gewicht in Gramm |
 | temperature | Körpertemperatur in °C |
 | sunbath | Optionale Dauer in Minuten |
+| massage | Optionale Dauer in Minuten |
+| gymnastics | Optionale Dauer in Minuten |
 
-Alle Arten nutzen Zeitpunkt, Person und gemeinsame CRUD-/Versions-/UUID-Logik. Sonnenbad hat ein eigenes leeres Dauerfeld im Entwurf; Still- und Flaschendauern werden nicht übernommen. Letzte Mahlzeit und Berichtssummen filtern ausdrücklich ihre Ereignisarten; die allgemeine Ereigniszahl berücksichtigt auch zusätzliche Ereignisse. Eine Schemaerweiterung muss vor der dazugehörigen Oberfläche produktiv verfügbar sein. Migrationsstand und Nachweise stehen in [setup.md](setup.md).
+Alle Arten nutzen Zeitpunkt, Person und gemeinsame CRUD-/Versions-/UUID-Logik. Sonnenbad, Massage und Babygymnastik haben jeweils ein eigenes leeres Dauerfeld im Entwurf; Still- und Flaschendauern werden nicht übernommen. Letzte Mahlzeit und Berichtssummen filtern ausdrücklich ihre Ereignisarten; die allgemeine Ereigniszahl berücksichtigt auch zusätzliche Ereignisse. Eine Schemaerweiterung muss vor der dazugehörigen Oberfläche produktiv verfügbar sein. Migrationsstand und Nachweise stehen in [setup.md](setup.md).
 
 ## Grenzen und Prüfung
 
