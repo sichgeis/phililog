@@ -110,3 +110,18 @@ Stand: [Betriebsdatum privat], vor Sonnenbad-Veröffentlichung. Nur fehlende Mig
 | 014 | Sonnenbad | Lokal geprüft, produktiv ausstehend; [Feature 007](../specs/007-sonnenbad/tasks.md) |
 
 Migration 014 erweitert ausschließlich Arten- und Detailconstraints; vorhandene Ereignisse, Spaltenrechte und RLS bleiben unverändert. Vor dem zugehörigen Frontend ausrollen. Interne Sicherungen vor Migrationen ersetzen keinen vollständigen externen Sicherungssatz; siehe [recovery.md](recovery.md).
+
+
+## Browserunabhängiger Administrationszugang
+
+Einrichtung am [Betriebsdatum privat] beauftragt; Token-Erstellung durch den Kontoinhaber steht noch aus. Für Migrationen wird ein persönlicher Token für die [Supabase Management API](https://supabase.com/docs/reference/api/introduction) verwendet. Der Publishable-Key der App dient nicht zur Schemaadministration.
+
+1. In [Access Tokens](https://supabase.com/dashboard/account/tokens) einen Token `PROJECT_ADMIN_TOKEN` mit Ablaufdatum erstellen (z. B. 90 Tage).
+2. Wenn verfügbar, auf Projekt `PROJECT_REF` beschränken: Database Read-write und Migrations Read-write. Weitere Verwaltungsrechte sind für diesen Ablauf nicht nötig. [Scoped Tokens](https://supabase.com/docs/guides/platform/personal-access-tokens) werden noch schrittweise freigeschaltet; wenn die Eingrenzung fehlt, zunächst klären, bevor ein kontoweit berechtigter Classic-Token verwendet wird.
+3. Im lokalen Projektterminal `PHILILOG_SUPABASE_PROJECT=PROJECT_REF python3 scripts/setup-supabase-access.py` mit der separat verwalteten Projektkennung starten und den Token verdeckt eingeben. Nicht in Chat, Shell-Befehlsargumente, Vite-Variablen oder GitHub-Pages-Variablen kopieren.
+4. Das Skript prüft ausschließlich `SELECT 1` per Management API und speichert erst bei Erfolg unter `~/.config/phililog/supabase-access-token`, Verzeichnisrechte 0700, Dateirechte 0600. Vorhandene Tokens werden bei fehlgeschlagener Prüfung nicht ersetzt. Die Datei liegt außerhalb des Repositories; sie ist lokal zugriffsbeschränkt, nicht verschlüsselt.
+5. `PHILILOG_SUPABASE_PROJECT=PROJECT_REF python3 scripts/setup-supabase-access.py --check` prüft den gespeicherten Zugang erneut. Die Leseprüfung beweist noch keine Schreibrechte.
+
+Administrationsskripte lesen den Token direkt aus dieser Datei in den Prozessspeicher und setzen den Authorization-Header für `https://api.supabase.com`. Tokenwerte nicht ausgeben oder als Prozessargument übergeben. API-Zugriff ersetzt den SQL-Editor; Sicherung, Transaktion, Bestandsvergleich und Prüfung der tatsächlich fehlenden Migrationen bleiben erforderlich. Kein pauschales `db push` auf die unvollständige historische CLI-Migrationsliste.
+
+Widerruf und Erneuerung erfolgen in den Access-Token-Einstellungen. Die Einrichtung allein ändert keine produktiven Daten. Migration 014 und das bereits beauftragte Deployment bleiben bis zum erfolgreichen API-Zugang offen.
