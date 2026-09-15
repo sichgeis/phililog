@@ -50,7 +50,7 @@ try {
       ('99999999-9999-4999-8999-999999999999','sunbath','2088-01-01Z',5,'${christian}'),
       ('88888888-8888-4888-8888-888888888888','massage','2088-01-01Z',7,'${julia}'),
       ('77777777-7777-4777-8777-777777777777','gymnastics','2088-01-01Z',null,'${christian}');
-    update public.feedings set mood_after='asleep' where kind='breast';
+    update public.feedings set mood_after='asleep' where kind in ('breast', 'sunbath', 'massage', 'gymnastics');
     update public.family_settings set breast_left_ml=20,breast_right_ml=35;
     insert into private.events_before_20260913_correction
       select id,kind,occurred_at,started_at,duration_minutes,amount_ml,side,created_by,created_at,updated_at,version,milk_type,urine,stool,held_success,weight_g,performed_by,estimated_ml

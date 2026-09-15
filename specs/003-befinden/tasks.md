@@ -39,3 +39,18 @@ Grenzen: Keine physische Smartphone-Abnahme. Migration 013, Deployment und produ
 - [x] Anwendungscommit `d6bd7283e1d20ff85e9ab6f77e61c418b6838cc1` auf main gepusht. [Pages-Deployment 34884944077](https://github.com/sichgeis/phililog/actions/runs/34884944077) mit 42 Tests, Build und Veröffentlichung erfolgreich.
 - [x] Live-Leseprüfung: neues Asset `/phililog/assets/index-B-Q1_D7_.js`; alle sechs Befinden-Labels einschließlich Zornig und Eingeschlafen vorhanden, keine sichtbaren Fehler. Mitgliedschaft, Personenzuordnung, Einträge und Einstellungen mit HTTP 200. Keine produktiven Testeinträge angelegt.
 - [x] Abschlussdokumentation separat gepusht; veröffentlichte Anwendungsartefakte unverändert.
+
+## Erweiterung 15. September 2026 – Befinden bei Aktivitäten
+
+Stand: In Umsetzung. Umfang und Produktion ausdrücklich beauftragt.
+
+- [x] Spezifikation und technischer Plan aktualisiert.
+- [x] Formular, Speicherung, Migration und Regressionstests erweitert.
+- [x] `npm run check`: 58 Tests, TypeScript und Produktionsbuild erfolgreich. AC-008–009: sechs Optionen, Abwahl, Entwurf, Speicherreset, Bearbeiten, CSV und Wiederholung geprüft.
+- [x] `node scripts/test-local-supabase.mjs --configure-preview`: AC-010 mit echten API-Zugriffen, allen Werten/NULL, gemeinsamer Bearbeitung, Versionsschutz, Fremdzugriffen und unveränderten Berichtssummen bestanden.
+- [x] `node scripts/test-restore.mjs`: alle 16 Migrationen auf leerer Datenbank und synthetischer Dump/Restore einschließlich Aktivitätsbefinden bestanden.
+- [x] Browser-Harness gegen lokale Supabase mit synthetischem Konto: Sonnenbad/Ruhig, Massage/Eingeschlafen, Babygymnastik/Aufmerksam über echte App-Handler gespeichert. Keine Feature-Mocks. CDP-Mausklick wirkungslos; DOM click/requestSubmit verwendet. 390×844 und 320×740 visuell geprüft, kein horizontaler Überlauf, Touch-Ziele mindestens 73 px. Screenshots `/private/tmp/phililog-activity-mood390.png` und `/private/tmp/phililog-activity-mood320.png`. Keine physische Smartphone-Abnahme.
+- [x] Migration 016 produktiv nach Schemaabgleich transaktional angewendet. Private Sicherung der Einträge/des vorherigen Constraints, exakter Bestandsvergleich und RLS-/Sicherungsschutz erfolgreich. Committed Schema separat bestätigt. Keine produktiven Testeinträge. SHA-256: `c625741254a30777aa7af802f55dc238d6a700b68f58032f5a8c93adf67f20a6`.
+- [ ] Produktive Migration, CI und Pages-Veröffentlichung verifizieren.
+
+Nächster Schritt: Geprüften Stand committen, pushen und Pages-Veröffentlichung bestätigen.

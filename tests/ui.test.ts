@@ -221,7 +221,7 @@ test('Sonnenbad unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder u
  ui.find('[data-kind="sunbath"]').click();
  assert.equal(ui.find('#sunbath-duration').value, '');
  assert.equal(ui.find('.duration-block').hidden, true);
- for (const selector of ['#mood-options', '#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
+ for (const selector of ['#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
  ui.input('#sunbath-duration', '5');
  await ui.app.refresh();
  assert.equal(ui.find('#sunbath-duration').value, '5');
@@ -232,7 +232,7 @@ test('Sonnenbad unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder u
  let saved: any;
  ui.setCreate(async p => { saved = p.input; return p.input; });
  await ui.app.save();
- assert.equal(saved.kind, 'sunbath'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, null);
+ assert.equal(saved.kind, 'sunbath'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, 'calm');
  ui.find('[data-kind="sunbath"]').click(); assert.equal(ui.find('#sunbath-duration').value, '');
  await ui.app.save(); assert.equal(saved.duration_minutes, null);
 });
@@ -252,7 +252,7 @@ test('Massage unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder und
  ui.find('[data-kind="massage"]').click();
  assert.equal(ui.find('#massage-duration').value, '');
  assert.equal(ui.find('.duration-block').hidden, true);
- for (const selector of ['#mood-options', '#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
+ for (const selector of ['#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
  ui.input('#massage-duration', '5');
  await ui.app.refresh();
  assert.equal(ui.find('#massage-duration').value, '5');
@@ -263,7 +263,7 @@ test('Massage unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder und
  let saved: any;
  ui.setCreate(async p => { saved = p.input; return p.input; });
  await ui.app.save();
- assert.equal(saved.kind, 'massage'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, null);
+ assert.equal(saved.kind, 'massage'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, 'calm');
  ui.find('[data-kind="massage"]').click(); assert.equal(ui.find('#massage-duration').value, '');
  await ui.app.save(); assert.equal(saved.duration_minutes, null);
 });
@@ -283,7 +283,7 @@ test('Babygymnastik unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Feld
  ui.find('[data-kind="gymnastics"]').click();
  assert.equal(ui.find('#gymnastics-duration').value, '');
  assert.equal(ui.find('.duration-block').hidden, true);
- for (const selector of ['#mood-options', '#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
+ for (const selector of ['#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
  ui.input('#gymnastics-duration', '5');
  await ui.app.refresh();
  assert.equal(ui.find('#gymnastics-duration').value, '5');
@@ -294,7 +294,7 @@ test('Babygymnastik unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Feld
  let saved: any;
  ui.setCreate(async p => { saved = p.input; return p.input; });
  await ui.app.save();
- assert.equal(saved.kind, 'gymnastics'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, null);
+ assert.equal(saved.kind, 'gymnastics'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, 'calm');
  ui.find('[data-kind="gymnastics"]').click(); assert.equal(ui.find('#gymnastics-duration').value, '');
  await ui.app.save(); assert.equal(saved.duration_minutes, null);
 });
@@ -316,5 +316,33 @@ test('Aktivitäten behalten jeweils ihre eigene Dauer beim Wechsel', async t => 
  for (const [kind, value] of [['sunbath', '3'], ['massage', '7'], ['gymnastics', '9']]) {
   ui.find(`[data-kind="${kind}"]`).click();
   assert.equal(ui.find(`#${kind}-duration`).value, value);
+ }
+});
+
+for (const kind of ['sunbath', 'massage', 'gymnastics']) test(`${kind}: Befinden auswählen, entfernen, wiederherstellen und bei Messungen zurücksetzen`, async t => {
+ const ui = await setup(t);
+ ui.find(`[data-kind="${kind}"]`).click();
+ assert.equal(ui.window.document.querySelectorAll('[data-mood]').length, 6);
+ assert.equal(ui.window.document.querySelector('[data-mood][aria-pressed="true"]'), null);
+ ui.find('[data-mood="calm"]').click();
+ ui.find('[data-mood="asleep"]').click();
+ assert.equal(ui.find('[data-mood="calm"]').getAttribute('aria-pressed'), 'false');
+ ui.find('[data-mood="asleep"]').click();
+ assert.equal(ui.window.document.querySelector('[data-mood][aria-pressed="true"]'), null);
+ ui.find('[data-mood="angry"]').click();
+ await ui.app.enterSession('test-user');
+ assert.equal(ui.find('[data-mood="angry"]').getAttribute('aria-pressed'), 'true');
+ let saved: any;
+ ui.setCreate(async p => { saved = p.input; return p.input; });
+ await ui.app.save();
+ assert.equal(saved.mood_after, 'angry');
+ ui.find(`[data-kind="${kind}"]`).click();
+ assert.equal(ui.window.document.querySelector('[data-mood][aria-pressed="true"]'), null);
+ for (const measurement of ['weight', 'temperature']) {
+  ui.find('[data-mood="calm"]').click();
+  ui.find(`[data-kind="${measurement}"]`).click();
+  assert.equal(ui.window.document.querySelector('#mood-options'), null);
+  ui.find(`[data-kind="${kind}"]`).click();
+  assert.equal(ui.window.document.querySelector('[data-mood][aria-pressed="true"]'), null);
  }
 });

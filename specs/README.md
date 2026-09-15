@@ -41,7 +41,7 @@ Die Übersicht trennt Implementierung von noch offener Geräteabnahme. Historisc
 | --- | --- | --- |
 | 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung (Geräteabnahme offen) |
 | 002 | [Tagesbericht und Still-Schätzung](002-tagesbericht/spec.md) | Abgeschlossen |
-| 003 | [Befinden nach einem Ereignis](003-befinden/spec.md) | Abgeschlossen |
+| 003 | [Befinden nach einem Ereignis](003-befinden/spec.md) | In Umsetzung (Erweiterung geprüft, Veröffentlichung läuft) |
 | 004 | [Anordnung und Bedienbarkeit](004-bedienlayout/spec.md) | Abgeschlossen |
 | 005 | [Wartung und zuverlässige Speicherung](005-wartung/spec.md) | Abgeschlossen |
 | 006 | [Temperatur und persönliche Speichereffekte](006-temperatur-und-effekte/spec.md) | Abgeschlossen |

@@ -192,7 +192,7 @@ test('Sonnenbad trennt optionale Dauer von Mahlzeiten und erhält Nachtrag, Korr
  const input = feedingInput(draft, now);
  assert.equal(input.duration_minutes, 5);
  assert.equal(input.occurred_at, now.toISOString());
- for (const key of ['mood_after', 'estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
+ for (const key of ['estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
  for (const sunbathDuration of ['', '0']) assert.equal(feedingInput({ ...draft, sunbathDuration }, now).duration_minutes, null);
  for (const sunbathDuration of ['-1', '1.5', 'abc', '2147483648']) assert.throws(() => feedingInput({ ...draft, sunbathDuration }, now), /Dauer/);
  const entry = { ...input, id: 'sunbath-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'Christian' as const };
@@ -214,7 +214,7 @@ test('Massage trennt optionale Dauer von Mahlzeiten und erhält Nachtrag, Korrek
  const input = feedingInput(draft, now);
  assert.equal(input.duration_minutes, 5);
  assert.equal(input.occurred_at, now.toISOString());
- for (const key of ['mood_after', 'estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
+ for (const key of ['estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
  for (const massageDuration of ['', '0']) assert.equal(feedingInput({ ...draft, massageDuration }, now).duration_minutes, null);
  for (const massageDuration of ['-1', '1.5', 'abc', '2147483648']) assert.throws(() => feedingInput({ ...draft, massageDuration }, now), /Dauer/);
  const entry = { ...input, id: 'massage-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'Christian' as const };
@@ -236,7 +236,7 @@ test('Babygymnastik trennt optionale Dauer von Mahlzeiten und erhält Nachtrag, 
  const input = feedingInput(draft, now);
  assert.equal(input.duration_minutes, 5);
  assert.equal(input.occurred_at, now.toISOString());
- for (const key of ['mood_after', 'estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
+ for (const key of ['estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
  for (const gymnasticsDuration of ['', '0']) assert.equal(feedingInput({ ...draft, gymnasticsDuration }, now).duration_minutes, null);
  for (const gymnasticsDuration of ['-1', '1.5', 'abc', '2147483648']) assert.throws(() => feedingInput({ ...draft, gymnasticsDuration }, now), /Dauer/);
  const entry = { ...input, id: 'gymnastics-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'Christian' as const };
@@ -251,4 +251,17 @@ test('Babygymnastik trennt optionale Dauer von Mahlzeiten und erhält Nachtrag, 
  assert.equal(draftFromFeeding({ ...entry, duration_minutes: null }).gymnasticsDuration, '');
  assert.equal(feedingInput({ ...draft, kind: 'breast' }, now).duration_minutes, 30);
  assert.equal(feedingInput({ ...draft, kind: 'bottle' }, now).duration_minutes, 15);
+});
+
+for (const kind of ['sunbath', 'massage', 'gymnastics'] as const) test(`${kind}: Befinden speichern, bearbeiten, exportieren und abwählen`, () => {
+ for (const mood of ['fussy', 'sleepy', 'calm', 'alert', 'angry', 'asleep'] as const) {
+  const input = feedingInput({ ...newDraft(), kind, mood }, now);
+  assert.equal(input.mood_after, mood);
+  const entry = { ...input, id: 'activity-mood', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
+  assert.equal(feedingInput(draftFromFeeding(entry), now).mood_after, mood);
+  assert.equal(sameInput(input, { ...input, mood_after: null }), false);
+  assert.equal(feedingInput({ ...draftFromFeeding(entry), mood: null }, now).mood_after, null);
+  assert.match(toCsv([entry]), /Quengelig|Schläfrig|Ruhig|Aufmerksam|Zornig|Eingeschlafen/);
+ }
+ assert.equal(feedingInput({ ...newDraft(), kind }, now).mood_after, null);
 });

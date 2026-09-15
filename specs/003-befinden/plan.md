@@ -9,3 +9,7 @@ Prüfung: Fachlogik zu optionalem Wert, Bearbeiten, Export und Wiederholung; lok
 ## Erweiterung 14. September 2026
 
 Zentrale Mood-Tabelle um angry (Zornig) und asleep (Eingeschlafen) erweitern. Migration 013 ersetzt ausschließlich den Check-Constraint durch die sechs zulässigen Werte; keine Datenkorrektur oder Rechteänderung. Fach-/DOM-Tests und lokale Supabase-Prüfung um beide Werte ergänzen. Migration vor dem neuen Frontend ausrollen.
+
+## Erweiterung 15. September 2026
+
+Die bisherigen Aktivitätsausschlüsse in Formular, Artwechsel und Speicherpayload entfernen. Messereignisse bleiben ausgeschlossen. Migration 016 erweitert ausschließlich `feeding_mood_after` um sunbath/massage/gymnastics, ohne Daten- oder Rechteänderungen. Bestehende Anzeige-/CSV-/Entwurfslogik wiederverwenden. AC-008–009 durch Fach-/DOM-Tests und mobile Browserprüfung, AC-010 durch lokale Supabase und Restore prüfen. Produktiv Schema abgleichen, interne private Sicherung, transaktionale Migration und exakten Bestandsvergleich durchführen; dann Commit/Push, CI und Pages-Veröffentlichung.

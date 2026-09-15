@@ -92,8 +92,15 @@ try {
     assert.deepEqual((await outsider.client.from('feedings').update({ duration_minutes: 9 }).eq('id', activityId).select()).data, []);
     assert.ok((await outsider.client.from('feedings').insert({ ...activity, id: randomUUID(), created_by: outsider.user.id })).error);
     assert.ifError((await christian.client.from('feedings').update({ duration_minutes: null }).eq('id', activityId)).error);
-    for (const extra of [{ duration_minutes: 0 }, { duration_minutes: -1 }, { amount_ml: 65 }, { estimated_ml: 25 }, { mood_after: 'calm' }, { temperature_c: 37.2 }, { weight_g: 3500 }, { urine: true }]) assert.ok((await julia.client.from('feedings').insert({ ...activity, id: randomUUID(), ...extra })).error, 'Invalid activity details denied');
-    assert.deepEqual((await christian.client.from('feedings').delete().eq('id', activityId).eq('version', 3).select('id')).data, [{ id: activityId }]);
+    for (const extra of [{ duration_minutes: 0 }, { duration_minutes: -1 }, { amount_ml: 65 }, { estimated_ml: 25 }, { mood_after: 'invalid' }, { temperature_c: 37.2 }, { weight_g: 3500 }, { urine: true }]) assert.ok((await julia.client.from('feedings').insert({ ...activity, id: randomUUID(), ...extra })).error, 'Invalid activity details denied');
+    for (const mood of ['fussy', 'sleepy', 'calm', 'alert', 'angry', 'asleep', null]) {
+      const changed = await christian.client.from('feedings').update({ mood_after: mood }).eq('id', activityId).select().single();
+      assert.ifError(changed.error); assert.equal(changed.data.mood_after, mood);
+      assert.equal((await julia.client.from('feedings').select().eq('id', activityId).single()).data.mood_after, mood);
+    }
+    assert.deepEqual((await julia.client.from('feedings').update({ mood_after: 'calm' }).eq('id', activityId).eq('version', 3).select()).data, []);
+    assert.deepEqual((await outsider.client.from('feedings').update({ mood_after: 'calm' }).eq('id', activityId).select()).data, []);
+    assert.deepEqual((await christian.client.from('feedings').delete().eq('id', activityId).eq('version', 10).select('id')).data, [{ id: activityId }]);
   }
   const temperatureId = randomUUID(); ids.push(temperatureId);
   const temperature = { ...input, id: temperatureId, kind: 'temperature', amount_ml: null, duration_minutes: null, temperature_c: 37.2 };

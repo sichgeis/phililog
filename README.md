@@ -14,7 +14,7 @@ Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Daten
 - **Flasche:** Menge in 5-ml-Schritten, Milchart und Dauer.
 - **Wickeln:** Urin, Stuhl und erfolgreiches Abhalten unabhängig auswählen.
 - **Unter „Mehr“:** Wiegen in Gramm, Temperatur in °C sowie Sonnenbad, Massage und Babygymnastik mit optionaler Dauer. Leere Dauer dieser Aktivitäten oder 0 bedeutet unbekannt; es gibt keinen voreingestellten Wert.
-- **Befinden danach:** Bei Stillen, Flasche und Wickeln optional Quengelig, Schläfrig, Ruhig, Aufmerksam, Zornig oder Eingeschlafen. Eine Auswahl ersetzt die vorherige; erneutes Tippen entfernt sie.
+- **Befinden danach:** Bei Stillen, Flasche, Wickeln, Sonnenbad, Massage und Babygymnastik optional Quengelig, Schläfrig, Ruhig, Aufmerksam, Zornig oder Eingeschlafen. Eine Auswahl ersetzt die vorherige; erneutes Tippen entfernt sie.
 
 Alle Ereignisse erscheinen im gemeinsamen Logbuch und lassen sich bearbeiten, löschen und als CSV exportieren. Neue Einträge werden dem angemeldeten Konto zugeordnet. Versionsprüfungen verhindern das Überschreiben neuerer Änderungen. Nach erfolgreichem Speichern erhält Julia Aquarellkonfetti, Christian Sterne und Regenbogen; reduzierte Bewegung wird berücksichtigt.
 
