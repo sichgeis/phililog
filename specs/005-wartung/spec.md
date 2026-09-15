@@ -2,7 +2,7 @@
 
 Status: Abgeschlossen; Nachweise in [tasks.md](tasks.md).
 
-Abgestimmt am 13. September 2026: Wartungspaket nach Maintenance-Review ausdrücklich zur Umsetzung einschließlich Tests, Commit und Push freigegeben. Produktionsdeployment benötigt einen separaten Auftrag. Architektur, Aquarellgestaltung und Produktumfang bleiben erhalten.
+Abgestimmt am 13. September 2026: Wartungspaket nach Maintenance-Review ausdrücklich zur Umsetzung einschließlich Tests, Commit und Push freigegeben. Produktionsdeployment wurde später mit Feature 006 beauftragt und am 14. September 2026 abgeschlossen. Architektur, Aquarellgestaltung und Produktumfang bleiben erhalten.
 
 - REQ-001 / AC-001: Ein Einstellungsentwurf behält seine Ausgangsversion auch bei Hintergrundaktualisierung. Eine fremde Änderung wird als Konflikt angezeigt. Eigene Werte bleiben sichtbar; „Serverwerte übernehmen“ verwirft sie ausdrücklich und startet mit der aktuellen Version.
 - REQ-002 / AC-002: Nach verlorener Speicherantwort erkennt dieselbe UUID den bereits erstellten Eintrag auch nach fremder Korrektur. Die Korrektur bleibt erhalten und wird benannt. Nach zwischenzeitlicher Löschung wird der Eintrag nicht wieder angelegt; die Oberfläche erklärt dies und gibt das Formular frei. Ungewisse Netzwerkfehler behalten die Wiederholungs-ID.
@@ -14,4 +14,4 @@ Grenze: Vor Einführung des UUID-Nachweises bereits gelöschte Einträge lassen 
 
 ## Integration mit dem veröffentlichten Bedienlayout
 
-Am 13. September 2026 ausdrücklich beauftragt: Wartungspaket mit aktuellem `main` zusammenführen, prüfen und auf `main` pushen. Feature 004 und Migration 010 sind durch das bereits veröffentlichte Layout belegt. Wartung wird daher Feature 005 und der noch unveröffentlichte UUID-Nachweis Migration 011. Layout, Kalenderwochen und geschützte Personenzuordnung bleiben erhalten. Offene Formularbereiche werden anhand ihrer stabilen IDs erhalten, auch wenn sich die Reihenfolge durch einen Artwechsel ändert.
+Am 13. September 2026 ausdrücklich beauftragt: Wartungspaket mit aktuellem `main` zusammenführen, prüfen und auf `main` pushen. Feature 004 und Migration 010 sind durch das bereits veröffentlichte Layout belegt. Wartung wird daher Feature 005 und der zu diesem Zeitpunkt noch unveröffentlichte UUID-Nachweis Migration 011. Layout, Kalenderwochen und geschützte Personenzuordnung bleiben erhalten. Offene Formularbereiche werden anhand ihrer stabilen IDs erhalten, auch wenn sich die Reihenfolge durch einen Artwechsel ändert.

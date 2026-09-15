@@ -48,7 +48,7 @@ Kein eigener Ereignistyp „Quengeln“, keine automatische Ableitung aus andere
 
 ## Entscheidung
 
-Vier Zustände und erneutes Tippen zum Abwählen bestätigt. Gilt für Stillen, Flasche und Wickeln.
+Zunächst vier Zustände bestätigt; seit 14. September 2026 sind es sechs. Erneutes Tippen wählt ab. Gilt für Stillen, Flasche und Wickeln.
 
 ## Wartung – 13. September 2026
 
@@ -60,6 +60,6 @@ Ergänzende verbindliche Fehlerfälle und Akzeptanzkriterien: [freigegebenes War
 
 ## Erweiterung – 14. September 2026
 
-„Zornig“ und „Eingeschlafen“ zusätzlich zu den vier bestehenden Optionen ausdrücklich zur Umsetzung beauftragt. AC-007: Beide neuen Werte lassen sich auswählen, gegeneinander austauschen, abwählen, speichern, nachträglich bearbeiten und im Logbuch/CSV lesen. Entwürfe und sichere Wiederholungen berücksichtigen sie. Bei Wiegen und Temperatur ist weiterhin kein Befinden zulässig. Keine Vorauswahl oder Änderung bestehender Einträge.
+„Zornig“ und „Eingeschlafen“ zusätzlich zu den vier bestehenden Optionen ausdrücklich zur Umsetzung beauftragt. AC-007: Beide neuen Werte lassen sich auswählen, gegeneinander austauschen, abwählen, speichern, nachträglich bearbeiten und im Logbuch/CSV lesen. Entwürfe und sichere Wiederholungen berücksichtigen sie. Bei Wiegen, Temperatur und Sonnenbad ist weiterhin kein Befinden zulässig. Keine Vorauswahl oder Änderung bestehender Einträge.
 
 Commit, Push und Veröffentlichung einschließlich der erforderlichen produktiven Migration 013 am 14. September 2026 ausdrücklich beauftragt.

@@ -4,6 +4,10 @@
 
 Umgesetzt ist die kompakte Aquarellgestaltung: seitenweite Blau-/Türkis-/Violettflächen, klare Eingabefelder und mindestens 44 px hohe Touch-Ziele. Das finale App-Icon ist **Φ 1 · Klar**, ein weißes Phi auf dem ursprünglichen Aquarell-Klecks. Alle nachfolgenden Vorschläge dokumentieren die Entstehung; es steht keine Icon-Auswahl mehr aus. Fokus bleibt bei Formularaktualisierungen erhalten.
 
+Die Hauptauswahl enthält Flasche, Stillen und Wickeln. Seltenere Ereignisse stehen unter „Mehr“: Wiegen, Temperatur und Sonnenbad. Einstellungen stehen ausschließlich im Footer. Die sechs Befinden-Buttons verwenden drei Spalten beziehungsweise zwei Spalten auf sehr schmalen Geräten. Sonnenbad erhält ein Sonnensymbol und ein optionales Minutenfeld, keine voreingestellte Dauer.
+
+Julia erhält nach bestätigtem Speichern Aquarellkonfetti, Christian einen größeren Sternenregen mit Regenbogen. Die Dekoration blockiert keine Eingaben. Bei reduzierter Bewegung bleibt Christians Grafik ruhig; Julias Animation entfällt.
+
 ## Historischer Gestaltungsauftrag
 
 Am 12. September 2026 gewünscht: Die App soll die Blau-, Türkis- und Violetttöne sowie den Aquarellcharakter der Geburtskarte aufgreifen. Ein privates Referenzfoto wurde dazu angesehen. Das Foto und der individuelle Fußabdruck werden nicht als App-Asset verwendet und nicht ins Repository übernommen.
@@ -17,7 +21,7 @@ Am 12. September 2026 gewünscht: Die App soll die Blau-, Türkis- und Violettt�
 - Auswahlzustände zusätzlich durch Kontur, Beschriftung und Symbole erkennbar.
 - Keine zusätzlichen Bilddownloads, externen Schriftarten oder Tracking-Dienste. Der Aquarelleindruck lässt sich aus CSS-Farbschichten und einem kleinen SVG-Filter erzeugen.
 
-## Drei Vorschläge zur Auswahl
+## Historische Farbvorschläge
 
 | Richtung | Papier | Aktionsfarbe | Türkis | Blau | Violett | Charakter |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -25,7 +29,7 @@ Am 12. September 2026 gewünscht: Die App soll die Blau-, Türkis- und Violettt�
 | Meereslicht | `#F7FBFB` | `#237987` | `#79CBD0` | `#A1CCE7` | `#C3BAE1` | Heller und frischer, Türkis führt; Violett bleibt Nebenfarbe. |
 | Lavendel | `#FBF9FD` | `#765A99` | `#A0D5DC` | `#A6BFE0` | `#BDA5D8` | Weicher und stärker violett, mit hellblauen und türkisfarbenen Übergängen. |
 
-## Stand
+## Entscheidung zu den Farbvorschlägen
 
 Für den anschließenden autonomen Veröffentlichungsauftrag wurde die empfohlene Richtung Aquarell als erste Gestaltung umgesetzt. Die beiden anderen Varianten bleiben Alternativen. Die Vorschau zeigt eine verkürzte Eingabe mit erfundenen Beispieldaten; sie dient dem Farb- und Stilvergleich und speichert keine Daten.
 

@@ -20,7 +20,7 @@ Gemeinsamer Entwurfs- und Fokuserhalt einschließlich Befinden: [Wartungspaket](
 Stand: Abgeschlossen und veröffentlicht.
 
 - [x] Zornig (angry, 😠) und Eingeschlafen (asleep, 💤) in zentraler Wertetabelle ergänzt. Bestehende Anzeige-, Bearbeitungs- und Exportwege verwenden dieselben Werte.
-- [x] Migration 013 erweitert ausschließlich den Befinden-Constraint. Lokal transaktional angewendet; keine produktive Migration durchgeführt.
+- [x] Migration 013 erweitert ausschließlich den Befinden-Constraint. Zuerst lokal transaktional angewendet; produktive Ausführung siehe Veröffentlichungsnachweis unten.
 - [x] `npm run check`: 42 Tests, TypeScript und Produktionsbuild erfolgreich. Neue Fachtests prüfen beide Werte bei Bearbeitung, CSV, Wiederholungsvergleich, Abwahl und Ausschluss für Wiegen/Temperatur. DOM-Tests prüfen sechs Optionen, Wechsel, Abwahl, Entwurfserhalt und erfolgreichen Speicherpayload.
 - [x] `node scripts/test-local-supabase.mjs` erfolgreich: Beide Werte über echte API gespeichert/gelesen und durch das andere Mitglied geändert; bestehende Prüfungen für NULL, ungültige Werte, Versionskonflikte und Fremdzugriffe bestanden.
 - [x] Browser-Harness gegen lokale App mit synthetischem Testkonto: 390 × 844 px mit drei Spalten und 320 × 740 px mit zwei Spalten. Beide neuen Labels sichtbar, kein horizontaler Überlauf, Touch-Ziele mindestens 73 px hoch. Screenshots unter `/private/tmp/phililog-six-moods390.png` und `/private/tmp/phililog-six-moods320.png` visuell geprüft. Keine API-Mocks in der Browserprüfung.

@@ -1,5 +1,5 @@
 import { milliliters, type BreastDefaults } from './report.ts';
-export type FeedingKind = 'bottle' | 'breast' | 'diaper' | 'weight' | 'temperature';
+export type FeedingKind = 'bottle' | 'breast' | 'diaper' | 'weight' | 'temperature' | 'sunbath';
 export const moods = { fussy: { label: 'Quengelig', icon: '😣' }, sleepy: { label: 'Schläfrig', icon: '😴' }, calm: { label: 'Ruhig', icon: '😌' }, alert: { label: 'Aufmerksam', icon: '👀' }, angry: { label: 'Zornig', icon: '😠' }, asleep: { label: 'Eingeschlafen', icon: '💤' } } as const;
 export type Mood = keyof typeof moods;
 export type Person = 'Julia' | 'Christian';
@@ -14,6 +14,7 @@ export interface Draft {
   kind: FeedingKind;
   bottleDuration: string;
   breastDuration: string;
+  sunbathDuration: string;
   bottleUnknown: boolean;
   breastUnknown: boolean;
   urine: boolean;
@@ -57,7 +58,7 @@ export interface Feeding extends FeedingInput {
 export const PAGE_SIZE = 30;
 export function newDraft(defaults: BreastDefaults | number | null = null): Draft {
   const breastDefault = typeof defaults === 'number' ? { left: defaults, right: defaults } : defaults;
-  return { mood: null, breastDefault, estimateMode: 'auto', estimate: '', kind: 'breast', bottleDuration: '15', breastDuration: '30', bottleUnknown: false,
+  return { mood: null, breastDefault, estimateMode: 'auto', estimate: '', kind: 'breast', bottleDuration: '15', breastDuration: '30', sunbathDuration: '', bottleUnknown: false,
     breastUnknown: false, milkType: 'pre', urine: false, stool: false, heldSuccess: false, weight: '', temperature: '', amount: '', side: '', timeMode: 'now', localTime: '', exactTime: null, breastStart: null, breastEnd: null };
 }
 export function localDateTime(value: string | Date): string {
@@ -70,6 +71,7 @@ export function draftFromFeeding(entry: Feeding): Draft {
   draft.estimateMode = 'manual';
   draft.estimate = entry.estimated_ml == null ? '' : String(entry.estimated_ml);
   draft.kind = entry.kind;
+  if (entry.kind === 'sunbath') draft.sunbathDuration = entry.duration_minutes == null ? '' : String(entry.duration_minutes);
   draft.mood = entry.mood_after ?? null;
   draft.performedBy = entry.performed_by;
   draft.temperature = entry.temperature_c == null ? '' : String(entry.temperature_c);
@@ -85,7 +87,7 @@ export function draftFromFeeding(entry: Feeding): Draft {
     draft.bottleDuration = String(entry.duration_minutes ?? 0);
     draft.amount = String(entry.amount_ml ?? '');
     draft.milkType = entry.milk_type ?? '';
-  } else {
+  } else if (entry.kind === 'breast') {
     draft.breastUnknown = entry.duration_minutes === null;
     draft.breastDuration = String(entry.duration_minutes ?? 0);
     draft.side = entry.side ?? '';
@@ -115,7 +117,7 @@ export function feedingInput(draft: Draft, now = new Date()): FeedingInput {
   const unknown = (bottle ? draft.bottleUnknown : draft.breastUnknown) || (bottle ? draft.bottleDuration : draft.breastDuration) === '0';
   const timed = draft.kind === 'breast' && draft.breastStart !== null;
   if (timed && !draft.breastEnd) throw new Error('Bitte zuerst das Stillen beenden.');
-  const duration = diaper || draft.kind === 'weight' || draft.kind === 'temperature' ? null : timed ? Math.max(1, Math.round((new Date(draft.breastEnd!).getTime() - new Date(draft.breastStart!).getTime()) / 60000)) : unknown ? null : positiveInteger(bottle ? draft.bottleDuration : draft.breastDuration, 'Dauer');
+  const duration = draft.kind === 'sunbath' ? (draft.sunbathDuration === '' || draft.sunbathDuration === '0' ? null : positiveInteger(draft.sunbathDuration, 'Dauer')) : diaper || draft.kind === 'weight' || draft.kind === 'temperature' ? null : timed ? Math.max(1, Math.round((new Date(draft.breastEnd!).getTime() - new Date(draft.breastStart!).getTime()) / 60000)) : unknown ? null : positiveInteger(bottle ? draft.bottleDuration : draft.breastDuration, 'Dauer');
   const amount = bottle ? positiveInteger(draft.amount, 'Menge') : null;
   if (amount !== null && amount % 5 !== 0) throw new Error('Bitte die Menge in 5-ml-Schritten angeben.');
   const time = timed ? new Date(draft.breastEnd!) : draft.timeMode === 'now' ? now : draft.exactTime && localDateTime(draft.exactTime) === draft.localTime ? new Date(draft.exactTime) : new Date(draft.localTime);
@@ -126,13 +128,13 @@ export function feedingInput(draft: Draft, now = new Date()): FeedingInput {
   }
   const start = timed ? new Date(draft.breastStart!) : draft.kind === 'breast' && duration !== null ? new Date(time.getTime() - duration * 60000) : null;
   if (start && (!Number.isFinite(start.getTime()) || start > time)) throw new Error('Der Beginn muss vor dem Ende liegen.');
-  return { mood_after: draft.kind === 'weight' || draft.kind === 'temperature' ? null : draft.mood, estimated_ml: estimatedMilk(draft), ...(draft.performedBy !== undefined ? { performed_by: draft.performedBy } : {}), kind: draft.kind, occurred_at: time.toISOString(), started_at: start?.toISOString() ?? null, duration_minutes: duration,
+  return { mood_after: draft.kind === 'weight' || draft.kind === 'temperature' || draft.kind === 'sunbath' ? null : draft.mood, estimated_ml: estimatedMilk(draft), ...(draft.performedBy !== undefined ? { performed_by: draft.performedBy } : {}), kind: draft.kind, occurred_at: time.toISOString(), started_at: start?.toISOString() ?? null, duration_minutes: duration,
     amount_ml: amount, side: draft.kind === 'breast' ? draft.side || null : null, milk_type: bottle ? draft.milkType || null : null,
     urine: diaper ? draft.urine : null, stool: diaper ? draft.stool : null, held_success: diaper ? draft.heldSuccess : null, temperature_c: draft.kind === 'temperature' ? temperatureC(draft.temperature) : null, weight_g: draft.kind === 'weight' ? positiveInteger(draft.weight, 'Gewicht') : null };
 }
 export function dayKey(iso: string): string { return localDateTime(iso).slice(0, 10); }
 export const sideLabel = (side: Side | null): string => side ? { left: 'Links', right: 'Rechts', both: 'Beide' }[side] : '';
-export const kindLabel = (kind: FeedingKind): string => ({ bottle: 'Flasche', breast: 'Stillen', diaper: 'Wickeln', weight: 'Wiegen', temperature: 'Temperatur' })[kind];
+export const kindLabel = (kind: FeedingKind): string => ({ bottle: 'Flasche', breast: 'Stillen', diaper: 'Wickeln', weight: 'Wiegen', temperature: 'Temperatur', sunbath: 'Sonnenbad' })[kind];
 export const milkLabel = (milk: MilkType | null | undefined): string => milk === 'pre' ? 'Pre-Nahrung' : milk === 'breast_milk' ? 'Muttermilch' : '';
 export function toCsv(entries: Feeding[]): string {
   const escape = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`;

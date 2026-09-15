@@ -84,16 +84,33 @@ Migration 007 initialisiert links/rechts aus dem bisherigen gemeinsamen Standard
 
 Push und Pull Request starten `Check`: Fachlogik-/DOM-Regressionen, TypeScript und Build sowie eine isolierte Supabase-Instanz mit allen Migrationen, RLS-/API-Tests und synthetischem Restore. Dafür werden keine Produktionsschlüssel benötigt. `Publish GitHub Pages` bleibt ausschließlich manuell.
 
-Migration 011 vor der neuen Oberfläche in einer Transaktion anwenden. Sie übernimmt vorhandene UUIDs in einen privaten minimalen Nachweis und verhindert ihre Wiederverwendung nach Löschen. Bereits früher gelöschte IDs können nicht nachträglich erfasst werden. Historische Migrationen 001–010 bleiben unverändert. Für jede manuelle Ausführung Dateiname, Prüfsumme, Datum und Ergebnis privat protokollieren; vorhandene CLI-Historie zusätzlich prüfen. Eine Fehlermeldung „Spalte existiert bereits“ ist Anlass zum Abgleich, nicht zum erneuten Ausführen historischer Korrekturen.
+Migration 011 wurde am 14. September 2026 produktiv in einer Transaktion angewendet. Sie übernimmt vorhandene UUIDs in einen privaten minimalen Nachweis und verhindert ihre Wiederverwendung nach Löschen. Bereits früher gelöschte IDs können nicht nachträglich erfasst werden. Historische Migrationen 001–010 bleiben unverändert. Für jede manuelle Ausführung Dateiname, Prüfsumme, Datum und Ergebnis privat protokollieren; vorhandene CLI-Historie zusätzlich prüfen. Eine Fehlermeldung „Spalte existiert bereits“ ist Anlass zum Abgleich, nicht zum erneuten Ausführen historischer Korrekturen.
 
 Actions-Versionen am 13. September 2026 anhand der offiziellen Action-Manifeste geprüft: [checkout 7.0.1](https://github.com/actions/checkout/blob/v7.0.1/action.yml), [setup-node 7.0.0](https://github.com/actions/setup-node/blob/v7.0.0/action.yml), [upload-pages-artifact 5.0.0](https://github.com/actions/upload-pages-artifact/blob/v5.0.0/action.yml), [deploy-pages 5.0.1](https://github.com/actions/deploy-pages/blob/v5.0.1/action.yml). JavaScript-Actions verwenden Node 24, Upload bleibt eine Composite-Action mit dem Standardartefakt `github-pages`. Die Workflows nutzen aktuelle GitHub-gehostete Ubuntu-Runner.
 
 ## Bedienlayout und aktuelle Person
 
-Vor Veröffentlichung des Layouts aus Feature 004 Migration `202609130010_current_family_person.sql` einspielen. Die RPC liefert ausschließlich den Namen der eigenen freigeschalteten Rolle. Sie verändert weder Einträge noch die automatische Personenzuordnung. Die App benötigt die RPC beim Öffnen des Logbuchs; die Migration daher vor der Oberfläche veröffentlichen. Lokal mit Mitglieder-, Fremd- und anonymem Konto geprüft.
+Migration `202609130010_current_family_person.sql` gehört zum veröffentlichten Layout aus Feature 004. Die RPC liefert ausschließlich den Namen der eigenen freigeschalteten Rolle. Sie verändert weder Einträge noch die automatische Personenzuordnung. Die App benötigt die RPC beim Öffnen des Logbuchs; die Migration daher vor der Oberfläche veröffentlichen. Lokal mit Mitglieder-, Fremd- und anonymem Konto geprüft.
 
 Am 13. September 2026 nach ausdrücklichem Auftrag produktiv eingespielt. Vorher wurden die App-Tabellen konsistent in `private.events_before_20260913_layout`, `private.settings_before_20260913_layout` und `private.members_before_20260913_layout` gesichert und alle Rechte für public/anon/authenticated entzogen. Die Migration wurde mit Vorher-/Nachher-Prüfsummen in einer Transaktion ausgeführt; Originaltabellen blieben unverändert. Diese Kopien sind eine Sicherung der App-Daten innerhalb derselben Datenbank, kein vollständiges externes Projektbackup einschließlich Auth.
 
 ## Temperatur-Erweiterung (veröffentlicht, 14. September 2026)
 
-Vor Veröffentlichung der Temperatur-Oberfläche Migration `202609140012_temperature.sql` einmalig einspielen, nachdem vorherige Migrationen vorhanden sind. Sie ergänzt die Messwertspalte, Constraints und Spaltenrechte. Migrationen 011 und 012 wurden am 14. September 2026 produktiv in einer Transaktion angewendet. Interne Sicherung der betroffenen Tabellen im privaten Schema, unveränderte Originaldaten und erhaltene Rechte/RLS wurden geprüft. Anschließend den PostgREST-Schemacache bei Bedarf mit `NOTIFY pgrst, 'reload schema';` aktualisieren.
+Die veröffentlichte Temperatur-Oberfläche verwendet Migration `202609140012_temperature.sql`. Sie ergänzt die Messwertspalte, Constraints und Spaltenrechte. Migrationen 011 und 012 wurden am 14. September 2026 produktiv in einer Transaktion angewendet. Interne Sicherung der betroffenen Tabellen im privaten Schema, unveränderte Originaldaten und erhaltene Rechte/RLS wurden geprüft. Anschließend den PostgREST-Schemacache bei Bedarf mit `NOTIFY pgrst, 'reload schema';` aktualisieren.
+
+
+## Migrationsübersicht
+
+Stand: 15. September 2026, vor Sonnenbad-Veröffentlichung. Nur fehlende Migrationen ausführen; die manuelle SQL-Historie wird durch Schema und dokumentierte Prüfnachweise ergänzt.
+
+| Migrationen | Inhalt | Produktiver Stand / Nachweis |
+| --- | --- | --- |
+| 001–005 | Logbuch, Milchart, Wickeln, Gewicht, Person | Eingespielt; [Feature 001](../specs/001-fuettern/tasks.md) |
+| 006–008 | Bericht, getrennte Standards, einmalige Bestandskorrektur | Eingespielt; [Feature 002](../specs/002-tagesbericht/tasks.md) |
+| 009 | Befinden | Eingespielt; [Feature 003](../specs/003-befinden/tasks.md) |
+| 010 | Aktuelle Person | Eingespielt; [Feature 004](../specs/004-bedienlayout/tasks.md) |
+| 011–012 | Dauerhafter UUID-Nachweis, Temperatur | Eingespielt; [Feature 006](../specs/006-temperatur-und-effekte/tasks.md) |
+| 013 | Zornig und Eingeschlafen | Eingespielt; [Feature 003](../specs/003-befinden/tasks.md) |
+| 014 | Sonnenbad | Lokal geprüft, produktiv ausstehend; [Feature 007](../specs/007-sonnenbad/tasks.md) |
+
+Migration 014 erweitert ausschließlich Arten- und Detailconstraints; vorhandene Ereignisse, Spaltenrechte und RLS bleiben unverändert. Vor dem zugehörigen Frontend ausrollen. Interne Sicherungen vor Migrationen ersetzen keinen vollständigen externen Sicherungssatz; siehe [recovery.md](recovery.md).

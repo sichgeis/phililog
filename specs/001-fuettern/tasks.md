@@ -19,7 +19,8 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 - [x] T-004: Automatisierte Prüfungen und Browserprüfung dokumentieren.
 - [x] T-005: Einrichtung und manuellen Pages-Workflow vorbereiten.
 - [x] T-006: Stillbeginn/-ende per Klick mit Fortsetzung nach Neuladen (AC-011).
-- [ ] T-007: Produktive Einrichtung, Smartphone-Installation und gemeinsame Abnahme.
+- [x] T-007a: Produktive Einrichtung und gemeinsame Kontozugriffe.
+- [ ] T-007b: Vollständige Smartphone-/PWA-Installation und gemeinsame Geräteabnahme dokumentieren.
 
 ## Prüfnachweise vom 12. September 2026
 

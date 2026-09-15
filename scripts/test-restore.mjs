@@ -12,6 +12,7 @@ const sql = (db, input) => docker(['psql', '-X', '-U', 'supabase_admin', '-d', d
 const julia = '11111111-1111-4111-8111-111111111111';
 const christian = '22222222-2222-4222-8222-222222222222';
 const outsider = '33333333-3333-4333-8333-333333333333';
+const migrations = readdirSync('supabase/migrations').filter(f => f.endsWith('.sql')).sort();
 try {
   sql('postgres', `create database ${source}; create database ${target};`);
   // Reuse the installed Auth schema, never its data. Roles belong to the local cluster.
@@ -20,7 +21,7 @@ try {
   // Supabase bootstrap grants on a fresh platform database.
   sql(source, 'grant usage on schema public to anon, authenticated, service_role;');
   sql(source, 'create schema supabase_migrations; create table supabase_migrations.schema_migrations(version text primary key, statements text[], name text);');
-  for (const file of readdirSync('supabase/migrations').filter(f => f.endsWith('.sql')).sort()) {
+  for (const file of migrations) {
     const version = file.split('_')[0];
     sql(source, `begin; ${readFileSync(`supabase/migrations/${file}`, 'utf8')}\ninsert into supabase_migrations.schema_migrations(version,name) values ('${version}','${file}'); commit;`);
   }
@@ -43,6 +44,11 @@ try {
     insert into public.feedings(id,kind,occurred_at,amount_ml,created_by) values
       ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee','bottle','2088-01-01Z',60,'${julia}');
     delete from public.feedings where id='eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
+    insert into public.feedings(id,kind,occurred_at,temperature_c,created_by) values
+      ('ffffffff-ffff-4fff-8fff-ffffffffffff','temperature','2088-01-01Z',37.2,'${julia}');
+    insert into public.feedings(id,kind,occurred_at,duration_minutes,created_by) values
+      ('99999999-9999-4999-8999-999999999999','sunbath','2088-01-01Z',5,'${christian}');
+    update public.feedings set mood_after='asleep' where kind='breast';
     update public.family_settings set breast_left_ml=20,breast_right_ml=35;
     insert into private.events_before_20260913_correction
       select id,kind,occurred_at,started_at,duration_minutes,amount_ml,side,created_by,created_at,updated_at,version,milk_type,urine,stool,held_success,weight_g,performed_by,estimated_ml
@@ -68,7 +74,7 @@ try {
     do $$ begin
       assert public.is_family_member();
       assert public.current_family_person() = 'Julia';
-      assert (select count(*)=4 from public.feedings);
+      assert (select count(*)=6 from public.feedings);
       assert public.feeding_create_known('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee');
       update public.feedings set amount_ml=75 where id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' and version=1;
       assert not found;
@@ -81,7 +87,7 @@ try {
       exception when unique_violation then null; end;
     end $$;
     select set_config('request.jwt.claim.sub','${christian}',true);
-    do $$ begin assert public.is_family_member(); assert (select count(*)=4 from public.feedings); end $$;
+    do $$ begin assert public.is_family_member(); assert (select count(*)=6 from public.feedings); end $$;
     select set_config('request.jwt.claim.sub','${outsider}',true);
     do $$ begin assert not public.is_family_member(); assert (select count(*)=0 from public.feedings); end $$;
     reset role;
@@ -90,7 +96,7 @@ try {
       assert not has_table_privilege('authenticated','private.events_before_20260913_correction','select');
  assert not has_table_privilege('anon','public.feedings','select'); end $$;
     rollback;`);
-  console.log('Restore bestanden: alle 11 Migrationen auf leerer Datenbank, vollständiger synthetischer Dump/Restore, identische Daten und Metadaten, RLS, Versionsschutz und gelöschte UUID.');
+  console.log(`Restore bestanden: alle ${migrations.length} Migrationen auf leerer Datenbank, vollständiger synthetischer Dump/Restore einschließlich Temperatur und Sonnenbad, identische Daten und Metadaten, RLS, Versionsschutz und gelöschte UUID.`);
 } finally {
   sql('postgres', `drop database if exists ${target} with (force); drop database if exists ${source} with (force);`);
 }

@@ -211,3 +211,34 @@ for (const mood of ['angry', 'asleep']) test(`${mood}: Auswahl, Wechsel, Abwahl,
  assert.equal(saved.mood_after, mood);
  assert.equal(ui.window.document.querySelector('[data-mood][aria-pressed="true"]'), null);
 });
+
+test('Sonnenbad unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder und Speichern', async t => {
+ const ui = await setup(t);
+ assert.ok(ui.find('#extra-events [data-kind="sunbath"]'));
+ assert.equal(ui.window.document.querySelector('.kind-picker [data-kind="sunbath"]'), null);
+ ui.find('[data-kind="bottle"]').click(); ui.input('#amount', '65');
+ ui.find('[data-mood="calm"]').click();
+ ui.find('[data-kind="sunbath"]').click();
+ assert.equal(ui.find('#sunbath-duration').value, '');
+ assert.equal(ui.find('.duration-block').hidden, true);
+ for (const selector of ['#mood-options', '#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
+ ui.input('#sunbath-duration', '5');
+ await ui.app.refresh();
+ assert.equal(ui.find('#sunbath-duration').value, '5');
+ await ui.app.enterSession('test-user');
+ assert.equal(ui.find('#sunbath-duration').value, '5');
+ ui.find('[data-kind="bottle"]').click(); assert.equal(ui.find('#duration').value, '15');
+ ui.find('[data-kind="sunbath"]').click(); assert.equal(ui.find('#sunbath-duration').value, '5');
+ let saved: any;
+ ui.setCreate(async p => { saved = p.input; return p.input; });
+ await ui.app.save();
+ assert.equal(saved.kind, 'sunbath'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, null);
+ ui.find('[data-kind="sunbath"]').click(); assert.equal(ui.find('#sunbath-duration').value, '');
+ await ui.app.save(); assert.equal(saved.duration_minutes, null);
+});
+
+test('Laufendes Stillen sperrt Sonnenbad wie andere zusätzliche Ereignisse', async t => {
+ const ui = await setup(t);
+ ui.find('#start-breast').click();
+ assert.equal(ui.find('[data-kind="sunbath"]').disabled, true);
+});

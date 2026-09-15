@@ -183,3 +183,5 @@ form:has(input:focus,select:focus) .save-bar{position:static}
 @keyframes star-fall{10%{opacity:1}80%{opacity:1}100%{transform:translate(var(--drift),110vh) rotate(220deg);opacity:0}}
 @keyframes rainbow-glow{0%{opacity:0;transform:translateX(-50%) scale(.8)}20%,65%{opacity:1}100%{opacity:0;transform:translateX(-50%) scale(1.08)}}
 @media(prefers-reduced-motion:reduce){.star-celebration.reduced-celebration{display:block;background:none}.reduced-celebration i{display:none}.reduced-celebration .celebration-rainbow{animation:none;font-size:100px;top:15%}.reduced-celebration .celebration-rainbow::after{content:' ✦ ★ ✦';display:block;font-size:32px;text-align:center;color:#9b6800}}
+
+.entry-icon.sunbath{background:#fff3d6;color:#94641f}

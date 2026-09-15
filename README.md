@@ -1,26 +1,28 @@
 # Phililog
 
-Ein gemeinsames Logbuch für den Alltag mit einem neugeborenen Baby. Es erfasst Stillen, Fläschchen und Wickeln mit Urin, Stuhl und erfolgreichem Abhalten sowie Gewichts- und Temperaturmessungen.
+Ein gemeinsames Logbuch für den Alltag mit Philine. Die Smartphone-Web-App erfasst Stillen, Fläschchen, Wickeln, Gewicht, Körpertemperatur und Sonnenbad.
 
-## Projektstatus
+[App öffnen](https://sichgeis.github.io/phililog/) · [Einrichtung und Betrieb](docs/setup.md) · [Spezifikationen](specs/README.md)
 
-Die erste Web-App-Version ist implementiert und wurde lokal mit synthetischen Daten geprüft. Sie enthält kompakte Fütterungs- und Wickeleingabe, Wiegen unter „Weitere Ereignisse“, Stillstart/-ende, Personenzuordnung zu Julia/Christian, Historie, Korrekturen, Löschen, CSV-Export, einen Tagesbericht, gemeinsame Einstellungen für Still-Schätzungen und eine Projektinfo. Die App ist auf [GitHub Pages](https://sichgeis.github.io/phililog/) veröffentlicht und mit dem Supabase-Free-Projekt Philine-Log in Europa verbunden. Beide Elternkonten und der gemeinsame Datenzugriff wurden produktiv geprüft. [MVP-Spezifikation](specs/001-fuettern/spec.md).
+## Aktueller Stand
 
-## Befinden danach
+Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Julia und Christian greifen auf dasselbe geschützte Logbuch zu. Der Sonnenbad-Stand ist lokal implementiert und geprüft; seine Veröffentlichung und Migration 014 sind beauftragt und werden gerade vorbereitet. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
 
-Bei Stillen, Flasche und Wickeln könnt ihr optional Quengelig, Schläfrig, Ruhig, Aufmerksam, Zornig oder Eingeschlafen auswählen. Ein anderer Button ersetzt die Auswahl; erneutes Tippen entfernt sie. Die Angabe bleibt beim Ereignis, erscheint im Logbuch und CSV und kann später geändert werden. Jeder neue Eintrag startet ohne Vorauswahl. [Spezifikation](specs/003-befinden/spec.md).
+## Eintragen und nachschlagen
 
-Zornig und Eingeschlafen sind seit 14. September 2026 veröffentlicht; Migration 013 ist produktiv eingespielt.
+- **Stillen:** Start/Ende per Klick oder Nachtrag; optionale Seite und Schätzung. Ein laufender Entwurf bleibt bis zum Speichern auf dem eigenen Gerät.
+- **Flasche:** Menge in 5-ml-Schritten, Milchart und Dauer.
+- **Wickeln:** Urin, Stuhl und erfolgreiches Abhalten unabhängig auswählen.
+- **Unter „Mehr“:** Wiegen in Gramm, Temperatur in °C und Sonnenbad mit optionaler Dauer. Leere Sonnenbad-Dauer oder 0 bedeutet unbekannt; es gibt keinen voreingestellten Wert.
+- **Befinden danach:** Bei Stillen, Flasche und Wickeln optional Quengelig, Schläfrig, Ruhig, Aufmerksam, Zornig oder Eingeschlafen. Eine Auswahl ersetzt die vorherige; erneutes Tippen entfernt sie.
 
-## Tagesbericht und Still-Schätzung
+Alle Ereignisse erscheinen im gemeinsamen Logbuch und lassen sich bearbeiten, löschen und als CSV exportieren. Neue Einträge werden dem angemeldeten Konto zugeordnet. Versionsprüfungen verhindern das Überschreiben neuerer Änderungen. Nach erfolgreichem Speichern erhält Julia Aquarellkonfetti, Christian Sterne und Regenbogen; reduzierte Bewegung wird berücksichtigt.
 
-„Tagesbericht“ zeigt sieben Kalendertage in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge, erfasste Summe sowie Wickeln/Urin/Stuhl. Fehlende Schätzungen werden kenntlich gemacht. Die Navigation zeigt die Kalenderwoche samt Jahr, Wochenpfeile, das heutige Datum und „Heute“. Wochen beginnen montags; die laufende Woche reicht bis heute. Eine freie Datumsauswahl entfällt.
+## Tagesbericht und Einstellungen
 
-Unter „Einstellungen“ im Footer lassen sich linke und rechte Brust separat einstellen, anfangs jeweils 25 ml. Bei „Beide“ werden die Werte addiert; offene Seite bleibt ohne automatische Menge. Die aufklappbare Stillmenge erlaubt eine eigene Gesamtmenge oder eine leere Angabe. Jeder Eintrag behält seine Schätzung; ein neuer Standard ändert gespeicherte Werte nicht. Bereits begonnene Entwürfe behalten ihren Standard; „Aktuellen Standard verwenden“ übernimmt ihn ausdrücklich. [Spezifikation](specs/002-tagesbericht/spec.md).
+Der Tagesbericht zeigt Kalenderwochen in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge und Wickelzahlen. Fehlende Schätzungen werden kenntlich gemacht. Wiegen, Temperatur und Sonnenbad verändern diese Summen nicht.
 
-## Überarbeitetes Bedienlayout
-
-Letzte Mahlzeit oberhalb der Eingabe, kompakte Zusatzangaben, erreichbare Speicherleiste, einheitliche Auswahlzustände und größere Personenauswahl. Das Logbuch hebt Menge und Dauer hervor. Hauptnavigation und Einstellungen bleiben beim Scrollen erreichbar. Der Stillablauf bleibt unverändert. [Spezifikation und Prüfnachweise](specs/004-bedienlayout/spec.md). Die Oberfläche ist auf GitHub Pages veröffentlicht. Migration 010 ist nach Sicherung der App-Daten produktiv eingespielt.
+Einstellungen sind im Footer erreichbar. Die Still-Schätzung wird getrennt für links und rechts festgelegt, anfangs jeweils 25 ml; „Beide“ addiert die Werte. Eigene Mengen und fehlende Schätzungen sind möglich. Neue Standards ändern gespeicherte Ereignisse oder begonnene Entwürfe nicht rückwirkend. „Aktuellen Standard verwenden“ übernimmt sie ausdrücklich.
 
 ## Entwicklung
 
@@ -84,22 +86,14 @@ Die Umsetzung verwendet Vite, TypeScript, CSS und Supabase Auth mit E-Mail/Passw
 
 Der kostenlose Supabase-Tarif bietet zum Zeitpunkt der Entscheidung 500 MB Datenbankplatz, kann bei geringer Aktivität pausiert werden und enthält keine automatischen Backups. Export und Datensicherung sind deshalb bei der fachlichen Beschreibung zu klären. Tarifbedingungen vor der Einrichtung erneut prüfen: [Supabase-Preise](https://supabase.com/pricing).
 
-## Veröffentlichung
+## Betrieb und Veröffentlichungen
 
-Die erste App-Version liegt im öffentlichen [GitHub-Repository](https://github.com/sichgeis/phililog). GitHub Pages ist mit GitHub Actions als Quelle aktiviert. Das [erste Deployment](https://github.com/sichgeis/phililog/actions/runs/34689824057) war erfolgreich. [App öffnen](https://sichgeis.github.io/phililog/).
+[Architektur](docs/architecture.md), [Gestaltung](docs/design.md), [Migrationen und Deployment](docs/setup.md) und [Sicherung/Wiederherstellung](docs/recovery.md) beschreiben den aktuellen Betrieb. CSV ist ein lesbarer Export, kein vollständiges Backup. Produktive interne Sicherungskopien werden niemals ins Repository übernommen.
+
+Das [GitHub-Repository](https://github.com/sichgeis/phililog) ist öffentlich; die Logbucheinträge bleiben geschützt in Supabase. Push und Pull Request starten automatische Prüfungen. Veröffentlichungen erfolgen über den manuellen Workflow „Publish GitHub Pages“ nach Freigabe; ein Push allein veröffentlicht nichts.
+
+Die physische Smartphone-/PWA-Abnahme bleibt in [Feature 001](specs/001-fuettern/tasks.md) gesondert dokumentiert. Eine vollständige Offline-Synchronisation ist nicht enthalten.
 
 ## Lizenz
 
 Noch nicht festgelegt.
-
-Am 13. September 2026 wurde der damalige Bestand auf ausdrücklichen Wunsch korrigiert: Flasche/Wickeln Christian, Stillen Julia; Still-Schätzung 25 ml je ausgewählter Brust (beide 50 ml, offen leer). Diese einmalige Korrektur verändert die automatische Zuordnung künftiger Einträge nicht.
-
-## Wartung und Betrieb
-
-[Architektur](docs/architecture.md), [vollständige Sicherung und geprüfte Wiederherstellung](docs/recovery.md) und [Wartungspaket](specs/005-wartung/spec.md). Migration 011 für den UUID-Nachweis ist produktiv eingespielt. Einstellungsentwürfe behalten ihre Ausgangsversion; bei Konflikt Serverwerte ausdrücklich übernehmen und die gewünschte Änderung neu eingeben.
-
-## Temperatur und Speichereffekte
-
-Unter „Mehr“ stehen Wiegen und Temperatur. Die Körpertemperatur wird in °C mit einer Nachkommastelle erfasst, im Logbuch angezeigt und im CSV exportiert; Komma und Punkt sind als Eingabe möglich. Einstellungen sind ausschließlich im Footer erreichbar. Christian erhält nach erfolgreichem Speichern einen großen Sternenregen mit Regenbogen, Julia weiterhin Aquarellkonfetti. Bei reduzierter Bewegung erscheint für Christian eine ruhige Grafik.
-
-Am 14. September 2026 veröffentlicht. Migrationen 011 und 012 sind nach interner Sicherung produktiv eingespielt. [Erfolgreiches Deployment](https://github.com/sichgeis/phililog/actions/runs/34817768491). [Umfang und Prüfnachweise](specs/006-temperatur-und-effekte/spec.md).

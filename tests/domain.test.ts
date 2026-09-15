@@ -186,3 +186,25 @@ for (const [mood, label] of [['angry', 'Zornig'], ['asleep', 'Eingeschlafen']] a
   assert.equal(feedingInput({ ...newDraft(), kind: 'weight', weight: '3500', mood }, now).mood_after, null);
  });
 }
+
+test('Sonnenbad trennt optionale Dauer von Mahlzeiten und erhält Nachtrag, Korrektur und CSV', () => {
+ const draft = { ...newDraft(), kind: 'sunbath' as const, mood: 'calm' as const, amount: '65', weight: '3500', temperature: '37,2', sunbathDuration: '5' };
+ const input = feedingInput(draft, now);
+ assert.equal(input.duration_minutes, 5);
+ assert.equal(input.occurred_at, now.toISOString());
+ for (const key of ['mood_after', 'estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
+ for (const sunbathDuration of ['', '0']) assert.equal(feedingInput({ ...draft, sunbathDuration }, now).duration_minutes, null);
+ for (const sunbathDuration of ['-1', '1.5', 'abc', '2147483648']) assert.throws(() => feedingInput({ ...draft, sunbathDuration }, now), /Dauer/);
+ const entry = { ...input, id: 'sunbath-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'Christian' as const };
+ const restored = draftFromFeeding(entry);
+ assert.equal(restored.sunbathDuration, '5');
+ assert.equal(restored.breastDuration, '30');
+ assert.equal(restored.bottleDuration, '15');
+ assert.equal(feedingInput({ ...restored, sunbathDuration: '7' }).occurred_at, input.occurred_at);
+ assert.equal(feedingInput(restored).performed_by, 'Christian');
+ assert.equal(sameInput(input, { ...input, duration_minutes: 7 }), false);
+ assert.match(toCsv([entry]), /"Sonnenbad";"5"/);
+ assert.equal(draftFromFeeding({ ...entry, duration_minutes: null }).sunbathDuration, '');
+ assert.equal(feedingInput({ ...draft, kind: 'breast' }, now).duration_minutes, 30);
+ assert.equal(feedingInput({ ...draft, kind: 'bottle' }, now).duration_minutes, 15);
+});
