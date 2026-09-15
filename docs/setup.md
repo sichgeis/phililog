@@ -107,14 +107,14 @@ Stand: [Betriebsdatum privat], vor Sonnenbad-Veröffentlichung. Nur fehlende Mig
 | 010 | Aktuelle Person | Eingespielt; [Feature 004](../specs/004-bedienlayout/tasks.md) |
 | 011–012 | Dauerhafter UUID-Nachweis, Temperatur | Eingespielt; [Feature 006](../specs/006-temperatur-und-effekte/tasks.md) |
 | 013 | Zornig und Eingeschlafen | Eingespielt; [Feature 003](../specs/003-befinden/tasks.md) |
-| 014 | Sonnenbad | Lokal geprüft, produktiv ausstehend; [Feature 007](../specs/007-sonnenbad/tasks.md) |
+| 014 | Sonnenbad | Produktiv am [Betriebsdatum privat]; [Feature 007](../specs/007-sonnenbad/tasks.md) |
 
 Migration 014 erweitert ausschließlich Arten- und Detailconstraints; vorhandene Ereignisse, Spaltenrechte und RLS bleiben unverändert. Vor dem zugehörigen Frontend ausrollen. Interne Sicherungen vor Migrationen ersetzen keinen vollständigen externen Sicherungssatz; siehe [recovery.md](recovery.md).
 
 
 ## Browserunabhängiger Administrationszugang
 
-Einrichtung am [Betriebsdatum privat] beauftragt; Token-Erstellung durch den Kontoinhaber steht noch aus. Für Migrationen wird ein persönlicher Token für die [Supabase Management API](https://supabase.com/docs/reference/api/introduction) verwendet. Der Publishable-Key der App dient nicht zur Schemaadministration.
+Administrativen Zugang nur für das jeweilige Zielprojekt mit minimalen Rechten und begrenzter Laufzeit einrichten. Betriebsnachweise bleiben privat.
 
 1. In [Access Tokens](https://supabase.com/dashboard/account/tokens) einen Token `PROJECT_ADMIN_TOKEN` mit Ablaufdatum erstellen (z. B. 90 Tage).
 2. Wenn verfügbar, auf Projekt `PROJECT_REF` beschränken: Database Read-write und Migrations Read-write. Weitere Verwaltungsrechte sind für diesen Ablauf nicht nötig. [Scoped Tokens](https://supabase.com/docs/guides/platform/personal-access-tokens) werden noch schrittweise freigeschaltet; wenn die Eingrenzung fehlt, zunächst klären, bevor ein kontoweit berechtigter Classic-Token verwendet wird.
@@ -124,4 +124,4 @@ Einrichtung am [Betriebsdatum privat] beauftragt; Token-Erstellung durch den Kon
 
 Administrationsskripte lesen den Token direkt aus dieser Datei in den Prozessspeicher und setzen den Authorization-Header für `https://api.supabase.com`. Tokenwerte nicht ausgeben oder als Prozessargument übergeben. API-Zugriff ersetzt den SQL-Editor; Sicherung, Transaktion, Bestandsvergleich und Prüfung der tatsächlich fehlenden Migrationen bleiben erforderlich. Kein pauschales `db push` auf die unvollständige historische CLI-Migrationsliste.
 
-Widerruf und Erneuerung erfolgen in den Access-Token-Einstellungen. Die Einrichtung allein ändert keine produktiven Daten. Migration 014 und das bereits beauftragte Deployment bleiben bis zum erfolgreichen API-Zugang offen.
+Widerruf und Erneuerung erfolgen in den Access-Token-Einstellungen. Die Einrichtung allein ändert keine produktiven Daten. Migration 014 wurde am [Betriebsdatum privat] über diesen Zugang erfolgreich angewendet; die Schreibrechte sind damit ebenfalls bestätigt.
