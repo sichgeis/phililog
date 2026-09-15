@@ -4,7 +4,7 @@
 
 Umgesetzt ist die kompakte Aquarellgestaltung: seitenweite Blau-/Türkis-/Violettflächen, klare Eingabefelder und mindestens 44 px hohe Touch-Ziele. Das finale App-Icon ist **Φ 1 · Klar**, ein weißes Phi auf dem ursprünglichen Aquarell-Klecks. Alle nachfolgenden Vorschläge dokumentieren die Entstehung; es steht keine Icon-Auswahl mehr aus. Fokus bleibt bei Formularaktualisierungen erhalten.
 
-Die Hauptauswahl enthält Flasche, Stillen und Wickeln. Seltenere Ereignisse stehen unter „Mehr“: Wiegen, Temperatur und Sonnenbad. Einstellungen stehen ausschließlich im Footer. Die sechs Befinden-Buttons verwenden drei Spalten beziehungsweise zwei Spalten auf sehr schmalen Geräten. Sonnenbad erhält ein Sonnensymbol und ein optionales Minutenfeld, keine voreingestellte Dauer.
+Die Hauptauswahl enthält Flasche, Stillen und Wickeln. Seltenere Ereignisse stehen unter „Mehr“: Wiegen, Temperatur, Sonnenbad, Massage und Babygymnastik. Einstellungen stehen ausschließlich im Footer. Die sechs Befinden-Buttons verwenden drei Spalten beziehungsweise zwei Spalten auf sehr schmalen Geräten. Sonnenbad, Massage und Babygymnastik erhalten eigene Symbole und ein optionales Minutenfeld ohne voreingestellte Dauer.
 
 Julia erhält nach bestätigtem Speichern Aquarellkonfetti, Christian einen größeren Sternenregen mit Regenbogen. Die Dekoration blockiert keine Eingaben. Bei reduzierter Bewegung bleibt Christians Grafik ruhig; Julias Animation entfällt.
 
