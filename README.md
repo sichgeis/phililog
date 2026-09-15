@@ -6,7 +6,7 @@ Ein gemeinsames Logbuch für den Alltag mit dem Kind. Die Smartphone-Web-App erf
 
 ## Aktueller Stand
 
-Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Person A und Person B greifen auf dasselbe geschützte Logbuch zu. Der Sonnenbad-Stand ist lokal implementiert und geprüft; seine Veröffentlichung und Migration 014 sind beauftragt und werden gerade vorbereitet. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
+Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Person A und Person B greifen auf dasselbe geschützte Logbuch zu. Sonnenbad und Migration 014 sind seit dem [Betriebsdatum privat] veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
 
 ## Eintragen und nachschlagen
 

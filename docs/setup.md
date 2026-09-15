@@ -97,7 +97,7 @@ Die veröffentlichte Temperatur-Oberfläche verwendet Migration `202609140012_te
 
 ## Migrationsübersicht
 
-Stand: [Betriebsdatum privat], vor Sonnenbad-Veröffentlichung. Nur fehlende Migrationen ausführen; die manuelle SQL-Historie wird durch Schema und dokumentierte Prüfnachweise ergänzt.
+Stand: [Betriebsdatum privat], einschließlich Sonnenbad-Veröffentlichung. Nur fehlende Migrationen ausführen; die manuelle SQL-Historie wird durch Schema und dokumentierte Prüfnachweise ergänzt.
 
 | Migrationen | Inhalt | Produktiver Stand / Nachweis |
 | --- | --- | --- |
