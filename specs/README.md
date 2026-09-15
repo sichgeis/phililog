@@ -6,7 +6,7 @@ Zuerst klären wir **was** erreicht werden soll und woran wir den Erfolg erkenne
 
 Dieser Ablauf ist bewusst werkzeugunabhängig. Es ist kein SDD-Framework und keine zusätzliche CLI erforderlich.
 
-Die abgestimmte Architektur und das Budget von 0 € stehen im [README](../README.md#architektur-und-datenhaltung). Sie bilden die Randbedingungen für die folgenden Spezifikationen; die fachliche Beschreibung läuft.
+Die abgestimmte Architektur und das Budget von 0 € stehen im [README](../README.md#architektur-und-datenhaltung). Sie bilden die Randbedingungen für die folgenden Spezifikationen; die einzelnen Feature-Spezifikationen konkretisieren sie.
 
 ## Ablage
 
@@ -35,15 +35,16 @@ Statusfolge: `Entwurf` → `Abgestimmt` → `In Umsetzung` → `Abgeschlossen`. 
 
 ## Spezifikationsübersicht
 
-Der MVP wurde zur Umsetzung beauftragt. Verbleibende Rückfragen und Prüfnachweise stehen in den Feature-Dokumenten.
+Die Übersicht trennt Implementierung von noch offener Geräteabnahme. Historische Prüfnachweise bleiben in den jeweiligen Aufgaben erhalten; abgeschlossene Teilaufgaben werden nicht durch spätere Erweiterungen ungültig.
 
 | ID | Feature / Link | Status |
 | --- | --- | --- |
-| 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung |
+| 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung (Geräteabnahme offen) |
 | 002 | [Tagesbericht und Still-Schätzung](002-tagesbericht/spec.md) | Abgeschlossen |
 | 003 | [Befinden nach einem Ereignis](003-befinden/spec.md) | Abgeschlossen |
 | 004 | [Anordnung und Bedienbarkeit](004-bedienlayout/spec.md) | Abgeschlossen |
 | 005 | [Wartung und zuverlässige Speicherung](005-wartung/spec.md) | Abgeschlossen |
 | 006 | [Temperatur und persönliche Speichereffekte](006-temperatur-und-effekte/spec.md) | Abgeschlossen |
+| 007 | [Sonnenbad im Logbuch](007-sonnenbad/spec.md) | In Umsetzung |
 
 Der nächste konkrete Schritt und der Fortschritt stehen in den [Aufgaben zu Feature 001](001-fuettern/tasks.md).

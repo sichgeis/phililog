@@ -48,3 +48,7 @@ Browser-Harness mit synthetischem Konto auf Port 5175: neues Layout/Person/Save-
 Integrationscommit (historischer Commit): GitHub Check 34784505499 (historischer Prüfnachweis) vollständig erfolgreich, einschließlich frischem transaktionalem Start aller elf Migrationen, API-/RLS-Tests, Restore und 32 App-Tests/Build auf Node 24. Browser-KW-Wechsel 37 → 36 → Heute (37) zusätzlich bestätigt, Screenshot visuell geprüft; Testkonto danach abgemeldet.
 
 Integration abgeschlossen; dieser Stand wird im ausdrücklich beauftragten Fast-Forward auf Main übernommen und gepusht. Keine offenen Integrationsaufgaben. Das Wartungspaket ist damit mit dem neuen Layout kompatibel. Für eine spätere Veröffentlichung bleibt ausschließlich die produktive Migration **011** vor dem manuellen Pages-Deployment erforderlich; diese Betriebsaktionen sind nicht Teil des Merge-Auftrags.
+
+## Produktiver Stand
+
+Migration 011 und Wartungsoberfläche sind seit [Betriebsdatum privat] veröffentlicht. Sicherung, Prüfsumme und Deployment-Nachweis stehen in [Feature 006](../006-temperatur-und-effekte/tasks.md). Der historische Implementierungsverlauf oben bleibt als Prüfnachweis erhalten.

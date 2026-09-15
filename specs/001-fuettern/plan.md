@@ -4,7 +4,7 @@ Bezug: [Spezifikation](spec.md)
 
 ## Ansatz
 
-Vite, TypeScript und CSS liefern eine statische, mobil optimierte Web-App. Zwei Ansichten ohne zusätzliche Router-Abhängigkeit; Supabase-JavaScript-Client für Auth und CRUD. Kein selbst gehostetes Produktionsbackend. Öffentliche Konfiguration über Vite-Umgebungsvariablen. Ohne Konfiguration erscheint eine Einrichtungsseite, keine vorgetäuschte erfolgreiche Speicherung.
+Vite, TypeScript und CSS liefern eine statische, mobil optimierte Web-App. Eingabe, Logbuch, Tagesbericht, Einstellungen und Projektinfo ohne zusätzliche Router-Abhängigkeit; Supabase-JavaScript-Client für Auth und CRUD. Kein selbst gehostetes Produktionsbackend. Öffentliche Konfiguration über Vite-Umgebungsvariablen. Ohne Konfiguration erscheint eine Einrichtungsseite, keine vorgetäuschte erfolgreiche Speicherung.
 
 ## Daten und Schutz
 
