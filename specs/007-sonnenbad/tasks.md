@@ -12,7 +12,7 @@ Stand: Lokal implementiert, mobile Sichtprüfung offen. Nicht veröffentlicht.
 
 Nächster Schritt: Chrome Remote Debugging aktivieren und Sonnenbad bei 320/390 px mit lokalem synthetischem Konto visuell prüfen.
 
-Grenzen: Keine physische Smartphone-Abnahme; produktive Migration, Commit, Push und Veröffentlichung ausdrücklich beauftragt; Ausführung läuft. Für Veröffentlichung zuerst Migration 014 anwenden.
+Grenzen: Keine physische Smartphone-Abnahme; Commit und Push abgeschlossen; produktive Migration und Veröffentlichung warten auf Browserzugang. Für Veröffentlichung zuerst Migration 014 anwenden.
 
 
 ## Veröffentlichungsauftrag und Projektpflege – 15. September 2026
@@ -21,3 +21,6 @@ Grenzen: Keine physische Smartphone-Abnahme; produktive Migration, Commit, Push 
 - [x] README konsolidiert; Architektur, Gestaltung, Betrieb und Wiederherstellung aktualisiert. Feature-Status und historische Nachweise getrennt, veraltete Angaben zu bereits veröffentlichten Migrationen korrigiert. Offene physische Geräteabnahme in Feature 001 erhalten.
 - [x] Restore-Test um Temperatur, Sonnenbad und neuen Befindenwert erweitert. Alle 14 Migrationen auf leerer lokaler Datenbank und kompletter synthetischer Dump/Restore erfolgreich. Migrationszahl wird aus den vorhandenen Dateien ermittelt.
 - [ ] Chrome-Zugang wiederherstellen; danach mobile Prüfung, Migration 014 und Deployment abschließen.
+
+- [x] Commit `40551e215db20030cfdbf90b8889dec46f956792` auf main gepusht. [CI 34972773232](https://github.com/sichgeis/phililog/actions/runs/34972773232) erfolgreich: App sowie isolierte Datenbank mit allen Migrationen, API/RLS-Tests und Restore.
+- [ ] Veröffentlichung noch nicht gestartet: Chrome Remote Debugging deaktiviert; Nutzer um Aktivierung gebeten. Migration 014 ist vorbereitet, aber nicht produktiv ausgeführt. Bestehende Live-Version bleibt erhalten.
