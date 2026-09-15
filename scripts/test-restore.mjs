@@ -47,7 +47,9 @@ try {
     insert into public.feedings(id,kind,occurred_at,temperature_c,created_by) values
       ('ffffffff-ffff-4fff-8fff-ffffffffffff','temperature','2088-01-01Z',37.2,'${julia}');
     insert into public.feedings(id,kind,occurred_at,duration_minutes,created_by) values
-      ('99999999-9999-4999-8999-999999999999','sunbath','2088-01-01Z',5,'${christian}');
+      ('99999999-9999-4999-8999-999999999999','sunbath','2088-01-01Z',5,'${christian}'),
+      ('88888888-8888-4888-8888-888888888888','massage','2088-01-01Z',7,'${julia}'),
+      ('77777777-7777-4777-8777-777777777777','gymnastics','2088-01-01Z',null,'${christian}');
     update public.feedings set mood_after='asleep' where kind='breast';
     update public.family_settings set breast_left_ml=20,breast_right_ml=35;
     insert into private.events_before_20260913_correction
@@ -74,7 +76,7 @@ try {
     do $$ begin
       assert public.is_family_member();
       assert public.current_family_person() = 'Julia';
-      assert (select count(*)=6 from public.feedings);
+      assert (select count(*)=8 from public.feedings);
       assert public.feeding_create_known('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee');
       update public.feedings set amount_ml=75 where id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' and version=1;
       assert not found;
@@ -87,7 +89,7 @@ try {
       exception when unique_violation then null; end;
     end $$;
     select set_config('request.jwt.claim.sub','${christian}',true);
-    do $$ begin assert public.is_family_member(); assert (select count(*)=6 from public.feedings); end $$;
+    do $$ begin assert public.is_family_member(); assert (select count(*)=8 from public.feedings); end $$;
     select set_config('request.jwt.claim.sub','${outsider}',true);
     do $$ begin assert not public.is_family_member(); assert (select count(*)=0 from public.feedings); end $$;
     reset role;
@@ -96,7 +98,7 @@ try {
       assert not has_table_privilege('authenticated','private.events_before_20260913_correction','select');
  assert not has_table_privilege('anon','public.feedings','select'); end $$;
     rollback;`);
-  console.log(`Restore bestanden: alle ${migrations.length} Migrationen auf leerer Datenbank, vollständiger synthetischer Dump/Restore einschließlich Temperatur und Sonnenbad, identische Daten und Metadaten, RLS, Versionsschutz und gelöschte UUID.`);
+  console.log(`Restore bestanden: alle ${migrations.length} Migrationen auf leerer Datenbank, vollständiger synthetischer Dump/Restore einschließlich Temperatur, Sonnenbad, Massage und Babygymnastik, identische Daten und Metadaten, RLS, Versionsschutz und gelöschte UUID.`);
 } finally {
   sql('postgres', `drop database if exists ${target} with (force); drop database if exists ${source} with (force);`);
 }

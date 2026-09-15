@@ -185,3 +185,6 @@ form:has(input:focus,select:focus) .save-bar{position:static}
 @media(prefers-reduced-motion:reduce){.star-celebration.reduced-celebration{display:block;background:none}.reduced-celebration i{display:none}.reduced-celebration .celebration-rainbow{animation:none;font-size:100px;top:15%}.reduced-celebration .celebration-rainbow::after{content:' ✦ ★ ✦';display:block;font-size:32px;text-align:center;color:#9b6800}}
 
 .entry-icon.sunbath{background:#fff3d6;color:#94641f}
+
+.entry-icon.massage{background:#fbe8ee;color:#a45673}
+.entry-icon.gymnastics{background:#e6f3ec;color:#38795a}

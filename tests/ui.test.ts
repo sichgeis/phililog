@@ -242,3 +242,79 @@ test('Laufendes Stillen sperrt Sonnenbad wie andere zusätzliche Ereignisse', as
  ui.find('#start-breast').click();
  assert.equal(ui.find('[data-kind="sunbath"]').disabled, true);
 });
+
+test('Massage unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder und Speichern', async t => {
+ const ui = await setup(t);
+ assert.ok(ui.find('#extra-events [data-kind="massage"]'));
+ assert.equal(ui.window.document.querySelector('.kind-picker [data-kind="massage"]'), null);
+ ui.find('[data-kind="bottle"]').click(); ui.input('#amount', '65');
+ ui.find('[data-mood="calm"]').click();
+ ui.find('[data-kind="massage"]').click();
+ assert.equal(ui.find('#massage-duration').value, '');
+ assert.equal(ui.find('.duration-block').hidden, true);
+ for (const selector of ['#mood-options', '#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
+ ui.input('#massage-duration', '5');
+ await ui.app.refresh();
+ assert.equal(ui.find('#massage-duration').value, '5');
+ await ui.app.enterSession('test-user');
+ assert.equal(ui.find('#massage-duration').value, '5');
+ ui.find('[data-kind="bottle"]').click(); assert.equal(ui.find('#duration').value, '15');
+ ui.find('[data-kind="massage"]').click(); assert.equal(ui.find('#massage-duration').value, '5');
+ let saved: any;
+ ui.setCreate(async p => { saved = p.input; return p.input; });
+ await ui.app.save();
+ assert.equal(saved.kind, 'massage'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, null);
+ ui.find('[data-kind="massage"]').click(); assert.equal(ui.find('#massage-duration').value, '');
+ await ui.app.save(); assert.equal(saved.duration_minutes, null);
+});
+
+test('Laufendes Stillen sperrt Massage wie andere zusätzliche Ereignisse', async t => {
+ const ui = await setup(t);
+ ui.find('#start-breast').click();
+ assert.equal(ui.find('[data-kind="massage"]').disabled, true);
+});
+
+test('Babygymnastik unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder und Speichern', async t => {
+ const ui = await setup(t);
+ assert.ok(ui.find('#extra-events [data-kind="gymnastics"]'));
+ assert.equal(ui.window.document.querySelector('.kind-picker [data-kind="gymnastics"]'), null);
+ ui.find('[data-kind="bottle"]').click(); ui.input('#amount', '65');
+ ui.find('[data-mood="calm"]').click();
+ ui.find('[data-kind="gymnastics"]').click();
+ assert.equal(ui.find('#gymnastics-duration').value, '');
+ assert.equal(ui.find('.duration-block').hidden, true);
+ for (const selector of ['#mood-options', '#amount', '#temperature', '#weight', '.side-picker', '.timer-box']) assert.equal(ui.window.document.querySelector(selector), null, selector);
+ ui.input('#gymnastics-duration', '5');
+ await ui.app.refresh();
+ assert.equal(ui.find('#gymnastics-duration').value, '5');
+ await ui.app.enterSession('test-user');
+ assert.equal(ui.find('#gymnastics-duration').value, '5');
+ ui.find('[data-kind="bottle"]').click(); assert.equal(ui.find('#duration').value, '15');
+ ui.find('[data-kind="gymnastics"]').click(); assert.equal(ui.find('#gymnastics-duration').value, '5');
+ let saved: any;
+ ui.setCreate(async p => { saved = p.input; return p.input; });
+ await ui.app.save();
+ assert.equal(saved.kind, 'gymnastics'); assert.equal(saved.duration_minutes, 5); assert.equal(saved.mood_after, null);
+ ui.find('[data-kind="gymnastics"]').click(); assert.equal(ui.find('#gymnastics-duration').value, '');
+ await ui.app.save(); assert.equal(saved.duration_minutes, null);
+});
+
+test('Laufendes Stillen sperrt Babygymnastik wie andere zusätzliche Ereignisse', async t => {
+ const ui = await setup(t);
+ ui.find('#start-breast').click();
+ assert.equal(ui.find('[data-kind="gymnastics"]').disabled, true);
+});
+
+
+test('Aktivitäten behalten jeweils ihre eigene Dauer beim Wechsel', async t => {
+ const ui = await setup(t);
+ for (const [kind, value] of [['sunbath', '3'], ['massage', '7'], ['gymnastics', '9']]) {
+  ui.find(`[data-kind="${kind}"]`).click();
+  assert.equal(ui.find(`#${kind}-duration`).value, '');
+  ui.input(`#${kind}-duration`, value);
+ }
+ for (const [kind, value] of [['sunbath', '3'], ['massage', '7'], ['gymnastics', '9']]) {
+  ui.find(`[data-kind="${kind}"]`).click();
+  assert.equal(ui.find(`#${kind}-duration`).value, value);
+ }
+});

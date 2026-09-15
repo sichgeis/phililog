@@ -1,26 +1,26 @@
 # Phililog
 
-Ein gemeinsames Logbuch für den Alltag mit Philine. Die Smartphone-Web-App erfasst Stillen, Fläschchen, Wickeln, Gewicht, Körpertemperatur und Sonnenbad.
+Ein gemeinsames Logbuch für den Alltag mit Philine. Die Smartphone-Web-App erfasst Stillen, Fläschchen, Wickeln, Gewicht, Körpertemperatur, Sonnenbad, Massage und Babygymnastik.
 
 [App öffnen](https://sichgeis.github.io/phililog/) · [Einrichtung und Betrieb](docs/setup.md) · [Spezifikationen](specs/README.md)
 
 ## Aktueller Stand
 
-Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Julia und Christian greifen auf dasselbe geschützte Logbuch zu. Sonnenbad und Migration 014 sind seit dem 15. September 2026 veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
+Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Julia und Christian greifen auf dasselbe geschützte Logbuch zu. Massage, Babygymnastik und Migration 015 sind seit dem 15. September 2026 veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
 
 ## Eintragen und nachschlagen
 
 - **Stillen:** Start/Ende per Klick oder Nachtrag; optionale Seite und Schätzung. Ein laufender Entwurf bleibt bis zum Speichern auf dem eigenen Gerät.
 - **Flasche:** Menge in 5-ml-Schritten, Milchart und Dauer.
 - **Wickeln:** Urin, Stuhl und erfolgreiches Abhalten unabhängig auswählen.
-- **Unter „Mehr“:** Wiegen in Gramm, Temperatur in °C und Sonnenbad mit optionaler Dauer. Leere Sonnenbad-Dauer oder 0 bedeutet unbekannt; es gibt keinen voreingestellten Wert.
+- **Unter „Mehr“:** Wiegen in Gramm, Temperatur in °C sowie Sonnenbad, Massage und Babygymnastik mit optionaler Dauer. Leere Dauer dieser Aktivitäten oder 0 bedeutet unbekannt; es gibt keinen voreingestellten Wert.
 - **Befinden danach:** Bei Stillen, Flasche und Wickeln optional Quengelig, Schläfrig, Ruhig, Aufmerksam, Zornig oder Eingeschlafen. Eine Auswahl ersetzt die vorherige; erneutes Tippen entfernt sie.
 
 Alle Ereignisse erscheinen im gemeinsamen Logbuch und lassen sich bearbeiten, löschen und als CSV exportieren. Neue Einträge werden dem angemeldeten Konto zugeordnet. Versionsprüfungen verhindern das Überschreiben neuerer Änderungen. Nach erfolgreichem Speichern erhält Julia Aquarellkonfetti, Christian Sterne und Regenbogen; reduzierte Bewegung wird berücksichtigt.
 
 ## Tagesbericht und Einstellungen
 
-Der Tagesbericht zeigt Kalenderwochen in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge und Wickelzahlen. Fehlende Schätzungen werden kenntlich gemacht. Wiegen, Temperatur und Sonnenbad verändern diese Summen nicht.
+Der Tagesbericht zeigt Kalenderwochen in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge und Wickelzahlen. Fehlende Schätzungen werden kenntlich gemacht. Wiegen, Temperatur, Sonnenbad, Massage und Babygymnastik verändern diese Summen nicht.
 
 Einstellungen sind im Footer erreichbar. Die Still-Schätzung wird getrennt für links und rechts festgelegt, anfangs jeweils 25 ml; „Beide“ addiert die Werte. Eigene Mengen und fehlende Schätzungen sind möglich. Neue Standards ändern gespeicherte Ereignisse oder begonnene Entwürfe nicht rückwirkend. „Aktuellen Standard verwenden“ übernimmt sie ausdrücklich.
 
