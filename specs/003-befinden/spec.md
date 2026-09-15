@@ -2,7 +2,7 @@
 
 ## Abstimmungsstand
 
-- Stand: Erweiterung abgeschlossen und veröffentlicht, [Betriebsdatum privat].
+- Stand: Erweiterungen abgeschlossen und veröffentlicht, zuletzt [Betriebsdatum privat].
 - Auftrag: Vier Optionen einschließlich Abwahl am [Betriebsdatum privat] bestätigt; Umsetzung und Veröffentlichung ausdrücklich beauftragt.
 
 ## Ziel und Umfang
