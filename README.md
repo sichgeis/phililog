@@ -6,7 +6,7 @@ Ein gemeinsames Logbuch für den Alltag mit Philine. Die Smartphone-Web-App erfa
 
 ## Aktueller Stand
 
-Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Julia und Christian greifen auf dasselbe geschützte Logbuch zu. Massage, Babygymnastik und Migration 015 sind seit dem 15. September 2026 veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
+Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Julia und Christian greifen auf dasselbe geschützte Logbuch zu. Massage, Babygymnastik und das optionale Befinden bei allen drei Aktivitäten einschließlich Sonnenbad sind seit dem 15. September 2026 mit Migration 016 veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
 
 ## Eintragen und nachschlagen
 

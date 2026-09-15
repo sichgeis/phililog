@@ -42,7 +42,7 @@ Grenzen: Keine physische Smartphone-Abnahme. Migration 013, Deployment und produ
 
 ## Erweiterung 15. September 2026 – Befinden bei Aktivitäten
 
-Stand: In Umsetzung. Umfang und Produktion ausdrücklich beauftragt.
+Stand: Abgeschlossen und veröffentlicht am 15. September 2026. Umfang und Produktion ausdrücklich beauftragt.
 
 - [x] Spezifikation und technischer Plan aktualisiert.
 - [x] Formular, Speicherung, Migration und Regressionstests erweitert.
@@ -51,6 +51,8 @@ Stand: In Umsetzung. Umfang und Produktion ausdrücklich beauftragt.
 - [x] `node scripts/test-restore.mjs`: alle 16 Migrationen auf leerer Datenbank und synthetischer Dump/Restore einschließlich Aktivitätsbefinden bestanden.
 - [x] Browser-Harness gegen lokale Supabase mit synthetischem Konto: Sonnenbad/Ruhig, Massage/Eingeschlafen, Babygymnastik/Aufmerksam über echte App-Handler gespeichert. Keine Feature-Mocks. CDP-Mausklick wirkungslos; DOM click/requestSubmit verwendet. 390×844 und 320×740 visuell geprüft, kein horizontaler Überlauf, Touch-Ziele mindestens 73 px. Screenshots `/private/tmp/phililog-activity-mood390.png` und `/private/tmp/phililog-activity-mood320.png`. Keine physische Smartphone-Abnahme.
 - [x] Migration 016 produktiv nach Schemaabgleich transaktional angewendet. Private Sicherung der Einträge/des vorherigen Constraints, exakter Bestandsvergleich und RLS-/Sicherungsschutz erfolgreich. Committed Schema separat bestätigt. Keine produktiven Testeinträge. SHA-256: `c625741254a30777aa7af802f55dc238d6a700b68f58032f5a8c93adf67f20a6`.
-- [ ] Produktive Migration, CI und Pages-Veröffentlichung verifizieren.
+- [x] Anwendungscommit `45113e783c63af87ab08acf48d24a3e4e328282d` auf main gepusht. [CI 35020303606](https://github.com/sichgeis/phililog/actions/runs/35020303606) vollständig erfolgreich, einschließlich frischer isolierter Datenbank und Restore.
+- [x] [Pages-Veröffentlichung 35020303159](https://github.com/sichgeis/phililog/actions/runs/35020303159) erfolgreich. Live-HTML und `index-BIqaq8fT.js` mit HTTP 200; veröffentlichter Speicherpfad schließt nur Wiegen/Temperatur vom Befinden aus. Produktionsprüfung ausschließlich lesend.
+- [x] Lokales Logbuch zeigt alle drei Testereignisse mit richtigem Befinden. Eigener Testtab und Entwicklungsserver geschlossen. README, Betriebsdokumentation und SDD aktualisiert; `git diff --check` erfolgreich.
 
-Nächster Schritt: Geprüften Stand committen, pushen und Pages-Veröffentlichung bestätigen.
+Keine offene Implementierungs- oder Veröffentlichungsaufgabe. Physische Smartphone-Abnahme bleibt separat in Feature 001.
