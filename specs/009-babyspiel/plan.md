@@ -100,3 +100,10 @@ Spaß und Lesbarkeit sind erst am spielbaren Ergebnis prüfbar. Die Anfangswerte
 - Migration `202609180017_baby_game.sql`: eigene Tabellen, konsistenter `game_snapshot` und atomarer `game_apply`. Abgelehnte Käufe werden ebenfalls als Ergebnis gespeichert; ein neuer Versuch nach weiterem Spielen bekommt eine neue Vorgangs-ID.
 - `tests/fixtures/game-v1.json`: bleibender synthetischer Altstand. Der Restore prüft die unveränderte Wiederholung der Installation und den späteren Abschluss eines offenen V1-Vorgangs. Zukünftige tatsächlich neue Formatversionen benötigen zusätzliche Migrationen und dieselben Fixtures; eine heute noch nicht existierende V2-Migration wird nicht als geprüft behauptet.
 - Die Browserprüfung nutzt ersatzweise isoliertes Headless-Chromium, da Browser-Harness an fehlender macOS-Bedienungshilfe-Freigabe scheiterte. Keine Spiel-API wurde im Browser gemockt.
+
+## Freigegebener Ausbau V2
+
+- Eigenes `pacifier.ts` für Zeitphasen, Eingaben und Punkte, Integration im bestehenden Spiel-Lebenszyklus. Die Uhr verwendet ausschließlich aktive `performance.now()`-Differenzen; Eingaben aktualisieren zuerst die Uhr. Keine zweite Spieleengine.
+- Migration 018 ergänzt `game_scores`, `game_snapshot_v2` und `game_apply_v2`. Die publizierte Migration 017 und ihre RPCs bleiben unverändert. V1-Käufe, Übungen, andere Spiele und offene V1-Abschlüsse verwenden weiter `game_apply`; nur neue Timingrunden verwenden `game_apply_v2`.
+- Beide Schreibpfade sperren dieselbe `game_state`-Zeile und benutzen dieselben global eindeutigen Vorgangsnachweise. V2 berechnet Ergebnisse aus zwölf Timingabweichungen, prüft Muster und Hilfen; Anti-Cheat-Nachweis menschlichen Spielens bleibt außerhalb des Umfangs.
+- Snapshot V2 ergänzt Rekorde, Formatversion bleibt additiv bei 1. Rückfall auf V1-Client bleibt möglich, ohne Datenbankrollback. Produktion: zuerst Migration, dann geprüfter Client. Keine produktiven Testdaten.

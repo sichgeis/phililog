@@ -6,7 +6,7 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 
 - Fortschritt: T-005–T-011 lokal umgesetzt und technisch geprüft. Drei Spiele, fünf Fähigkeiten, gemeinsamer versionierter Spielstand, mobile Oberfläche und entfernbarer Einstieg sind vorhanden. Seit dem 18. September 2026 produktiv veröffentlicht.
 - Blocker: Keine bekannten technischen Blocker. Echte Smartphone-/PWA-Abnahme und subjektive Spielspaßbewertung durch beide Nutzer stehen aus; Browseremulation ersetzt diese nicht.
-- Nächster Schritt: T-012 – gemeinsame Geräte- und Spielspaßabnahme der beschriebenen Version durchführen.
+- Nächster Schritt: Die veröffentlichte Schnuller-Herausforderung auf dem iPhone auf Spielspaß und Timinggefühl prüfen.
 
 ## Spezifikationsarbeit
 
@@ -80,3 +80,24 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 - [Publish GitHub Pages 35339436445](https://github.com/sichgeis/phililog/actions/runs/35339436445): Build und Deploy des Implementierungscommits erfolgreich.
 - Produktiv-Smoke-Test: `https://sichgeis.github.io/phililog/` HTTP 200; ausgelieferter Hauptchunk `index-B7ebfnrO.js` enthält den Footer-Einstieg, Spielchunk `game-B9ovh4Wa.js` enthält Fähigkeiten und Spiel-RPC. Anonymer `game_snapshot`-Aufruf wird mit HTTP 401 abgewiesen. Keine Anmeldung als Familienkonto und keine Produktionsrunde für die Freigabeprüfung.
 - Geräte-/Spielspaßabnahme bleibt bewusst offen: Nutzer testet nun auf seinem iPhone.
+
+
+## Erste Spielrückmeldung und Designreview (18. September 2026)
+
+- Nutzer bewertet die veröffentlichte Version als langweilig und nicht herausfordernd. Die Spielspaßabnahme ist damit nicht erfolgreich; technische Prüfnachweise bleiben gültig.
+- Beauftragt: Online-Recherche zu Spieldesign, Gameplay-Loops und Progression sowie ein angewandter Verbesserungsvorschlag. Keine Umsetzung neuer Regeln beauftragt.
+- [Designreview und Vorschlag V2](design-review-v2.md): Primärquellen, konkrete Diagnose der bestehenden Regeln, neue Mechanikvorschläge, Progression und Plan für eine vergleichende Spielprobe. Noch nicht abgestimmt; V1-Spezifikation bleibt Beschreibung des veröffentlichten Verhaltens.
+
+
+## Schnuller V2 – Umsetzung und Freigabeprüfung
+
+- Nutzer hat die empfohlene erste Stufe ausdrücklich zur Umsetzung und direkten Veröffentlichung freigegeben. Umfang: Schnuller mit zwölf Gelegenheiten, zwei Tempo-Mustern, Präzision, Serie, Medaillen, getrennten Rekorden und erhaltenem ruhigem Modus. Gespräch und Greifen bleiben V1.
+- V2-Zusatz in `spec.md` ist die verbindliche Konkretisierung; weitere Vorschläge aus dem Designreview bleiben offen.
+- Reine Regeln prüfen Treffergrenzen, Rettung, Erstversuch, Serienmultiplikator, Medaillen und XP. DOM prüft Countdown, endgültige Eingabe, 60 Sekunden simulierte Hintergrundpause, Fortsetzung und zwölf präzise Treffer sowie Wiederholung nach verloren gegangener Antwort.
+- Lokale Supabase-Prüfung erfolgreich: Punkte-/XP-Parität zwischen Client und Server für alle Hilfen, ungültige Payloads, Rechte und Mitgliedschaft, geteilte Rekorde, Idempotenz, wiederholte Migration, unbekannte Formatversion. Keine Tests gegen produktive Familiendaten.
+- Restore erfolgreich mit allen 18 Migrationen: zuerst befüllte historische V1-Fixture, dann tatsächliche Migration 018; jede alte Zeile und Zeitstempel unverändert. Danach vollständiger Dump/Restore einschließlich V2-Rekord und erneute Migration. Alte Vorgangsnachweise und offener V1-Abschluss weiterhin gültig.
+- Mobile Browserprüfung mit isoliertem Chromium, echten lokalen Auth-/Spiel-RPCs und synthetischem Konto, ohne API-Mocks: zwölf Touch-Treffer, Gold und 3.900 Punkte, gespeicherter Rekord nach Reload, Pause/Countdown, langsames/schnelles Muster. 320×568, 390×844 und 430×844 ohne horizontalen Überlauf; mindestens 48-Pixel-Tippfläche vollständig im Viewport.
+- Browser-Harness blieb wegen fehlender macOS-Bedienungshilfe-Freigabe nicht verfügbar; isolierter Browser gemäß UI-Prüfskill. Vier Screenshots (Anleitung, Countdown, Serie, Ergebnis) unter `/private/tmp/phililog-game-screenshots/v2-*.png` visuell geprüft. Echtes iPhone, 60-/120-Hz-Gefühl und Spaß bleiben die anschließende Nutzerabnahme.
+- Additive Migration 018 erhält V1-RPCs, alle XP, Fähigkeiten und Statistiken. Keine Reset- oder Umwertungsoperation. Client-Rollback auf V1 bleibt möglich.
+
+- Finale lokale Freigabe: `npm run check` erfolgreich (77 Tests, TypeScript, Produktionsbuild), `git diff --check` ohne Befund.

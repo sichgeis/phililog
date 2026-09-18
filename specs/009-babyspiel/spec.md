@@ -145,3 +145,26 @@ Wenn die Antwort negativ ausfällt, Mechanik oder Balancing gezielt überarbeite
 - 18. September 2026: Nutzerentscheidungen übernommen; Regeln, Wiederholbarkeit, gemeinsame Speicherung und Updatebeständigkeit ausgearbeitet. Nutzer hat abschließend ausdrücklich nur Spezifikation und Commit beauftragt.
 
 - 18. September 2026: Version 1 durch „Implementiere nun bitte wie besprochen“ zur Umsetzung freigegeben. Footer-Einstieg und konkrete Regeln übernommen.
+
+## Freigegebene Erweiterung V2: Schnuller-Herausforderung
+
+Am 18. September 2026 hat der Nutzer die empfohlene erste Stufe aus dem [Designreview](design-review-v2.md) zur Umsetzung und direkten Veröffentlichung freigegeben. Nur das Schnullerspiel wird überarbeitet; Gespräch, Greifen und Fähigkeitspreise bleiben erhalten. Diese Regeln ersetzen die Timingvariante aus V1.
+
+- Eine Runde umfasst zwölf Gelegenheiten ohne Weiter-Schaltflächen. Der Marker läuft jeweils einmal von links nach rechts. Ein deutlich angekündigtes gleichmäßiges Muster (2.200 ms Bewegung) oder ein abwechselnd langsames/schnelles Muster (2.400/1.600 ms) ist frei wählbar. Je Gelegenheit kommen 400 ms Vorbereitung und 600 ms Nachlauf hinzu: ca. 36–38 Sekunden pro Runde. Zu Beginn und nach Pause läuft ein Countdown von zwei Sekunden.
+- Ein Tipp pro Gelegenheit entscheidet endgültig. Eingaben während Vorbereitung/Nachlauf werden ignoriert. Ohne Tipp endet die Gelegenheit als verpasst. Ein zu früher/später Tipp kann nicht korrigiert werden. Feedback nennt früh, spät, verpasst, Treffer, präzise oder Rettung. Fehler kosten weder vorhandene Punkte noch XP.
+- Normale Treffer liegen einschließlich ±250 ms um die Mitte, präzise Treffer einschließlich ±90 ms. „Hände entdeckt“ erweitert nur normale Treffer auf ±375 ms. „Gezielt greifen“ rettet den ersten Fehler einmalig als normalen Treffer. Hilfen werden beim Rundenstart festgehalten; vorhandene Fähigkeiten und Preise bleiben gültig.
+- Normal 100 Punkte, präzise 200. Ab drei aufeinanderfolgenden Treffern gilt für den nächsten Treffer Faktor 1,5, ab sechs Faktor 2. Ein Fehler setzt die Serie zurück; eine Rettung zählt als normaler Treffer. Bronze ab acht Treffern, Silber ab zehn mit vier präzisen, Gold ab elf mit acht präzisen. Maximal erreichbar: 3.900 Punkte.
+- Abschluss: 10 XP + abgerundet `(Treffer + präzise Treffer) × 5 / 24`, maximal 15 XP. Die Auswertung nennt Punkte, Treffer, Präzision, längste Serie, Medaille, bisherigen Rekord und Abstand zur nächsten Medaille. Direkte Wiederholung möglich.
+- Rekorde gelten gemeinsam für die Familie, getrennt nach Regelversion 2, Muster und Hilfen. V1-Statistik bleibt als historischer Bestwert erhalten. Ohne-Timing-Modus bleibt ausdrücklich wählbar, mit fünf Aktionen, 10 XP und ohne V2-Rekord.
+- Pause, Logbuchwechsel und Hintergrund frieren die aktive Zeit ein. Fortsetzen erfordert einen Tipp und Countdown. Kein Ton erforderlich; große einhändige Tippfläche, keine Blinkeffekte. Reduzierte Bewegung entfernt dekorative Bewegung; die notwendige Timingbewegung bleibt in der bewusst gewählten Herausforderung. Ohne Timing ist die Alternative.
+- Neue Datenbankmigration additiv; XP, Guthaben, alle IDs, historische Statistik und Vorgangsnachweise bleiben erhalten. Auch alte offene Vorgänge werden weiterhin nach V1 verarbeitet.
+
+### Zusätzliche Abnahme
+
+AC-V2-01: Zwölf Gelegenheiten, endgültiger erster Tipp, automatische Fortsetzung, korrekte Grenzwerte, Serien und einmalige Rettung sind regelbasiert getestet.
+
+AC-V2-02: Pause/Hintergrund/Countdown verbrauchen keine Spielzeit. Übungsmodus, Wiederholung und gesicherte Übertragung bleiben bedienbar.
+
+AC-V2-03: Server berechnet Punkte und XP aus zwölf ganzzahligen Timingabweichungen (oder null bei keinem Tipp), prüft Hilfen, trennt Rekorde und verhindert Doppelvergabe. Tests prüfen fremde/anonyme Konten und konkurrierende Vorgänge.
+
+AC-V2-04: Historische V1-Fixture übersteht Migration, Wiederholung und Restore; alter offener Abschluss bleibt gültig. Tatsächlicher Spielspaß wird danach auf dem iPhone beurteilt.

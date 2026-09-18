@@ -155,7 +155,7 @@ node scripts/test-restore.mjs
 npm run check
 ```
 
-Das lokale Migrationsskript spricht ausschließlich `supabase_db_phililog` an und trägt 017 transaktional ein. Es wiederholt keine historischen Logbuchmigrationen. Bei einem frischen Aufbau enthält `start-test-supabase.mjs` die neue Migration automatisch.
+Das lokale Migrationsskript spricht ausschließlich `supabase_db_phililog` an und trägt fehlende Migrationen 017 und 018 jeweils transaktional ein. Es wiederholt keine historischen Logbuchmigrationen. Bei einem frischen Aufbau enthält `start-test-supabase.mjs` die neue Migration automatisch.
 
 Die Spieltests innerhalb `test-local-supabase.mjs` bewahren den bestehenden synthetischen Spielstand auf, testen mit einem leeren Zustand und stellen ihn anschließend wieder her. Während dieser Prüfung nicht parallel in der lokalen Vorschau spielen. Browser-Spielproben erzeugen hingegen normalen Fortschritt des lokalen Testkontos.
 
@@ -164,3 +164,10 @@ Migration 017 erhält bei einer Wiederholung vorhandene Spielzeilen; das ist ein
 Am 18.09.2026 auf ausdrücklichen Veröffentlichungsauftrag transaktional produktiv angewandt. Vorhandene Logbuchdaten, Einstellungen und Mitgliedschaften unverändert; Spiel-RLS und fehlende direkte Browser-Schreibrechte geprüft. Nur leeren initialen Spielstand angelegt, keine Produktionsrunde gespielt. Prüfsumme und privates Ausführungsprotokoll siehe Feature 009.
 
 Frontend am 18.09.2026 aus Commit `35f1f37` über [Publish GitHub Pages 35339436445](https://github.com/sichgeis/phililog/actions/runs/35339436445) veröffentlicht. App- und Datenbank-CI erfolgreich; öffentliche App und Spielchunk erreichbar, anonymer Spielstandzugriff gesperrt. Einstieg nach Anmeldung im Footer: „Kleine Schritte · Spiel“.
+
+
+## Schnuller-Herausforderung: Migration 018
+
+`202609180018_pacifier_challenge.sql` ergänzt ausschließlich `game_scores` und zwei V2-RPCs. Migration 017 und V1-RPCs bleiben unverändert. Ein V1-Client kann weiterhin lesen und schreiben; der neue Client überträgt Käufe, andere Spiele und ruhige Runden weiter nach V1. Neue Timingrunden und deren ausstehende Vorgänge verwenden `game_apply_v2`. Beide Pfade teilen Sperre und Vorgangs-IDs. Keine rückwirkende Umwertung oder Löschung.
+
+Vor Veröffentlichung: `npm run check`, lokale Supabase-Tests und Restore mit tatsächlich befüllter V1-Datenbank vor Installation 018. Danach zuerst 018 produktiv anwenden, dann Frontend veröffentlichen. Bei einem Client-Rollback bleiben V2-Rekorde gespeichert. `game_scores` ist Bestandteil des vollständigen Dumps und Restore-Nachweises.

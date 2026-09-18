@@ -28,7 +28,7 @@ Einstellungen sind im Footer erreichbar. Die Still-Schätzung wird getrennt für
 
 „Kleine Schritte“ ist ein getrenntes Spielmodul mit dezentem Einstieg im Footer. Schnuller-Moment und Babygespräch bringen gemeinsame XP; fünf Fähigkeiten erleichtern das Spiel und schalten ein Greifspiel frei. Alle Spiele bleiben wiederholbar. Bestätigte XP und Fähigkeiten liegen getrennt vom Logbuch in Supabase und sollen bei späteren Erweiterungen erhalten bleiben.
 
-Das Spiel ist seit dem 18. September 2026 einschließlich Migration 017 veröffentlicht. [Spielregeln und Umfang](specs/009-babyspiel/spec.md) · [Umsetzungs- und Prüfstand](specs/009-babyspiel/tasks.md). Die gemeinsame Spielprobe auf euren echten Smartphones steht noch aus.
+Die V1 ist seit dem 18. September 2026 veröffentlicht. Die Schnuller-Erweiterung (Migration 018) ergänzt zwölf zusammenhängende Timinggelegenheiten, zwei Tempi, Präzision, Serien und getrennte gemeinsame Rekorde. [Spielregeln und Umfang](specs/009-babyspiel/spec.md) · [Umsetzungs- und Prüfstand](specs/009-babyspiel/tasks.md). V1 wurde als zu langweilig bewertet; die erneute Spielspaßprobe erfolgt mit der Schnuller-Erweiterung.
 
 ## Entwicklung
 

@@ -21,7 +21,7 @@ try {
   // Supabase bootstrap grants on a fresh platform database.
   sql(source, 'grant usage on schema public to anon, authenticated, service_role;');
   sql(source, 'create schema supabase_migrations; create table supabase_migrations.schema_migrations(version text primary key, statements text[], name text);');
-  for (const file of migrations) {
+  for (const file of migrations.filter(file => !file.startsWith('202609180018'))) {
     const version = file.split('_')[0];
     sql(source, `begin; ${readFileSync(`supabase/migrations/${file}`, 'utf8')}\ninsert into supabase_migrations.schema_migrations(version,name) values ('${version}','${file}'); commit;`);
   }
@@ -68,15 +68,25 @@ try {
     insert into public.game_unlocks(skill_id,price) select skill_id,price from jsonb_to_recordset(${json(fixture.unlocks)}) as t(skill_id text,price integer);
     insert into public.game_stats(game_id,rounds,best_bonus) select game_id,rounds,best_bonus from jsonb_to_recordset(${json(fixture.stats)}) as t(game_id text,rounds bigint,best_bonus integer);
     insert into public.game_operations(id,actor_id,kind,rules_version,client_schema,payload,result) values('${fixture.receipt.id}','${julia}','round',1,1,${json(fixture.receipt.payload)},${json(fixture.receipt.result)});`);
-  const tables = ['public.game_state','public.game_unlocks','public.game_stats','public.game_operations','private.events_before_20260913_layout', 'private.settings_before_20260913_layout', 'private.members_before_20260913_layout', 'public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
+  const oldTables = ['game_state','game_unlocks','game_stats','game_operations'];
+  const historicalV1 = () => oldTables.map(table => sql(source, `select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from public.${table} t;`));
+  const beforeUpgrade = historicalV1();
+  sql(source, `begin; ${readFileSync('supabase/migrations/202609180018_pacifier_challenge.sql', 'utf8')}
+    insert into supabase_migrations.schema_migrations(version,name) values('202609180018','202609180018_pacifier_challenge.sql'); commit;`);
+  assert.deepEqual(historicalV1(), beforeUpgrade, 'Actual V1-to-V2 upgrade preserves historical rows and timestamps');
+  const tables = ['public.game_scores','public.game_state','public.game_unlocks','public.game_stats','public.game_operations','private.events_before_20260913_layout', 'private.settings_before_20260913_layout', 'private.members_before_20260913_layout', 'public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
   const snapshot = db => tables.map(table => sql(db, `select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from ${table} t;`));
+  const historical = snapshot(source);
+  sql(source, `begin; ${readFileSync('supabase/migrations/202609180018_pacifier_challenge.sql', 'utf8')} commit;`);
+  assert.deepEqual(snapshot(source), historical, 'V2 installation preserves the populated V1 fixture');
+  sql(source, `insert into public.game_scores(rules_version,tempo,assists,rounds,best_score) values(2,'steady',3,7,2800);`);
   const before = snapshot(source);
   // Consistent custom-format dump includes schema, grants, policies, triggers and all data.
   const dump = docker(['pg_dump', '-U', 'supabase_admin', '-d', source, '-Fc', '--schema=public', '--schema=private', '--schema=auth', '--schema=supabase_migrations']);
   sql(target, 'drop schema public;');
   docker(['pg_restore', '-U', 'supabase_admin', '-d', target, '--exit-on-error', '--single-transaction'], dump);
   assert.deepEqual(snapshot(target), before, 'All application, Auth, private backup and migration rows roundtrip exactly');
-  sql(target, `begin; ${readFileSync('supabase/migrations/202609180017_baby_game.sql', 'utf8')} commit;`);
+  sql(target, `begin; ${readFileSync('supabase/migrations/202609180018_pacifier_challenge.sql', 'utf8')} commit;`);
   assert.deepEqual(snapshot(target), before, 'Game installation repeated after restore preserves historical fixture');
   sql(target, `begin;
     set local role authenticated;
@@ -91,6 +101,8 @@ try {
       assert public.game_apply('${fixture.pending.id}','${julia}','round',${json(fixture.pending.payload)},1,1)->>'status' = 'saved';
       assert (public.game_snapshot()->>'xp_total')::integer = 215;
       assert (public.game_snapshot()->>'xp_balance')::integer = 35;
+      assert public.game_snapshot_v2()->>'rules_version' = '2';
+      assert public.game_snapshot_v2()->'scores'->0->>'best_score' = '2800';
       assert public.current_family_person() = 'Julia';
       assert (select count(*)=8 from public.feedings);
       assert public.feeding_create_known('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee');
