@@ -4,7 +4,7 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 
 ## Aktueller Stand
 
-- Fortschritt: T-005–T-011 lokal umgesetzt und technisch geprüft. Drei Spiele, fünf Fähigkeiten, gemeinsamer versionierter Spielstand, mobile Oberfläche und entfernbarer Einstieg sind vorhanden. Seit dem 18. September 2026 produktiv veröffentlicht.
+- Fortschritt: T-005–T-011 sowie die freigegebene Schnuller-V2-Erweiterung umgesetzt und technisch geprüft. Drei Spiele, fünf Fähigkeiten, gemeinsamer versionierter Spielstand, mobile Oberfläche und entfernbarer Einstieg sind vorhanden. Seit dem 18. September 2026 produktiv veröffentlicht.
 - Blocker: Keine bekannten technischen Blocker. Echte Smartphone-/PWA-Abnahme und subjektive Spielspaßbewertung durch beide Nutzer stehen aus; Browseremulation ersetzt diese nicht.
 - Nächster Schritt: Die veröffentlichte Schnuller-Herausforderung auf dem iPhone auf Spielspaß und Timinggefühl prüfen.
 
@@ -101,3 +101,17 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 - Additive Migration 018 erhält V1-RPCs, alle XP, Fähigkeiten und Statistiken. Keine Reset- oder Umwertungsoperation. Client-Rollback auf V1 bleibt möglich.
 
 - Finale lokale Freigabe: `npm run check` erfolgreich (77 Tests, TypeScript, Produktionsbuild), `git diff --check` ohne Befund.
+
+
+## Veröffentlichung Schnuller V2 am 18. September 2026
+
+- Implementierungscommit: `fcc571c6271c7e6b5ae603421757673ea1751b60`, nach `main` gepusht.
+- Migration 018 produktiv transaktional angewandt. Serverinterner vollständiger Vorher-/Nachher-Vergleich von Logbuch, Einstellungen, Mitgliedschaften und allen vier V1-Spieltabellen: unverändert. Keine produktiven Testspielrunden.
+- V1- und V2-RPCs vorhanden, V2-RLS aktiv, direkte Browser-Schreibrechte und anonymer Zugriff gesperrt.
+- SHA-256 der Migration: `ea2145f49bac9ccd542a0a70558e2ececc81af29b354ced1a102548e5ff86ea0`. Privates Protokoll: `.private/game-migration-018-release.json` (nicht im Git-Bestand).
+
+- [GitHub Check 35343341904](https://github.com/sichgeis/phililog/actions/runs/35343341904): App erfolgreich (77 Tests/Build), Datenbank-Neuaufbau, API-/RLS-Tests und Restore erfolgreich.
+
+- [Publish GitHub Pages 35343487380](https://github.com/sichgeis/phililog/actions/runs/35343487380): Build und Produktionsdeploy von `fcc571c` erfolgreich.
+- Öffentlicher Smoke-Test erfolgreich: HTTP 200, Hauptchunk `index-Cdk-Rabu.js`, Spielchunk `game-VUW4UVfg.js` mit V2-RPC, Tempowechsel und neuer Wertung ausgeliefert. Anonymer V2-Snapshot wird mit HTTP 401 abgewiesen. Keine Produktionsanmeldung oder Testspielrunde.
+- Veröffentlichte Adresse: https://sichgeis.github.io/phililog/ – nach Neuladen im Footer „Kleine Schritte · Spiel“, dann „Schnuller-Moment“.

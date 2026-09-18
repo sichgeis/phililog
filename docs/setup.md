@@ -115,6 +115,7 @@ Stand: 18. September 2026, einschließlich Babyspiel. Nur fehlende Migrationen a
 | 015 | Massage und Babygymnastik | Produktiv am 15.09.2026; [Feature 008](../specs/008-massage-babygymnastik/tasks.md) |
 | 016 | Befinden bei Aktivitäten | Produktiv am 15.09.2026; [Feature 003](../specs/003-befinden/tasks.md) |
 | 017 | Getrennter gemeinsamer Spielstand, Fähigkeiten, Statistik und Vorgangsnachweise | Produktiv am 18.09.2026; [Feature 009](../specs/009-babyspiel/tasks.md) |
+| 018 | Schnuller-Herausforderung, getrennte Rekorde und V2-RPCs bei erhaltenem V1-Bestand | Produktiv am 18.09.2026; [Feature 009](../specs/009-babyspiel/tasks.md) |
 
 Migration 014 erweitert ausschließlich Arten- und Detailconstraints; vorhandene Ereignisse, Spaltenrechte und RLS bleiben unverändert. Vor dem zugehörigen Frontend ausrollen. Interne Sicherungen vor Migrationen ersetzen keinen vollständigen externen Sicherungssatz; siehe [recovery.md](recovery.md).
 
@@ -171,3 +172,7 @@ Frontend am 18.09.2026 aus Commit `35f1f37` über [Publish GitHub Pages 35339436
 `202609180018_pacifier_challenge.sql` ergänzt ausschließlich `game_scores` und zwei V2-RPCs. Migration 017 und V1-RPCs bleiben unverändert. Ein V1-Client kann weiterhin lesen und schreiben; der neue Client überträgt Käufe, andere Spiele und ruhige Runden weiter nach V1. Neue Timingrunden und deren ausstehende Vorgänge verwenden `game_apply_v2`. Beide Pfade teilen Sperre und Vorgangs-IDs. Keine rückwirkende Umwertung oder Löschung.
 
 Vor Veröffentlichung: `npm run check`, lokale Supabase-Tests und Restore mit tatsächlich befüllter V1-Datenbank vor Installation 018. Danach zuerst 018 produktiv anwenden, dann Frontend veröffentlichen. Bei einem Client-Rollback bleiben V2-Rekorde gespeichert. `game_scores` ist Bestandteil des vollständigen Dumps und Restore-Nachweises.
+
+Migration 018 am 18.09.2026 auf ausdrücklichen Auftrag produktiv angewandt. Logbuch- und V1-Spielbestand serverintern unverändert verglichen, RLS und RPC-Rechte bestätigt. Protokoll und Prüfsumme stehen bei Feature 009.
+
+Frontend V2 aus `fcc571c` über [Publish GitHub Pages 35343487380](https://github.com/sichgeis/phililog/actions/runs/35343487380) veröffentlicht; öffentliche Assets geprüft, anonymer V2-Zugriff HTTP 401.
