@@ -4,7 +4,7 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 
 ## Aktueller Stand
 
-- Fortschritt: T-005–T-011 lokal umgesetzt und technisch geprüft. Drei Spiele, fünf Fähigkeiten, gemeinsamer versionierter Spielstand, mobile Oberfläche und entfernbarer Einstieg sind vorhanden. Noch nicht produktiv veröffentlicht.
+- Fortschritt: T-005–T-011 lokal umgesetzt und technisch geprüft. Drei Spiele, fünf Fähigkeiten, gemeinsamer versionierter Spielstand, mobile Oberfläche und entfernbarer Einstieg sind vorhanden. Seit dem [Betriebsdatum privat] produktiv veröffentlicht.
 - Blocker: Keine bekannten technischen Blocker. Echte Smartphone-/PWA-Abnahme und subjektive Spielspaßbewertung durch beide Nutzer stehen aus; Browseremulation ersetzt diese nicht.
 - Nächster Schritt: T-012 – gemeinsame Geräte- und Spielspaßabnahme der beschriebenen Version durchführen.
 
@@ -75,4 +75,8 @@ Bezüge: [Spezifikation](spec.md) · [Technischer Plan](plan.md)
 - Migration 017 produktiv über projektgebundene Management API transaktional angewandt. Vorher: Spieltabellen noch nicht vorhanden, Schema bis 016 bestätigt. Nachher: vier RLS-geschützte Spieltabellen, nur Mitglieder dürfen RPCs ausführen; direkte Browser-Schreibrechte fehlen.
 - Logbuchereignisse, Settings und Mitgliedschaften innerhalb der Transaktion exakt über serverinterne Prüfsummen verglichen: unverändert. Keine produktiven Testeinträge oder Spielrunden angelegt.
 - Migrationsdatei SHA-256: `c2932e41ae26c2bb895ea0ff98d9d9576624ec965c9e26f0fec2d9ecc8075af3`. Privates Ausführungsprotokoll außerhalb des Git-Bestands unter `.private/game-migration-017-release.json`.
-- Frontend-Veröffentlichung: wird nach Commit/Push über „Publish GitHub Pages“ ausgeführt; Nachweis folgt.
+- Implementierungscommit (historischer Commit) nach `main` gepusht; der vorherige Spezifikationscommit wurde ebenfalls übertragen.
+- GitHub Check 35339266454 (historischer Prüfnachweis): App sowie Datenbank-Neuaufbau, API-/RLS-Tests und Restore erfolgreich.
+- Publish GitHub Pages 35339436445 (historischer Prüfnachweis): Build und Deploy des Implementierungscommits erfolgreich.
+- Produktiv-Smoke-Test: `https://sichgeis.github.io/phililog/` HTTP 200; ausgelieferter Hauptchunk `index-B7ebfnrO.js` enthält den Footer-Einstieg, Spielchunk `game-B9ovh4Wa.js` enthält Fähigkeiten und Spiel-RPC. Anonymer `game_snapshot`-Aufruf wird mit HTTP 401 abgewiesen. Keine Anmeldung als Familienkonto und keine Produktionsrunde für die Freigabeprüfung.
+- Geräte-/Spielspaßabnahme bleibt bewusst offen: Nutzer testet nun auf seinem iPhone.
