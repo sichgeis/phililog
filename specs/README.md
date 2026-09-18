@@ -47,6 +47,7 @@ Die Übersicht trennt Implementierung von noch offener Geräteabnahme. Historisc
 | 006 | [Temperatur und persönliche Speichereffekte](006-temperatur-und-effekte/spec.md) | Abgeschlossen |
 | 007 | [Sonnenbad im Logbuch](007-sonnenbad/spec.md) | Abgeschlossen |
 | 008 | [Massage und Babygymnastik](008-massage-babygymnastik/spec.md) | Abgeschlossen |
+| 010 | [Nachtpost – Action-Adventure](010-nachtpost/spec.md) | In Umsetzung (Kampagnen- und Spielzeitabnahme offen) |
 | 009 | [Optionales Babyspiel – separate Spielspezifikation](009-babyspiel/spec.md) | In Umsetzung (veröffentlicht; Geräte-/Spielspaßabnahme offen) |
 
 Der nächste konkrete Schritt und der Fortschritt stehen in den [Aufgaben zu Feature 001](001-fuettern/tasks.md).

@@ -176,3 +176,10 @@ Vor Veröffentlichung: `npm run check`, lokale Supabase-Tests und Restore mit ta
 Migration 018 am 18.09.2026 auf ausdrücklichen Auftrag produktiv angewandt. Logbuch- und V1-Spielbestand serverintern unverändert verglichen, RLS und RPC-Rechte bestätigt. Protokoll und Prüfsumme stehen bei Feature 009.
 
 Frontend V2 aus `fcc571c` über [Publish GitHub Pages 35343487380](https://github.com/sichgeis/phililog/actions/runs/35343487380) veröffentlicht; öffentliche Assets geprüft, anonymer V2-Zugriff HTTP 401.
+
+
+## Nachtpost: Migration 019
+
+`202609180019_nachtpost.sql` ergänzt einen eigenen Abenteuerstand, private Speichernachweise und zwei Familien-RPCs. V1-/V2-Spieltabellen bleiben unverändert. Der lokale Migrationshelfer berücksichtigt 019; ein frischer Testaufbau lädt sie automatisch. Erst Datenbank, dann Client veröffentlichen. Ein Rückfall auf den alten Client erfordert keine Datenlöschung; der Abenteuerstand bleibt erhalten.
+
+Prüfung: `npm run check`, `node scripts/test-local-supabase.mjs` und `node scripts/test-restore.mjs`. Der Browser-Test nutzt ausschließlich die lokale Datenbank und erfundene Teststände. Ausgeführt wurden Mechanik-, Konflikt-, Touch- und Endprüfungen; Vierstunden- und Geräteabnahme bleiben ausdrücklich offen.

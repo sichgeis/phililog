@@ -24,11 +24,13 @@ Der Tagesbericht zeigt Kalenderwochen in deutscher Zeit: Flaschenmenge, geschät
 
 Einstellungen sind im Footer erreichbar. Die Still-Schätzung wird getrennt für links und rechts festgelegt, anfangs jeweils 25 ml; „Beide“ addiert die Werte. Eigene Mengen und fehlende Schätzungen sind möglich. Neue Standards ändern gespeicherte Ereignisse oder begonnene Entwürfe nicht rückwirkend. „Aktuellen Standard verwenden“ übernimmt sie ausdrücklich.
 
-## Optionales Babyspiel
+## Nachtpost und Spielstube
 
-„Kleine Schritte“ ist ein getrenntes Spielmodul mit dezentem Einstieg im Footer. Schnuller-Moment und Babygespräch bringen gemeinsame XP; fünf Fähigkeiten erleichtern das Spiel und schalten ein Greifspiel frei. Alle Spiele bleiben wiederholbar. Bestätigte XP und Fähigkeiten liegen getrennt vom Logbuch in Supabase und sollen bei späteren Erweiterungen erhalten bleiben.
+Das getrennte Spielmodul enthält jetzt **„Nachtpost – Das Amt für verlorene Morgen“**: ein eigenes Top-down-Abenteuer mit Postbotin Mara und Stern Pipp, sechs Regionen, Kämpfen, Werkzeugen, Rätseln, Fähigkeitenbaum, Briefen und zwei Schlussentscheidungen. Touchsteuerung, Tastatur, Pause, optionale Musik und ein gemeinsamer versionierter Supabase-Spielstand gehören dazu.
 
-Die V1 ist seit dem 18. September 2026 veröffentlicht. Die ebenfalls veröffentlichte Schnuller-Erweiterung (Migration 018) ergänzt zwölf zusammenhängende Timinggelegenheiten, zwei Tempi, Präzision, Serien und getrennte gemeinsame Rekorde. [Spielregeln und Umfang](specs/009-babyspiel/spec.md) · [Umsetzungs- und Prüfstand](specs/009-babyspiel/tasks.md). V1 wurde als zu langweilig bewertet; die erneute Spielspaßprobe erfolgt mit der Schnuller-Erweiterung.
+Die bisherigen Minispiele, XP, Fähigkeiten und Schnuller-Rekorde bleiben in der **Spielstube** erhalten. Beide Spiele sind vom Logbuch unabhängig und über dessen bisherigen Footer-Einstieg erreichbar.
+
+[Abenteuerumfang und Anforderungen](specs/010-nachtpost/spec.md) · [Prüfstand und offene Abnahme](specs/010-nachtpost/tasks.md) · [Bisherige Spielregeln](specs/009-babyspiel/spec.md). Die Kampagne ist ein spielbarer Kandidat; mindestens vier Stunden qualitativ guter Umfang und ein vollständiger menschlicher Erstspieltest sind noch nicht nachgewiesen.
 
 ## Entwicklung
 

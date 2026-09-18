@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { testAdventure } from './test-adventure-supabase.mjs';
 import { testGame } from './test-game-supabase.mjs';
 import { createClient } from '@supabase/supabase-js';
 const status = JSON.parse(execFileSync('npx', ['--yes', 'supabase@2.117.0', 'status', '-o', 'json'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }));
@@ -265,6 +266,7 @@ try {
   assert.ok((await julia.client.from('feedings').update({kind:'weight',amount_ml:null,duration_minutes:null,weight_g:3500,mood_after:'calm'}).eq('id',moodId)).error);
   assert.deepEqual((await outsider.client.from('feedings').update({mood_after:'calm'}).eq('id',moodId).select()).data,[]);
   await testGame({ julia, christian, outsider, anonymous });
+  await testAdventure({ julia, christian, outsider, anonymous });
   console.log('Lokale Supabase-Prüfungen bestanden: erlaubte/verbotene CRUD-Zugriffe, Selbstfreischaltung, Validierung, Duplikatschutz, Versionskonflikte, echte Wiederholung und Export über 505 Einträge.');
 } finally {
   for (let offset = 0; offset < ids.length; offset += 100) {

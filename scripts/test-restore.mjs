@@ -74,7 +74,11 @@ try {
   sql(source, `begin; ${readFileSync('supabase/migrations/202609180018_pacifier_challenge.sql', 'utf8')}
     insert into supabase_migrations.schema_migrations(version,name) values('202609180018','202609180018_pacifier_challenge.sql'); commit;`);
   assert.deepEqual(historicalV1(), beforeUpgrade, 'Actual V1-to-V2 upgrade preserves historical rows and timestamps');
-  const tables = ['public.game_scores','public.game_state','public.game_unlocks','public.game_stats','public.game_operations','private.events_before_20260913_layout', 'private.settings_before_20260913_layout', 'private.members_before_20260913_layout', 'public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
+  const adventureFixture=JSON.parse(readFileSync('tests/fixtures/adventure-v1.json','utf8'));
+  sql(source, `begin; update public.adventure_state set revision=${adventureFixture.revision-1},payload=${json(adventureFixture.payload)};
+    set local role authenticated; select set_config('request.jwt.claim.sub','${julia}',true);
+    select public.adventure_save('66666666-6666-4666-8666-666666666666','${julia}',4,${json(adventureFixture.payload)}); commit;`);
+  const tables = ['public.adventure_state','private.adventure_receipts','public.game_scores','public.game_state','public.game_unlocks','public.game_stats','public.game_operations','private.events_before_20260913_layout', 'private.settings_before_20260913_layout', 'private.members_before_20260913_layout', 'public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
   const snapshot = db => tables.map(table => sql(db, `select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from ${table} t;`));
   const historical = snapshot(source);
   sql(source, `begin; ${readFileSync('supabase/migrations/202609180018_pacifier_challenge.sql', 'utf8')} commit;`);
@@ -103,6 +107,12 @@ try {
       assert (public.game_snapshot()->>'xp_balance')::integer = 35;
       assert public.game_snapshot_v2()->>'rules_version' = '2';
       assert public.game_snapshot_v2()->'scores'->0->>'best_score' = '2800';
+      assert public.adventure_save('66666666-6666-4666-8666-666666666666','${julia}',4,${json(adventureFixture.payload)})->>'revision' = '5';
+      assert public.adventure_load()->'payload' = ${json(adventureFixture.payload)};
+      assert public.adventure_save('${adventureFixture.pending.id}','${julia}',5,${json(adventureFixture.pending.payload)})->>'revision' = '6';
+      assert public.adventure_save('${adventureFixture.pending.id}','${julia}',5,${json(adventureFixture.pending.payload)})->>'revision' = '6';
+      assert public.adventure_load()->>'revision' = '6';
+      assert public.adventure_load()->'payload'->>'sparks' = '18';
       assert public.current_family_person() = 'Julia';
       assert (select count(*)=8 from public.feedings);
       assert public.feeding_create_known('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee');

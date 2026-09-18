@@ -48,3 +48,10 @@ Der vollständige Sicherungssatz umfasst zusätzlich `public.game_state`, `publi
 `test-restore.mjs` vergleicht alle vier Tabellen nach dem Dump/Restore und einer erneuten verlustfreien Spielinstallation. Der historische synthetische V1-Stand enthält 203 Gesamt-XP, 23 verfügbares XP, fünf Fähigkeiten, Statistik und einen verarbeiteten Vorgang. Eine vorgemerkte V1-Runde wird nach Restore zweimal angefragt und genau einmal hinzugefügt. Fixtures bei zukünftigen Versionen ergänzen, nicht überschreiben.
 
 Nur lokal vorgemerkte, noch nicht bestätigte Vorgänge sind nicht in einer Datenbanksicherung enthalten. Sie verbleiben kontogebunden auf dem jeweiligen Gerät. Nach Wiederherstellung erst Identitäten und Spielversionen prüfen; keine Spieltabellen als vermeintliche Reparatur leeren.
+
+
+## Nachtpost ab Migration 019
+
+Zusätzlich sichern: `public.adventure_state` und `private.adventure_receipts`. Der Zustand enthält versioniertes Spiel-JSON und Revision; die privaten Nachweise enthalten UUID, Konto, Basisrevision, SHA-256 des Payloads und das bestätigte Ergebnis. Sie verhindern eine neue Anwendung nach Antwortverlust. Der Restore prüft `tests/fixtures/adventure-v1.json`, einen vorhandenen Nachweis und eine offene Speicherung genau einmal.
+
+Auf Geräten werden offene Aufträge kontogebunden aufbewahrt. Bei parallelen Geräten sperrt ein Revisionskonflikt das weitere Schreiben. Vor Übernahme des gemeinsamen Stands wird der lokale Konfliktstand separat archiviert; im Pausenmenü kann die letzte Konfliktsicherung exportiert werden. Die normalen lokalen Sicherungen ersetzen kein Datenbankbackup. Unbekannte Formatversionen niemals durch einen frischen Spielstand überschreiben.
