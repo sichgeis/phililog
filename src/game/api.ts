@@ -2,17 +2,17 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { RULES_VERSION, SCHEMA_VERSION, type GameId, type SkillId, type Snapshot } from './rules.ts';
 export interface Operation {
   id: string; account: string; rules_version: number; schema_version: number;
-  kind: 'round' | 'buy'; payload: { game?: GameId; completed?: number; bonus?: number; skill?: SkillId };
+  kind: 'round' | 'buy'; payload: { game?: GameId; completed?: number; bonus?: number; skill?: SkillId; tempo?: 'steady' | 'alternating'; assists?: number; offsets?: (number | null)[] };
 }
 export interface GameApi { load(): Promise<Snapshot>; submit(op: Operation): Promise<{ status: string; xp?: number }> }
 export function createApi(client: SupabaseClient): GameApi {
   return {
-    async load() { const { data, error } = await client.rpc('game_snapshot'); if (error) throw error; return data; },
+    async load() { const { data, error } = await client.rpc('game_snapshot_v2'); if (error) throw error; return data; },
     async submit(op) {
       // An auth change must not send a former user's local operation with a new token.
       const { data: { session } } = await client.auth.getSession();
       if (session?.user.id !== op.account) throw new Error('Bitte mit dem ursprünglichen Konto anmelden, um diese Runde zu speichern.');
-      const { data, error } = await client.rpc('game_apply', { operation_id: op.id, actor_id: op.account, operation_kind: op.kind, operation_payload: op.payload, rules: op.rules_version, client_schema: op.schema_version });
+      const { data, error } = await client.rpc(op.rules_version === 2 ? 'game_apply_v2' : 'game_apply', { operation_id: op.id, actor_id: op.account, operation_kind: op.kind, operation_payload: op.payload, rules: op.rules_version, client_schema: op.schema_version });
       if (error) throw error; return data;
     },
   };
@@ -31,8 +31,8 @@ export function readPending(storage: Pick<Storage, 'getItem'>, account: string):
 export function gameError(e: unknown) {
   const code = (e as { code?: string })?.code;
   if (code === '42501') return 'Kein Spielzugriff. Bitte Anmeldung und Freischaltung prüfen.';
-  if (code === 'PGRST202' || code === 'PGRST205') return 'Das Spiel ist in der Datenbank noch nicht eingerichtet. Migration 017 fehlt.';
+  if (code === 'PGRST202' || code === 'PGRST205') return 'Das Spiel ist in der Datenbank noch nicht eingerichtet. Migration 018 fehlt.';
   if (e instanceof Error && !/fetch|network|load failed/i.test(e.message)) return e.message;
   return 'Noch nicht gespeichert oder geladen. Bitte Verbindung prüfen und erneut versuchen.';
 }
-export function compatible(s: Snapshot) { return s.schema_version === SCHEMA_VERSION && s.rules_version === RULES_VERSION; }
+export function compatible(s: Snapshot) { return s.schema_version === SCHEMA_VERSION && [1, 2].includes(s.rules_version); }

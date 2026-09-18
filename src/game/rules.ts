@@ -17,6 +17,7 @@ export type SkillId = typeof skills[number]['id'];
 export interface Snapshot {
   schema_version: number; rules_version: number; revision: number;
   xp_total: number; xp_balance: number; unlocks: string[];
+  scores?: { tempo: 'steady' | 'alternating'; assists: number; rules_version: number; rounds: number; best_score: number }[];
   stats: { game_id: GameId; rounds: number; best_bonus: number }[];
 }
 export interface Round {

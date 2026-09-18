@@ -65,3 +65,32 @@
 .baby-game .game-error { background:#f7e7db; border:1px solid #dfbea6; color:#754b36; border-radius:14px; padding:12px; font-size:13px; line-height:1.6; }
 .baby-game .game-error button { border:0; background:transparent; color:inherit; text-decoration:underline; padding:8px; }
 @media(max-width:350px) { .baby-game .game-shell { padding-left:14px; padding-right:14px; } .baby-game .game-card { gap:8px; } .baby-game h1 { font-size:28px; } }
+
+.baby-game .game-modes { display: grid; gap: 8px; grid-template-columns: 1fr; margin: 20px 0; }
+.baby-game .game-modes button { min-height: 48px; border: 1px solid #a8b9af; background: #fffdf7; border-radius: 14px; color: #394d44; font: inherit; }
+.baby-game .game-modes button[aria-pressed="true"] { background: #395f50; color: white; }
+.baby-game .game-scorebar { display: flex; justify-content: space-between; gap: 8px; margin: 18px 0; font-variant-numeric: tabular-nums; }
+.baby-game .game-twelve { gap: 4px; }
+.baby-game .game-progress .missed { background: #c6a193; }
+.baby-game .game-perfect-zone { position: absolute; height: 100%; background: #537b67; border-radius: 8px; }
+.baby-game .game-tempo { text-align: center; font-size: .9rem; font-weight: 700; letter-spacing: .04em; }
+.baby-game .game-timing-button { min-height: 76px; width: 100%; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.baby-game .game-result-score { text-align: center; }
+.baby-game .game-result-score strong { font-size: 3rem; }
+.baby-game .game-result-score span { display: block; color: #5c6b48; font-weight: 700; }
+.baby-game .game-records { margin-top: 24px; }
+.baby-game .game-records p { padding: 12px 0; border-bottom: 1px solid #e2e6dc; font-size: .95rem; }
+.baby-game .game-records small { display: block; color: #62685e; }
+.baby-game.game-challenge .game-header { margin-bottom: 8px; }
+.baby-game.game-challenge .game-baby { height: clamp(70px, 20dvh, 150px); width: auto; }
+.baby-game.game-challenge .game-feedback { margin: 8px 0; min-height: 44px; }
+.baby-game.game-challenge .game-track { margin: 12px 8px; }
+.baby-game.game-challenge .game-tempo { margin: 8px 0; }
+.baby-game.game-challenge .game-note { margin-top: 12px; }
+@media(max-height:700px) {
+  .baby-game.game-challenge .game-shell { padding-top: 4px; }
+  .baby-game.game-challenge .game-scorebar { margin: 4px 0; }
+  .baby-game.game-challenge .game-progress { margin: 8px 0; }
+  .baby-game.game-challenge .game-baby { height: 60px; }
+  .baby-game.game-challenge .game-footer { display: none; }
+}
