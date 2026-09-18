@@ -36,3 +36,12 @@ Nächster Schritt: Einen vollständigen Erstspieltest auf dem iPhone mit Zeitmes
 
 - AC-006: Ein vollständiger menschlicher Erstspieltest, vier Stunden ohne Leerlauf/Grind und subjektiv ausgereifter Spielspaß. Der jetzige Stand ist ein spielbarer Kampagnenkandidat, kein nachgewiesen fertiges Vierstundenspiel.
 - Tatsächliche iPhone-/Safari-Leistung, Audiogefühl und Feinabstimmung der Touchkämpfe. Chromium-Emulation ersetzt diese nicht.
+
+## Veröffentlichung des Kampagnenkandidaten (18.09.2026)
+
+- Implementierungsstand `741139fae4d8c0905335ad2b021566e17f457403` auf `main` committed und gepusht, gemäß bestehender Autorisierung für direkte Veröffentlichungen.
+- [GitHub Check 35349487630](https://github.com/sichgeis/phililog/actions/runs/35349487630) erfolgreich: App einschließlich 89 Tests, frische lokale Datenbank mit allen Migrationen, API-Zugriffstests und vollständiger Restore.
+- Migration `202609180019_nachtpost.sql` produktiv additiv angewendet. SHA-256 `4d7ce5171881812c75ab317005ea30dcdaa2853c5986ab44365e22f793857298`. Transaktionaler serverinterner Vergleich bestätigt unveränderte Logbuch-, Familien- und bisherige Spieltabellen einschließlich V2-Rekorden. Keine produktiven Testspielstände angelegt.
+- [GitHub Pages 35349641208](https://github.com/sichgeis/phililog/actions/runs/35349641208) erfolgreich. Öffentlicher HTTP-Abruf bestätigt den Nachtpost-Code und die bestehende Spielstube in `game-DPJYOMvp.js`; anonymer `adventure_load` bleibt mit HTTP 401 gesperrt.
+- Nach letzter Bedienkorrektur nochmals echte lokale Browserprobe: Dialog bleibt über Pause → Fähigkeiten → Pause → Logbuch → Rückkehr erhalten. Bereits gedrehte Leitungen bleiben nach demselben Wechsel erhalten. Alle drei späteren Rätselvarianten erneut gelöst. Screenshots visuell kontrolliert; eigener Entwicklungsserver und isolierter Browser beendet, synthetischer lokaler Ausgangsstand wiederhergestellt.
+- Veröffentlichung bedeutet keine Abnahme von AC-006. Vollständiger ununterbrochener Erstspieltest, tatsächliche Mindestspielzeit und subjektive Qualität bleiben offen; nächster Schritt siehe oben.
