@@ -29,7 +29,7 @@ async function setup(t: any, options: { pending?: Operation; fail?: boolean; sch
   if (options.pending) window.localStorage.setItem(pendingKey('synthetic-user'), JSON.stringify(options.pending));
   if (options.storageFails) Object.defineProperty(window, 'localStorage', { value: { getItem: () => null, setItem: () => { throw new Error('Storage unavailable'); }, removeItem: () => {} }, configurable: true });
   Object.assign(window, { testApi: api });
-  const source = ['src/game/rules.ts', 'src/game/pacifier.ts', 'src/game/api.ts', 'src/game/index.ts'].map(path => stripTypeScriptTypes(readFileSync(path, 'utf8').replace(/^import .*;\n/gm, '').replace(/^export /gm, ''))).join('\n');
+  const source = ['src/game/rules.ts', 'src/game/pacifier.ts', 'src/game/api.ts', 'src/game/arcade.ts'].map(path => stripTypeScriptTypes(readFileSync(path, 'utf8').replace(/^import .*;\n/gm, '').replace(/^export /gm, ''))).join('\n');
   window.eval(source + '\nglobalThis.controller = mountGame({ container: document.querySelector("#game"), client: null, account: "synthetic-user", api: testApi, onExit() { controller.hide(); } });');
   const find = (selector: string) => { const el = window.document.querySelector(selector); assert.ok(el, selector); return el as any; };
   await tick();
