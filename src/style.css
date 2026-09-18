@@ -188,3 +188,6 @@ form:has(input:focus,select:focus) .save-bar{position:static}
 
 .entry-icon.massage{background:#fbe8ee;color:#a45673}
 .entry-icon.gymnastics{background:#e6f3ec;color:#38795a}
+
+/* Optional game entry; game presentation itself is loaded with its module. */
+.app-footer #open-game{min-height:48px;min-width:48px}

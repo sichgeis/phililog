@@ -32,3 +32,14 @@ Alle Arten nutzen Zeitpunkt, Person und gemeinsame CRUD-/Versions-/UUID-Logik. S
 Kein Service Worker speichert API-Antworten; keine vollständige Offline-Synchronisation. Ungespeicherte Stillzeiten sind nur auf dem eigenen Gerät verfügbar. Datenbankzugriffe benötigen Internet. CSV ist ein lesbarer Export, kein Backup.
 
 `npm run check` prüft Fachlogik, echte Formularhandler in Happy DOM (API kontrolliert ersetzt), TypeScript und Build. Die DOM-Tests prüfen Interaktionen, ersetzen aber keine reale Layoutprüfung. `test-local-supabase.mjs` prüft echte API/RLS/Constraints. `test-restore.mjs` prüft frische Migrationen und vollständigen synthetischen Restore in separaten lokalen Datenbanken. [Betrieb](setup.md), [Wiederherstellung](recovery.md), [Gestaltung](design.md).
+
+
+## Optionales Spielmodul „Kleine Schritte“
+
+Lokal umgesetzt, Veröffentlichung ausstehend: `src/game/` kapselt Spielregeln, RPC-Zugriffe, Darstellung und Styles. Der Footer lädt es dynamisch. `GAME_ENABLED` in `src/main.ts` schaltet den Einstieg ab. Das Logbuch bleibt im eigenen Container mit seinen Entwürfen erhalten; Spielanimationen verändern den Stilltimer nicht. Das Spiel verwendet bestehende Anmeldung und Familienzulassung, aber keine Ereignisdaten.
+
+Migration 017 ergänzt `game_state`, `game_unlocks`, `game_stats` und `game_operations`. `game_snapshot` liest einen konsistenten gemeinsamen Stand; `game_apply` verarbeitet Runde oder Kauf in einer Transaktion mit Zeilensperre und dauerhafter Vorgangs-ID. Direkte Browser-Schreibzugriffe auf die Tabellen sind gesperrt. Regelversion, Formatversion und Revision erfüllen unterschiedliche Aufgaben. Vollständige Client-Snapshots werden nie zurückgeschrieben.
+
+Abgeschlossene Runden und Käufe werden vor Versand unter `phililog-game:1:pending:<Konto-ID>` lokal vorgemerkt. Wiederholungen sind idempotent und bleiben an dasselbe Konto gebunden. Unvollständige Runden pausieren im Speicher; ein vollständiges Neuladen kann sie verwerfen. Ohne Verbindung beginnt keine neue belohnte Runde. Es gibt keine passive XP-Vergabe oder allgemeine Offline-Synchronisation.
+
+Ausbau: zunächst `GAME_ENABLED = false` setzen. Vollständig entfernen lassen sich anschließend die markierte Integration in `main.ts`, der Footer-Button und dessen einzelne CSS-Regel sowie `src/game/` und die zugehörigen Tests. Bereits veröffentlichte Migrationen bleiben historisch erhalten; Spieltabellen und Fortschritt werden nicht automatisch gelöscht. Eine Logbuchmigration hängt nicht vom Spiel ab.

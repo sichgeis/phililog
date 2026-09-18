@@ -1,0 +1,17 @@
+{
+  "description": "Erfundener bleibender Versions-1-Spielstand; bei neuen Versionen nicht überschreiben.",
+  "state": { "schema_version": 1, "revision": 19, "xp_total": 203, "xp_balance": 23 },
+  "unlocks": [
+    { "skill_id": "hands_discovered", "price": 20 },
+    { "skill_id": "targeted_grasp", "price": 40 },
+    { "skill_id": "self_pacifier", "price": 60 },
+    { "skill_id": "eye_contact", "price": 20 },
+    { "skill_id": "social_smile", "price": 40 }
+  ],
+  "stats": [
+    { "game_id": "pacifier", "rounds": 13, "best_bonus": 5 },
+    { "game_id": "grasp", "rounds": 1, "best_bonus": 3 }
+  ],
+  "receipt": { "id": "44444444-4444-4444-8444-444444444444", "payload": { "game": "grasp", "completed": 5, "bonus": 3 }, "result": { "status": "saved", "xp": 13 } },
+  "pending": { "id": "55555555-5555-4555-8555-555555555555", "account": "11111111-1111-4111-8111-111111111111", "kind": "round", "rules_version": 1, "schema_version": 1, "payload": { "game": "baby_talk", "completed": 5, "bonus": 2 } }
+}

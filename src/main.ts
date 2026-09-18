@@ -6,6 +6,34 @@ import { isActivity, hasDraftChanges, sameInput, moods, type Mood, type Person, 
 import { berlinDay, shiftDay, weekRange, reportTotal, milliliters, type Settings, type BreastDefaults, type DailyReport } from './report.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+// One integration switch; the logbook never imports game rules or game data.
+const GAME_ENABLED = true;
+let gameController: import('./game/index.ts').GameController | null = null;
+let gameContainer: HTMLDivElement | null = null;
+let gameOpening = false;
+async function openGame() {
+  if (!GAME_ENABLED || busy || gameOpening || !userId || !authorized) return;
+  captureForm(); remember();
+  if (gameController) { app.hidden = true; gameController.show(); window.scrollTo(0, 0); return; }
+  gameOpening = true;
+  const account = userId;
+  const ownEpoch = epoch;
+  try {
+    const { mountGame } = await import('./game/index.ts');
+    if (ownEpoch !== epoch || userId !== account) return;
+    gameContainer = document.createElement('div');
+    document.body.append(gameContainer);
+    gameController = mountGame({ container: gameContainer, client: supabase!, account, onExit: () => {
+      gameController?.hide(); app.hidden = false; render(); window.scrollTo(0, 0);
+    } });
+    app.hidden = true; window.scrollTo(0, 0);
+  } catch {
+    if (ownEpoch !== epoch || userId !== account) return;
+    gameController?.dispose(); gameController = null; gameContainer?.remove(); gameContainer = null;
+    app.hidden = false; error = 'Das Spiel konnte nicht geladen werden. Euer Logbuch ist weiter verfügbar.'; render();
+  } finally { gameOpening = false; }
+}
+
 const icons = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   book: '<path d="M4 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-2H4zM13 7a3 3 0 0 1 3-3h4v15h-3a4 4 0 0 0-4 2"/>',
@@ -110,6 +138,7 @@ function renderLogin() {
     } finally { busy = false; if (!userId) renderLogin(); }
   });
   bindLogout();
+  document.querySelector('#open-game')?.addEventListener('click', () => void openGame());
 }
 function entryValues(entry: Feeding): string {
   if (entry.kind === 'temperature') return `${entry.temperature_c?.toLocaleString('de-DE', { minimumFractionDigits: 1 })} °C`;
@@ -208,8 +237,9 @@ function aboutView(): string {
 function render() {
   if (!userId) return renderLogin();
   const restoreFormState = preserveFormState(app);
-  app.innerHTML = `<main class="app-main">${authorized ? `<div class="navigation-bar"><nav class="main-nav" aria-label="Hauptansichten"><button data-view="new" class="${view === 'new' ? 'active' : ''}" aria-current="${view === 'new' ? 'page' : 'false'}">${icon('plus')}Eintragen</button><button data-view="history" class="${view === 'history' ? 'active' : ''}" aria-current="${view === 'history' ? 'page' : 'false'}">${icon('book')}Logbuch</button><button data-view="report" class="${view === 'report' ? 'active' : ''}" aria-current="${view === 'report' ? 'page' : 'false'}">Tagesbericht</button></nav></div><div id="messages" aria-live="polite">${notice ? `<p class="message success">${icon('check')}${escape(notice)}</p>` : ''}${error ? `<p class="message error" role="alert">${escape(error)} <button id="refresh" class="text-button">Aktualisieren</button></p>` : ''}</div>${view === 'new' ? formView() : view === 'history' ? historyView() : view === 'report' ? reportView() : view === 'settings' ? settingsView() : aboutView()}` : `<section class="card access-card"><h1>${loading ? 'Euer Logbuch wird geöffnet …' : 'Zugang noch nicht freigeschaltet'}</h1><p>${escape(error || 'Dieses Konto muss für euer gemeinsames Logbuch freigeschaltet sein.')}</p><button id="refresh-access" class="secondary">Erneut prüfen</button></section>`}</main><footer class="app-footer"><span>phililog.</span>${authorized ? `<button class="text-button" data-view="about" aria-current="${view === 'about' ? 'page' : 'false'}">Über das Projekt</button><button class="text-button" data-view="settings">Einstellungen</button>` : ''}<button class="text-button logout" id="logout">Abmelden</button></footer>`;
+  app.innerHTML = `<main class="app-main">${authorized ? `<div class="navigation-bar"><nav class="main-nav" aria-label="Hauptansichten"><button data-view="new" class="${view === 'new' ? 'active' : ''}" aria-current="${view === 'new' ? 'page' : 'false'}">${icon('plus')}Eintragen</button><button data-view="history" class="${view === 'history' ? 'active' : ''}" aria-current="${view === 'history' ? 'page' : 'false'}">${icon('book')}Logbuch</button><button data-view="report" class="${view === 'report' ? 'active' : ''}" aria-current="${view === 'report' ? 'page' : 'false'}">Tagesbericht</button></nav></div><div id="messages" aria-live="polite">${notice ? `<p class="message success">${icon('check')}${escape(notice)}</p>` : ''}${error ? `<p class="message error" role="alert">${escape(error)} <button id="refresh" class="text-button">Aktualisieren</button></p>` : ''}</div>${view === 'new' ? formView() : view === 'history' ? historyView() : view === 'report' ? reportView() : view === 'settings' ? settingsView() : aboutView()}` : `<section class="card access-card"><h1>${loading ? 'Euer Logbuch wird geöffnet …' : 'Zugang noch nicht freigeschaltet'}</h1><p>${escape(error || 'Dieses Konto muss für euer gemeinsames Logbuch freigeschaltet sein.')}</p><button id="refresh-access" class="secondary">Erneut prüfen</button></section>`}</main><footer class="app-footer"><span>phililog.</span>${authorized ? `<button class="text-button" data-view="about" aria-current="${view === 'about' ? 'page' : 'false'}">Über das Projekt</button><button class="text-button" data-view="settings">Einstellungen</button>${GAME_ENABLED ? `<button class="text-button" id="open-game" ${busy ? 'disabled' : ''}>Kleine Schritte · Spiel</button>` : ''}` : ''}<button class="text-button logout" id="logout">Abmelden</button></footer>`;
   bindLogout();
+  document.querySelector('#open-game')?.addEventListener('click', () => void openGame());
   document.querySelector('#refresh-access')?.addEventListener('click', () => void enterSession(userId));
   document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view as typeof view)));
   document.querySelector('#refresh')?.addEventListener('click', () => void refresh());
@@ -419,6 +449,7 @@ async function refresh(more = false) {
 }
 async function enterSession(id: string | null) {
   if (id === userId && authorized) return;
+  gameController?.dispose(); gameController = null; gameContainer?.remove(); gameContainer = null; app.hidden = false;
   const previous = userId;
   const ownEpoch = ++epoch;
   if (previous && previous !== id) { try { localStorage.removeItem(storageKey()); } catch { /* no storage */ } }

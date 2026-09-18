@@ -39,3 +39,12 @@ PhiliLog-spezifische Abnahme:
 6. Alte Sicherung behalten, bis Daten und Zugriff auf beiden Geräten bestätigt sind. Bei Fehlern nicht weiter migrieren oder Quellbestand löschen, sondern das leere Ziel erneut aus der Sicherung aufbauen.
 
 Der Wechsel zu einem neuen verwalteten Projekt und die gerätespezifische Anmeldung bleiben eine gesonderte Betriebsabnahme.
+
+
+## Spielstand ab Migration 017
+
+Der vollständige Sicherungssatz umfasst zusätzlich `public.game_state`, `public.game_unlocks`, `public.game_stats` und `public.game_operations`. Die Vorgangsnachweise sind notwendig, damit die Wiederholung einer alten Speicherung keine doppelten XP vergibt. Ein Logbuch-CSV enthält keinen Spielstand.
+
+`test-restore.mjs` vergleicht alle vier Tabellen nach dem Dump/Restore und einer erneuten verlustfreien Spielinstallation. Der historische synthetische V1-Stand enthält 203 Gesamt-XP, 23 verfügbares XP, fünf Fähigkeiten, Statistik und einen verarbeiteten Vorgang. Eine vorgemerkte V1-Runde wird nach Restore zweimal angefragt und genau einmal hinzugefügt. Fixtures bei zukünftigen Versionen ergänzen, nicht überschreiben.
+
+Nur lokal vorgemerkte, noch nicht bestätigte Vorgänge sind nicht in einer Datenbanksicherung enthalten. Sie verbleiben kontogebunden auf dem jeweiligen Gerät. Nach Wiederherstellung erst Identitäten und Spielversionen prüfen; keine Spieltabellen als vermeintliche Reparatur leeren.
