@@ -7,7 +7,7 @@ import * as domain from '../src/domain.ts';
 import * as report from '../src/report.ts';
 
 // Execute the real entry point and handlers in a disposable DOM. Only the API is substituted.
-async function setup(t: any, person = 'Julia', reduced = false) {
+async function setup(t: any, person = 'Julia', reduced = false, gameLoader: () => Promise<any> = async () => { throw new Error('Game unavailable'); }) {
   const window = new Window({ url: 'http://localhost:5173' });
   t.after(() => window.happyDOM.close());
   window.document.body.innerHTML = '<div id="app"></div>';
@@ -16,7 +16,7 @@ async function setup(t: any, person = 'Julia', reduced = false) {
   const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
   Object.assign(window, domain, report, {
-    configured: true, currentFamilyPerson: async () => person,
+    loadGameForTest: gameLoader, configured: true, currentFamilyPerson: async () => person,
     matchMedia: () => ({ matches: reduced }),
     supabase: { rpc: async () => ({ data: true }), auth: { onAuthStateChange() {}, signOut: async () => ({}) } },
     getSettings: async () => ({ ...settings }),
@@ -31,8 +31,8 @@ async function setup(t: any, person = 'Julia', reduced = false) {
     createFeeding: (p: any) => create(p), updateFeeding: async () => entry,
   });
   const source = ['src/render-state.ts', 'src/main.ts'].map(path =>
-    stripTypeScriptTypes(readFileSync(path, 'utf8').replace(/^import .*;\n/gm, '').replace(/^export /gm, ''))).join('\n');
-  window.eval(source + '\nglobalThis.harness = { enterSession, refresh, storeSettings, save, switchView };');
+    stripTypeScriptTypes(readFileSync(path, 'utf8').replace("await import('./game/index.ts')", 'await globalThis.loadGameForTest()').replace(/^import .*;\n/gm, '').replace(/^export /gm, ''))).join('\n');
+  window.eval(source + '\nglobalThis.harness = { enterSession, refresh, storeSettings, save, switchView, openGame };');
   const app = (window as any).harness;
   await app.enterSession('test-user');
   const find = (selector: string) => { const el = window.document.querySelector(selector); assert.ok(el, selector); return el as any; };
@@ -345,4 +345,29 @@ for (const kind of ['sunbath', 'massage', 'gymnastics']) test(`${kind}: Befinden
   ui.find(`[data-kind="${kind}"]`).click();
   assert.equal(ui.window.document.querySelector('[data-mood][aria-pressed="true"]'), null);
  }
+});
+
+
+test('Spiel-Ladefehler erhält laufende Stillzeit und Eingaben; Footer ist ein separater Einstieg', async t => {
+  const ui = await setup(t);
+  ui.find('#start-breast').click();
+  const before = JSON.parse(ui.window.localStorage.getItem('phililog-draft:test-user')!).draft;
+  await ui.app.openGame();
+  assert.match(ui.find('#messages').textContent, /Spiel konnte nicht geladen/);
+  assert.ok(ui.find('#end-breast'));
+  const after = JSON.parse(ui.window.localStorage.getItem('phililog-draft:test-user')!).draft;
+  assert.equal(after.breastStart, before.breastStart); assert.equal(after.breastEnd, before.breastEnd); assert.equal(after.side, before.side);
+  assert.equal(after.estimate, before.estimate);
+  assert.equal(ui.find('#app').hidden, false);
+});
+
+test('Spielmodul isoliert Darstellung; Logbuchrefresh, Settings-Entwurf und Kontoabmeldung bleiben korrekt', async t => {
+  let config: any; let disposed = false;
+  const controller = { show() {}, hide() {}, dispose() { disposed = true; } };
+  const ui = await setup(t, 'Julia', false, async () => ({ mountGame(options: any) { config = options; options.container.textContent = 'Synthetic game mount'; return controller; } }));
+  ui.app.switchView('settings'); await ui.app.refresh(); ui.input('#breast-default-left', '45');
+  await ui.app.openGame(); assert.equal(ui.find('#app').hidden, true);
+  await ui.app.refresh(); assert.equal(config.container.textContent, 'Synthetic game mount');
+  config.onExit(); assert.equal(ui.find('#app').hidden, false); assert.equal(ui.find('#breast-default-left').value, '45');
+  await ui.app.enterSession(null); assert.equal(disposed, true); assert.equal(config.container.isConnected, false);
 });

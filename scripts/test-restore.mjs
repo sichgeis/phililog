@@ -62,7 +62,13 @@ try {
     create table private.members_before_20260913_layout as select * from private.members;
     revoke all on private.events_before_20260913_layout, private.settings_before_20260913_layout, private.members_before_20260913_layout from public, anon, authenticated;
   `);
-  const tables = ['private.events_before_20260913_layout', 'private.settings_before_20260913_layout', 'private.members_before_20260913_layout', 'public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
+  const fixture = JSON.parse(readFileSync('tests/fixtures/game-v1.json', 'utf8'));
+  const json = value => "'" + JSON.stringify(value).replaceAll("'", "''") + "'::jsonb";
+  sql(source, `update public.game_state set schema_version=${fixture.state.schema_version},revision=${fixture.state.revision},xp_total=${fixture.state.xp_total},xp_balance=${fixture.state.xp_balance};
+    insert into public.game_unlocks(skill_id,price) select skill_id,price from jsonb_to_recordset(${json(fixture.unlocks)}) as t(skill_id text,price integer);
+    insert into public.game_stats(game_id,rounds,best_bonus) select game_id,rounds,best_bonus from jsonb_to_recordset(${json(fixture.stats)}) as t(game_id text,rounds bigint,best_bonus integer);
+    insert into public.game_operations(id,actor_id,kind,rules_version,client_schema,payload,result) values('${fixture.receipt.id}','${julia}','round',1,1,${json(fixture.receipt.payload)},${json(fixture.receipt.result)});`);
+  const tables = ['public.game_state','public.game_unlocks','public.game_stats','public.game_operations','private.events_before_20260913_layout', 'private.settings_before_20260913_layout', 'private.members_before_20260913_layout', 'public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
   const snapshot = db => tables.map(table => sql(db, `select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from ${table} t;`));
   const before = snapshot(source);
   // Consistent custom-format dump includes schema, grants, policies, triggers and all data.
@@ -70,11 +76,21 @@ try {
   sql(target, 'drop schema public;');
   docker(['pg_restore', '-U', 'supabase_admin', '-d', target, '--exit-on-error', '--single-transaction'], dump);
   assert.deepEqual(snapshot(target), before, 'All application, Auth, private backup and migration rows roundtrip exactly');
+  sql(target, `begin; ${readFileSync('supabase/migrations/202609180017_baby_game.sql', 'utf8')} commit;`);
+  assert.deepEqual(snapshot(target), before, 'Game installation repeated after restore preserves historical fixture');
   sql(target, `begin;
     set local role authenticated;
     select set_config('request.jwt.claim.sub','${julia}',true);
     do $$ begin
       assert public.is_family_member();
+      assert (public.game_snapshot()->>'xp_total')::integer = 203;
+      assert (public.game_snapshot()->>'xp_balance')::integer = 23;
+      assert jsonb_array_length(public.game_snapshot()->'unlocks') = 5;
+      assert public.game_apply('${fixture.receipt.id}','${julia}','round',${json(fixture.receipt.payload)},1,1) = ${json(fixture.receipt.result)};
+      assert public.game_apply('${fixture.pending.id}','${julia}','round',${json(fixture.pending.payload)},1,1)->>'status' = 'saved';
+      assert public.game_apply('${fixture.pending.id}','${julia}','round',${json(fixture.pending.payload)},1,1)->>'status' = 'saved';
+      assert (public.game_snapshot()->>'xp_total')::integer = 215;
+      assert (public.game_snapshot()->>'xp_balance')::integer = 35;
       assert public.current_family_person() = 'Julia';
       assert (select count(*)=8 from public.feedings);
       assert public.feeding_create_known('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee');
@@ -98,7 +114,7 @@ try {
       assert not has_table_privilege('authenticated','private.events_before_20260913_correction','select');
  assert not has_table_privilege('anon','public.feedings','select'); end $$;
     rollback;`);
-  console.log(`Restore bestanden: alle ${migrations.length} Migrationen auf leerer Datenbank, vollständiger synthetischer Dump/Restore einschließlich Temperatur, Sonnenbad, Massage und Babygymnastik, identische Daten und Metadaten, RLS, Versionsschutz und gelöschte UUID.`);
+  console.log(`Restore bestanden: alle ${migrations.length} Migrationen auf leerer Datenbank, vollständiger synthetischer Dump/Restore einschließlich Temperatur, Sonnenbad, Massage und Babygymnastik, identische Daten und Metadaten, RLS, Versionsschutz und gelöschte UUID; Spielstand V1 mit Fähigkeiten, Statistik, altem Nachweis und vorgemerkter Runde erhalten.`);
 } finally {
   sql('postgres', `drop database if exists ${target} with (force); drop database if exists ${source} with (force);`);
 }

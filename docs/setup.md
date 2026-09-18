@@ -101,7 +101,7 @@ Die veröffentlichte Temperatur-Oberfläche verwendet Migration `202609140012_te
 
 ## Migrationsübersicht
 
-Stand: 15. September 2026, einschließlich Massage und Babygymnastik. Nur fehlende Migrationen ausführen; die manuelle SQL-Historie wird durch Schema und dokumentierte Prüfnachweise ergänzt.
+Stand: 18. September 2026, einschließlich Babyspiel. Nur fehlende Migrationen ausführen; die manuelle SQL-Historie wird durch Schema und dokumentierte Prüfnachweise ergänzt.
 
 | Migrationen | Inhalt | Produktiver Stand / Nachweis |
 | --- | --- | --- |
@@ -114,6 +114,7 @@ Stand: 15. September 2026, einschließlich Massage und Babygymnastik. Nur fehlen
 | 014 | Sonnenbad | Produktiv am 15.09.2026; [Feature 007](../specs/007-sonnenbad/tasks.md) |
 | 015 | Massage und Babygymnastik | Produktiv am 15.09.2026; [Feature 008](../specs/008-massage-babygymnastik/tasks.md) |
 | 016 | Befinden bei Aktivitäten | Produktiv am 15.09.2026; [Feature 003](../specs/003-befinden/tasks.md) |
+| 017 | Getrennter gemeinsamer Spielstand, Fähigkeiten, Statistik und Vorgangsnachweise | Produktiv am 18.09.2026; [Feature 009](../specs/009-babyspiel/tasks.md) |
 
 Migration 014 erweitert ausschließlich Arten- und Detailconstraints; vorhandene Ereignisse, Spaltenrechte und RLS bleiben unverändert. Vor dem zugehörigen Frontend ausrollen. Interne Sicherungen vor Migrationen ersetzen keinen vollständigen externen Sicherungssatz; siehe [recovery.md](recovery.md).
 
@@ -139,3 +140,25 @@ Migration 015 erweitert nur die Arten- und Detailconstraints. Am 15.09.2026 per 
 ## Befinden bei Aktivitäten
 
 Migration 016 erweitert ausschließlich den Befinden-Constraint um Sonnenbad, Massage und Babygymnastik. Am 15.09.2026 produktiv über die Management API angewendet, nach Schemaabgleich und mit transaktionaler Sicherung in `private.events_before_20260915_activity_moods` sowie `private.constraint_before_20260915_activity_moods`. Exakter Bestandsvergleich, RLS und fehlende Browserrechte auf die Sicherung bestätigt. Keine produktiven Testeinträge.
+
+
+## Babyspiel: Migration 017 (produktiv am 18. September 2026)
+
+Die lokale Umsetzung benötigt `202609180017_baby_game.sql`. Erst die Datenbankmigration anwenden, danach den passenden Client veröffentlichen; produktive Migration und Veröffentlichung benötigen einen eigenen Auftrag. Bei fehlender Migration bleibt das Logbuch verfügbar, während das Spiel eine Einrichtungsmeldung zeigt.
+
+Für die bereits eingerichtete lokale Testinstanz:
+
+```sh
+node scripts/apply-local-game-migration.mjs
+node scripts/test-local-supabase.mjs
+node scripts/test-restore.mjs
+npm run check
+```
+
+Das lokale Migrationsskript spricht ausschließlich `supabase_db_phililog` an und trägt 017 transaktional ein. Es wiederholt keine historischen Logbuchmigrationen. Bei einem frischen Aufbau enthält `start-test-supabase.mjs` die neue Migration automatisch.
+
+Die Spieltests innerhalb `test-local-supabase.mjs` bewahren den bestehenden synthetischen Spielstand auf, testen mit einem leeren Zustand und stellen ihn anschließend wieder her. Während dieser Prüfung nicht parallel in der lokalen Vorschau spielen. Browser-Spielproben erzeugen hingegen normalen Fortschritt des lokalen Testkontos.
+
+Migration 017 erhält bei einer Wiederholung vorhandene Spielzeilen; das ist ein ausdrücklicher Testfall, kein Ersatz für Migrationsverwaltung. Nach Veröffentlichung bleibt diese Migration unverändert. Jede spätere Formatänderung benötigt eine neue Migration und einen bestandenen Test mit `tests/fixtures/game-v1.json` sowie allen späteren historischen Fixtures. Neue Regelversionen müssen offene ältere Vorgänge weiterhin nach deren ursprünglichen Regeln verarbeiten können.
+
+Am 18.09.2026 auf ausdrücklichen Veröffentlichungsauftrag transaktional produktiv angewandt. Vorhandene Logbuchdaten, Einstellungen und Mitgliedschaften unverändert; Spiel-RLS und fehlende direkte Browser-Schreibrechte geprüft. Nur leeren initialen Spielstand angelegt, keine Produktionsrunde gespielt. Prüfsumme und privates Ausführungsprotokoll siehe Feature 009.

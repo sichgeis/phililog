@@ -2,9 +2,9 @@
 
 ## Abstimmungsstand
 
-- Stand: Abgestimmt im Grundumfang; für die Umsetzung ausgearbeitete Spezifikation, Version 1.
+- Stand: Abgestimmt, Version 1; seit 18. September 2026 in Umsetzung.
 - Auftraggeberentscheidung vom 18. September 2026: gemütlich und humorvoll, ein gemeinsames Baby, Start mit Schnuller und Babygespräch wie vorgeschlagen. Fortschritt muss über den Prototyp hinaus erhalten bleiben.
-- Auftrag: Spezifikation fertigstellen und committen. **Keine Implementierung, kein Push und keine Veröffentlichung in diesem Auftrag.**
+- Auftrag: Spezifikation fertigstellen und committen. Historischer Auftrag: keine Implementierung, kein Push und keine Veröffentlichung. Am 18. September 2026 anschließend ausdrücklich beauftragt: „Implementiere nun bitte wie besprochen.“ Damit ist Version 1 einschließlich Footer-Einstieg zur Umsetzung freigegeben; Push und Veröffentlichung bleiben separat.
 - Die konkreten Spielregeln, Zahlen und technischen Details unten sind Ausarbeitungen dieses Auftrags, keine bereits erprobten Spaß- oder Balancingwerte. Sie bilden die Ausgangsbasis für die spätere Umsetzung.
 - Das Paket beschreibt ausschließlich das optionale Spiel, getrennt von den Spezifikationen des Logbuchs.
 
@@ -34,7 +34,7 @@ Nicht enthalten: Füttern, Wickeln, Bauchlage, Krabbeln, Laufen, Sprechen, Pfleg
 
 Arbeitstitel: „Kleine Schritte“. Eine freundliche stilisierte Babyfigur mit wenigen klaren Ausdrücken: neugierig, konzentriert, zufrieden und lächelnd. Warme Farben, ruhige Animationen und kurze humorvolle Rückmeldungen wie „Schnuller erfolgreich wieder angedockt“. Keine Beschämung bei Fehlern, keine leidende Figur, kein Schreien. Die erste Version benötigt weder Ton noch Vibration.
 
-Der dezente Einstieg „Kleine Schritte · Spiel“ liegt im Footer neben den vorhandenen Zusatzansichten; kein neuer Hauptnavigationseintrag, kein automatisches Öffnen. Diese Platzierung interpretiert die diktierte Formulierung „Futter verstecken“ als „im Footer verstecken“; Rückfrage zur Bestätigung ist gestellt. Bis zur Antwort gilt sie als ausdrücklich dokumentierte Annahme.
+Der dezente Einstieg „Kleine Schritte · Spiel“ liegt im Footer neben den vorhandenen Zusatzansichten; kein neuer Hauptnavigationseintrag, kein automatisches Öffnen. Die zunächst dokumentierte Interpretation „im Footer verstecken“ ist Bestandteil der anschließend beauftragten Spezifikation.
 
 Die Spielübersicht zeigt Baby, verfügbares XP-Guthaben, Gesamt-XP, Spielkarten und den Zugang zu „Fähigkeiten“. Dort stehen beide Zweige mit Kosten, Voraussetzungen und einer Beschreibung des Effekts vor dem Kauf. Gesperrte Spiele erklären ihre Freischaltung. Ein ständig erreichbarer Rückweg „Zum Logbuch“ führt zur vorherigen Ansicht.
 
@@ -143,3 +143,5 @@ Wenn die Antwort negativ ausfällt, Mechanik oder Balancing gezielt überarbeite
 
 - 18. September 2026: Erste Idee und Vorschläge separat aufgenommen.
 - 18. September 2026: Nutzerentscheidungen übernommen; Regeln, Wiederholbarkeit, gemeinsame Speicherung und Updatebeständigkeit ausgearbeitet. Nutzer hat abschließend ausdrücklich nur Spezifikation und Commit beauftragt.
+
+- 18. September 2026: Version 1 durch „Implementiere nun bitte wie besprochen“ zur Umsetzung freigegeben. Footer-Einstieg und konkrete Regeln übernommen.

@@ -24,6 +24,12 @@ Der Tagesbericht zeigt Kalenderwochen in deutscher Zeit: Flaschenmenge, geschät
 
 Einstellungen sind im Footer erreichbar. Die Still-Schätzung wird getrennt für links und rechts festgelegt, anfangs jeweils 25 ml; „Beide“ addiert die Werte. Eigene Mengen und fehlende Schätzungen sind möglich. Neue Standards ändern gespeicherte Ereignisse oder begonnene Entwürfe nicht rückwirkend. „Aktuellen Standard verwenden“ übernimmt sie ausdrücklich.
 
+## Optionales Babyspiel (lokal umgesetzt)
+
+„Kleine Schritte“ ist ein getrenntes Spielmodul mit dezentem Einstieg im Footer. Schnuller-Moment und Babygespräch bringen gemeinsame XP; fünf Fähigkeiten erleichtern das Spiel und schalten ein Greifspiel frei. Alle Spiele bleiben wiederholbar. Bestätigte XP und Fähigkeiten liegen getrennt vom Logbuch in Supabase und sollen bei späteren Erweiterungen erhalten bleiben.
+
+Das Spiel ist noch nicht veröffentlicht. Es benötigt Migration 017 vor der passenden Frontend-Veröffentlichung. [Spielregeln und Umfang](specs/009-babyspiel/spec.md) · [Umsetzungs- und Prüfstand](specs/009-babyspiel/tasks.md). Die gemeinsame Spielprobe auf euren echten Smartphones steht noch aus.
+
 ## Entwicklung
 
 Wir beschreiben das gewünschte Verhalten vor der Implementierung und leiten daraus einen technischen Plan, Aufgaben und überprüfbare Akzeptanzkriterien ab.

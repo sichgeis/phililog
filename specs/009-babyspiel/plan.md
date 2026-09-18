@@ -4,7 +4,7 @@ Bezug: [Spezifikation](spec.md), Version 1 vom 18. September 2026.
 
 ## Status und Ausgangslage
 
-Implementierung vorbereitet, nicht begonnen und derzeit ausdrücklich nicht beauftragt. Bestehende Architektur: Vite, Vanilla TypeScript, CSS, Supabase Auth/PostgreSQL; `src/main.ts` verwaltet Ansichten und Entwürfe. Der Plan erweitert diese Struktur ohne neues Framework, Spielengine oder Dienst.
+Implementierung am 18. September 2026 ausdrücklich beauftragt und lokal umgesetzt; noch nicht veröffentlicht. Bestehende Architektur: Vite, Vanilla TypeScript, CSS, Supabase Auth/PostgreSQL; `src/main.ts` verwaltet Ansichten und Entwürfe. Der Plan erweitert diese Struktur ohne neues Framework, Spielengine oder Dienst.
 
 ## Modul und Integration
 
@@ -34,7 +34,7 @@ Ein Lese-RPC liefert einen konsistenten Snapshot aus Zustand, Freischaltungen un
 
 ## Schreiben, Wiederholung und Parallelität
 
-Zwei Schreib-RPCs: abgeschlossene Runde verbuchen und Fähigkeit kaufen. Beide prüfen die bestehende Familienzulassung, Auth-Identität, kompatible Versionen und typisierte Eingaben. Server entscheidet Belohnung und Preis anhand seines versionierten Katalogs; niemals einen vom Client gelieferten XP-Betrag oder Kontostand übernehmen.
+Ein Schreib-RPC `game_apply` mit zwei expliziten Vorgangsarten `round` und `buy`: abgeschlossene Runde verbuchen und Fähigkeit kaufen. Der gemeinsame Transaktionspfad hält Sperre, Versionsprüfung und Idempotenz an einer Stelle. Beide Vorgangsarten prüfen die bestehende Familienzulassung, Auth-Identität, kompatible Versionen und typisierte Eingaben. Server entscheidet Belohnung und Preis anhand seines versionierten Katalogs; niemals einen vom Client gelieferten XP-Betrag oder Kontostand übernehmen.
 
 Jeder Schreibvorgang läuft in einer Transaktion:
 
@@ -88,4 +88,15 @@ Pflichtprüfungen bei Umsetzung: `npm run check` und `node scripts/test-local-su
 
 ## Grenzen
 
-Spaß und Lesbarkeit sind erst am spielbaren Ergebnis prüfbar. Die Anfangswerte sind bewusst konkret, aber anpassbar. Noch keine Aussage über bestandene Spieltests, veröffentlichte Datenbankmigrationen oder auf echten Geräten bestätigte Bedienbarkeit.
+Spaß und Lesbarkeit sind erst am spielbaren Ergebnis prüfbar. Die Anfangswerte sind bewusst konkret, aber anpassbar. Tatsächliche lokale Prüfnachweise stehen in `tasks.md`. Produktive Veröffentlichung und bestätigte Bedienbarkeit auf echten Smartphones stehen noch aus.
+
+
+## Konkrete Umsetzung
+
+- `src/game/rules.ts`: versionierter Katalog und reine Rundentransitionen.
+- `src/game/api.ts`: RPC-Zugriff und kontogebundene Vorgänge.
+- `src/game/index.ts` und `style.css`: mobile Darstellung und eigener Lebenszyklus (`show`, `hide`, `pause`, `dispose`).
+- `src/main.ts`: `GAME_ENABLED`, dynamischer Import und separater Spielcontainer. Die bisherige Ansicht bleibt während des Spiels verborgen bestehen; bestehende Refreshes ersetzen ausschließlich deren DOM, nicht das Spiel.
+- Migration `202609180017_baby_game.sql`: eigene Tabellen, konsistenter `game_snapshot` und atomarer `game_apply`. Abgelehnte Käufe werden ebenfalls als Ergebnis gespeichert; ein neuer Versuch nach weiterem Spielen bekommt eine neue Vorgangs-ID.
+- `tests/fixtures/game-v1.json`: bleibender synthetischer Altstand. Der Restore prüft die unveränderte Wiederholung der Installation und den späteren Abschluss eines offenen V1-Vorgangs. Zukünftige tatsächlich neue Formatversionen benötigen zusätzliche Migrationen und dieselben Fixtures; eine heute noch nicht existierende V2-Migration wird nicht als geprüft behauptet.
+- Die Browserprüfung nutzt ersatzweise isoliertes Headless-Chromium, da Browser-Harness an fehlender macOS-Bedienungshilfe-Freigabe scheiterte. Keine Spiel-API wurde im Browser gemockt.
