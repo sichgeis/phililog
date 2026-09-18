@@ -36,7 +36,7 @@ Kein Service Worker speichert API-Antworten; keine vollständige Offline-Synchro
 
 ## Optionales Spielmodul „Kleine Schritte“
 
-Lokal umgesetzt, Veröffentlichung ausstehend: `src/game/` kapselt Spielregeln, RPC-Zugriffe, Darstellung und Styles. Der Footer lädt es dynamisch. `GAME_ENABLED` in `src/main.ts` schaltet den Einstieg ab. Das Logbuch bleibt im eigenen Container mit seinen Entwürfen erhalten; Spielanimationen verändern den Stilltimer nicht. Das Spiel verwendet bestehende Anmeldung und Familienzulassung, aber keine Ereignisdaten.
+Seit dem 18. September 2026 veröffentlicht: `src/game/` kapselt Spielregeln, RPC-Zugriffe, Darstellung und Styles. Der Footer lädt es dynamisch. `GAME_ENABLED` in `src/main.ts` schaltet den Einstieg ab. Das Logbuch bleibt im eigenen Container mit seinen Entwürfen erhalten; Spielanimationen verändern den Stilltimer nicht. Das Spiel verwendet bestehende Anmeldung und Familienzulassung, aber keine Ereignisdaten.
 
 Migration 017 ergänzt `game_state`, `game_unlocks`, `game_stats` und `game_operations`. `game_snapshot` liest einen konsistenten gemeinsamen Stand; `game_apply` verarbeitet Runde oder Kauf in einer Transaktion mit Zeilensperre und dauerhafter Vorgangs-ID. Direkte Browser-Schreibzugriffe auf die Tabellen sind gesperrt. Regelversion, Formatversion und Revision erfüllen unterschiedliche Aufgaben. Vollständige Client-Snapshots werden nie zurückgeschrieben.
 

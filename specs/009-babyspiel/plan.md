@@ -4,7 +4,7 @@ Bezug: [Spezifikation](spec.md), Version 1 vom 18. September 2026.
 
 ## Status und Ausgangslage
 
-Implementierung am 18. September 2026 ausdrücklich beauftragt und lokal umgesetzt; noch nicht veröffentlicht. Bestehende Architektur: Vite, Vanilla TypeScript, CSS, Supabase Auth/PostgreSQL; `src/main.ts` verwaltet Ansichten und Entwürfe. Der Plan erweitert diese Struktur ohne neues Framework, Spielengine oder Dienst.
+Implementierung am 18. September 2026 ausdrücklich beauftragt und umgesetzt und veröffentlicht. Bestehende Architektur: Vite, Vanilla TypeScript, CSS, Supabase Auth/PostgreSQL; `src/main.ts` verwaltet Ansichten und Entwürfe. Der Plan erweitert diese Struktur ohne neues Framework, Spielengine oder Dienst.
 
 ## Modul und Integration
 
@@ -88,7 +88,7 @@ Pflichtprüfungen bei Umsetzung: `npm run check` und `node scripts/test-local-su
 
 ## Grenzen
 
-Spaß und Lesbarkeit sind erst am spielbaren Ergebnis prüfbar. Die Anfangswerte sind bewusst konkret, aber anpassbar. Tatsächliche lokale Prüfnachweise stehen in `tasks.md`. Produktive Veröffentlichung und bestätigte Bedienbarkeit auf echten Smartphones stehen noch aus.
+Spaß und Lesbarkeit sind erst am spielbaren Ergebnis prüfbar. Die Anfangswerte sind bewusst konkret, aber anpassbar. Tatsächliche lokale Prüfnachweise stehen in `tasks.md`. Die produktive Veröffentlichung ist erfolgt; bestätigte Bedienbarkeit auf echten Smartphones steht noch aus.
 
 
 ## Konkrete Umsetzung
