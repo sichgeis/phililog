@@ -1,6 +1,6 @@
 # 011 – Logbuchfilter und Gewichtsvergleich
 
-Status: Abgeschlossen und veröffentlicht am 4. Oktober 2026. Abgestimmt durch ausdrücklichen Planungs-, Umsetzungs-, Migrations- und Veröffentlichungsauftrag vom 4. Oktober 2026. Der Auftrag erlaubt Commit, Push und Pages-Veröffentlichung.
+Status: Ursprünglicher Umfang veröffentlicht; Referenzumschaltung in Umsetzung. Die Erweiterung ist durch ausdrücklichen Umsetzungsauftrag vom 4. Oktober 2026 freigegeben. Abgestimmt durch ausdrücklichen Planungs-, Umsetzungs-, Migrations- und Veröffentlichungsauftrag vom 4. Oktober 2026. Der Auftrag erlaubt Commit, Push und Pages-Veröffentlichung.
 
 ## Anforderungen und Akzeptanzkriterien
 
@@ -15,4 +15,10 @@ Status: Abgeschlossen und veröffentlicht am 4. Oktober 2026. Abgestimmt durch a
 
 ## Referenzentscheidung
 
-[WHO Child Growth Standards – Weight-for-age](https://www.who.int/tools/child-growth-standards/standards/weight-for-age), Mädchen, taggenaue erweiterte Perzentiltabelle. Internationaler Standard ab Geburt; keine behauptete Niedersachsen-Stichprobe. [KiGGS](https://edoc.rki.de/handle/176904/3271?show=full) beginnt für diese Referenz bei drei Monaten und deckt den benötigten frühen Säuglingsbereich nicht vollständig ab. WHO verwendet eine altersabhängige schiefe Gewichtsverteilung; keine erfundene Normalverteilung. P50 ist der Median, kein arithmetischer Mittelwert. Hinweise auf nicht erfasste Körperlänge und Schwangerschaftsalter helfen bei der Interpretation.
+[WHO Child Growth Standards – Weight-for-age](https://www.who.int/tools/child-growth-standards/standards/weight-for-age), Mädchen, taggenaue erweiterte Perzentiltabelle. Internationaler Standard ab Geburt; keine behauptete Niedersachsen-Stichprobe. [KiGGS, zweite erweiterte Ausgabe](https://edoc.rki.de/bitstream/handle/176904/3254/28jWMa04ZjppM.pdf?sequence=) enthält ebenfalls Gewichtsreferenzen ab Geburt: Die ursprünglichen KiGGS-Messungen beginnen bei drei Monaten, ergänzt wurden deutsche Perinataldaten für die Geburt sowie interpolierte Werte für ein und zwei Monate. Die frühere pauschale Aussage, KiGGS decke diesen Bereich nicht ab, wurde beim Crosscheck am 04.10.2026 korrigiert. WHO bleibt der voreingestellte internationale Wachstumsstandard; KiGGS beschreibt eine andere, deutsche Referenzpopulation und ist eine mögliche zusätzliche Vergleichsbasis. WHO verwendet eine altersabhängige schiefe Gewichtsverteilung; keine erfundene Normalverteilung. P50 ist der Median, kein arithmetischer Mittelwert. Hinweise auf nicht erfasste Körperlänge und Schwangerschaftsalter helfen bei der Interpretation.
+
+## Erweiterung: wählbare Referenz
+
+- REQ-009 / AC-009: Direkt oberhalb der Gewichtskarten lassen sich „WHO · international“ und „KiGGS · Deutschland“ auswählen. WHO ist der Standard. Die Auswahl wird auf dem jeweiligen Gerät gemerkt, auch nach Neuladen; bei ungültigem oder gesperrtem Browserspeicher bleibt die Ansicht bedienbar. Keine Änderung der gemeinsamen Einstellungen oder Messwerte.
+- REQ-010 / AC-010: Der Wechsel aktualisiert alle geladenen Karten sofort, einschließlich Quellenname und zugänglicher Beschreibung, ohne neue Datenabfrage oder Verlust der Pagination und Eingabeentwürfe. Alter und Messwerte bleiben identisch.
+- REQ-011 / AC-011: KiGGS verwendet die veröffentlichten Mädchen-P10/P50/P90 der zweiten erweiterten RKI-Ausgabe (2013), gedruckte Seite 31, inklusive Perinataldaten. Zwischen den Altersstützpunkten werden die Perzentile linear interpoliert; ein Monat entspricht 365,25/12 Tagen. Die Schätzung und die bereits im RKI interpolierten Werte für ein und zwei Monate werden sichtbar erklärt. Beide Referenzen gelten in der App ausschließlich für Tag 0–1856; keine Mischung, Extrapolation oder behauptete Niedersachsen-Referenz.

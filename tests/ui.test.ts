@@ -8,15 +8,18 @@ import * as weight from '../src/weight.ts';
 import * as report from '../src/report.ts';
 
 // Execute the real entry point and handlers in a disposable DOM. Only the API is substituted.
-async function setup(t: any, person = 'Julia', reduced = false, gameLoader: () => Promise<any> = async () => { throw new Error('Game unavailable'); }) {
+async function setup(t: any, person = 'Julia', reduced = false, gameLoader: () => Promise<any> = async () => { throw new Error('Game unavailable'); }, initialReference: string | null = null) {
   const window = new Window({ url: 'http://localhost:5173' });
   t.after(() => window.happyDOM.close());
   window.document.body.innerHTML = '<div id="app"></div>';
+  if (initialReference) window.localStorage.setItem('phililog-weight-reference', initialReference);
   let settings = { breast_left_ml: 25, breast_right_ml: 25, birth_date: '2026-01-01', version: 1 };
   const submitted: number[] = [];
   const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
   Object.assign(window, domain, report, weight, {
+    readWeightReference: () => weight.readWeightReference(window.localStorage),
+    rememberWeightReference: (reference: weight.WeightReference) => weight.rememberWeightReference(reference, window.localStorage),
     loadGameForTest: gameLoader, configured: true, currentFamilyPerson: async () => person,
     matchMedia: () => ({ matches: reduced }),
     supabase: { rpc: async () => ({ data: true }), auth: { onAuthStateChange() {}, signOut: async () => ({}) } },
@@ -437,4 +440,44 @@ test('Geburtsdatum speichern aktualisiert gemeinsame Karten; fehlendes Datum zei
   (ui.window as any).listFeedings = async () => [];
   ui.app.switchView('weight'); await ui.app.refresh();
   assert.match(ui.find('.weight-explanation').textContent, /fehlt.*Geburtsdatum/);
+});
+
+
+test('Referenzwechsel aktualisiert Karten ohne Abfrage, erhält Pagination, Fokus und Entwurf', async t => {
+  const ui = await setup(t);
+  const sample = (id: string) => ({ ...domain.feedingInput({ ...domain.newDraft(), kind: 'weight', weight: '3900', timeMode: 'custom', localTime: '2026-01-01T12:00' }), id, version: 1 });
+  let calls = 0;
+  (ui.window as any).listFeedings = async (_limit: number, cursor: any) => { calls++; return cursor ? [sample('older')] : Array.from({ length: 30 }, (_, i) => sample(`w${i}`)); };
+  ui.find('[data-kind="bottle"]').click(); ui.input('#amount', '75');
+  ui.app.switchView('weight'); await ui.app.refresh(); await ui.app.refresh(true);
+  assert.equal(ui.window.document.querySelectorAll('.weight-card').length, 31);
+  assert.match(ui.find('.weight-relation').textContent, /Über P90/);
+  const before = calls;
+  ui.find('#weight-explanation').open = true;
+  const select = ui.find('#weight-reference'); select.focus(); select.value = 'kiggs';
+  select.dispatchEvent(new ui.window.Event('change', { bubbles: true }));
+  assert.equal(calls, before); assert.deepEqual(ui.submitted, []);
+  assert.equal(ui.window.document.querySelectorAll('.weight-card').length, 31);
+  assert.equal(ui.window.document.activeElement?.id, 'weight-reference');
+  assert.equal(ui.find('#weight-explanation').open, true);
+  assert.match(ui.find('.weight-relation').textContent, /Zwischen P10 und P90/);
+  assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /KiGGS/);
+  assert.match(ui.find('.weight-references').textContent, /2.840.*3.390.*3.930/);
+  assert.match(ui.find('.weight-card h2').textContent, /3.900 g/);
+  assert.match(ui.find('.weight-age').textContent, /0 Tage/);
+  assert.match(ui.find('#weight-explanation').textContent, /linear interpoliert.*ein und zwei Monate/);
+  assert.match(ui.find('#weight-explanation a').href, /edoc.rki.de/);
+  assert.equal(ui.window.localStorage.getItem('phililog-weight-reference'), 'kiggs');
+  ui.app.switchView('new'); assert.equal(ui.find('#amount').value, '75');
+  ui.app.switchView('weight'); await ui.app.refresh(); assert.equal(ui.find('#weight-reference').value, 'kiggs');
+  await ui.app.enterSession(null); assert.equal(ui.window.document.querySelector('.weight-card'), null);
+});
+
+test('Neue Ansicht lädt gemerkte Referenz und fällt bei ungültiger Präferenz auf WHO zurück', async t => {
+  for (const initial of ['kiggs', 'unknown']) {
+    const ui = await setup(t, 'Julia', false, undefined, initial);
+    (ui.window as any).listFeedings = async () => [];
+    ui.app.switchView('weight'); await ui.app.refresh();
+    assert.equal(ui.find('#weight-reference').value, initial === 'kiggs' ? 'kiggs' : 'who');
+  }
 });
