@@ -16,7 +16,7 @@ export function preserveFormState(root: HTMLElement): () => void {
   }
   const selection = active instanceof HTMLInputElement && active.selectionStart !== null
     ? [active.selectionStart, active.selectionEnd, active.selectionDirection ?? undefined] as const : null;
-  const details = [...root.querySelectorAll<HTMLDetailsElement>('form details[id]')].map(el => ({ id: el.id, open: el.open }));
+  const details = [...root.querySelectorAll<HTMLDetailsElement>('details[id]')].map(el => ({ id: el.id, open: el.open }));
   return () => {
     for (const state of details) {
       const next = root.querySelector<HTMLDetailsElement>(`#${CSS.escape(state.id)}`);

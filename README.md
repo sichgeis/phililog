@@ -6,7 +6,7 @@ Ein gemeinsames Logbuch für den Alltag mit Philine. Die Smartphone-Web-App erfa
 
 ## Aktueller Stand
 
-Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Julia und Christian greifen auf dasselbe geschützte Logbuch zu. Massage, Babygymnastik und das optionale Befinden bei allen drei Aktivitäten einschließlich Sonnenbad sind seit dem 15. September 2026 mit Migration 016 veröffentlicht. Seit dem 4. Oktober 2026 sind außerdem Logbuchfilter und die Gewichtsansicht mit WHO-Perzentilen veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
+Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Julia und Christian greifen auf dasselbe geschützte Logbuch zu. Massage, Babygymnastik und das optionale Befinden bei allen drei Aktivitäten einschließlich Sonnenbad sind seit dem 15. September 2026 mit Migration 016 veröffentlicht. Seit dem 4. Oktober 2026 sind außerdem Logbuchfilter und die Gewichtsansicht mit umschaltbaren WHO-/KiGGS-Perzentilen veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
 
 ## Eintragen und nachschlagen
 
@@ -16,7 +16,9 @@ Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Daten
 - **Unter „Mehr“:** Wiegen in Gramm, Temperatur in °C sowie Sonnenbad, Massage und Babygymnastik mit optionaler Dauer. Leere Dauer dieser Aktivitäten oder 0 bedeutet unbekannt; es gibt keinen voreingestellten Wert.
 - **Befinden danach:** Bei Stillen, Flasche, Wickeln, Sonnenbad, Massage und Babygymnastik optional Quengelig, Schläfrig, Ruhig, Aufmerksam, Zornig oder Eingeschlafen. Eine Auswahl ersetzt die vorherige; erneutes Tippen entfernt sie.
 
-Das Logbuch lässt sich nach jeder Ereignisart filtern, etwa ausschließlich nach Wiegen. Die eigene Ansicht **Gewicht** zeigt pro Messung eine Karte mit dem Alter am Messtag, dem Gewichtspunkt und WHO-Referenzen für Mädchen: P10, Median P50 und P90. Auch Werte außerhalb der Banden bleiben sichtbar. Das gemeinsame Geburtsdatum liegt geschützt in den Einstellungen; Alter und Vergleich werden für vorhandene Messungen automatisch berechnet.
+Das Logbuch lässt sich nach jeder Ereignisart filtern, etwa ausschließlich nach Wiegen. Die eigene Ansicht **Gewicht** zeigt pro Messung eine Karte mit dem Alter am Messtag, dem Gewichtspunkt und wahlweise WHO- oder KiGGS-Referenzen für Mädchen: P10, Median P50 und P90. Auch Werte außerhalb der Banden bleiben sichtbar. Das gemeinsame Geburtsdatum liegt geschützt in den Einstellungen; Alter und Vergleich werden für vorhandene Messungen automatisch berechnet.
+
+Der vollständige Gewichtsverlauf zeigt zusätzlich die Zunahme zwischen frei gewählten Messungen (Gramm und Gramm pro Tag) sowie die relative WHO-Position als z-Score. WHO-Zunahmeperzentilen erscheinen ausschließlich bei passenden veröffentlichten Altersintervallen. Ein optionales Geburtsgewicht in den Einstellungen ermöglicht zusätzlich passende Geburtsgewichtsgruppen in den ersten 60 Tagen. Eine optional beim Wiegen erfasste Körperlänge im Liegen ergänzt unter zwei Jahren den WHO-Vergleich Gewicht zur Länge. Das Alter richtet sich nach dem tatsächlichen Geburtstag; der errechnete Termin verändert es nicht.
 
 Alle Ereignisse erscheinen im gemeinsamen Logbuch und lassen sich bearbeiten, löschen und als CSV exportieren. Neue Einträge werden dem angemeldeten Konto zugeordnet. Versionsprüfungen verhindern das Überschreiben neuerer Änderungen. Nach erfolgreichem Speichern erhält Julia Aquarellkonfetti, Christian Sterne und Regenbogen; reduzierte Bewegung wird berücksichtigt.
 

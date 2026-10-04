@@ -39,8 +39,8 @@ try {
       ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','breast','2088-01-01Z','both',55,'${christian}');
     insert into public.feedings(id,kind,occurred_at,urine,stool,held_success,created_by) values
       ('cccccccc-cccc-4ccc-8ccc-cccccccccccc','diaper','2088-01-01Z',true,false,true,'${julia}');
-    insert into public.feedings(id,kind,occurred_at,weight_g,created_by) values
-      ('dddddddd-dddd-4ddd-8ddd-dddddddddddd','weight','2088-01-01Z',3500,'${christian}');
+    insert into public.feedings(id,kind,occurred_at,weight_g,length_cm,created_by) values
+      ('dddddddd-dddd-4ddd-8ddd-dddddddddddd','weight','2088-01-01Z',3500,52.5,'${christian}');
     insert into public.feedings(id,kind,occurred_at,amount_ml,created_by) values
       ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee','bottle','2088-01-01Z',60,'${julia}');
     delete from public.feedings where id='eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
@@ -51,7 +51,7 @@ try {
       ('88888888-8888-4888-8888-888888888888','massage','2088-01-01Z',7,'${julia}'),
       ('77777777-7777-4777-8777-777777777777','gymnastics','2088-01-01Z',null,'${christian}');
     update public.feedings set mood_after='asleep' where kind in ('breast', 'sunbath', 'massage', 'gymnastics');
-    update public.family_settings set breast_left_ml=20,breast_right_ml=35;
+    update public.family_settings set breast_left_ml=20,breast_right_ml=35,birth_date='2025-01-01',birth_weight_g=2800;
     insert into private.events_before_20260913_correction
       select id,kind,occurred_at,started_at,duration_minutes,amount_ml,side,created_by,created_at,updated_at,version,milk_type,urine,stool,held_success,weight_g,performed_by,estimated_ml
       from public.feedings where kind='bottle';

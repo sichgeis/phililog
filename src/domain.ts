@@ -27,6 +27,7 @@ export interface Draft {
   heldSuccess: boolean;
   temperature: string;
   weight: string;
+  length: string;
   amount: string;
   milkType: MilkType | '';
   side: '' | Side;
@@ -52,6 +53,7 @@ export interface FeedingInput {
   held_success?: boolean | null;
   temperature_c?: number | null;
   weight_g?: number | null;
+  length_cm?: number | null;
 }
 export interface Feeding extends FeedingInput {
   id: string;
@@ -64,7 +66,7 @@ export const PAGE_SIZE = 30;
 export function newDraft(defaults: BreastDefaults | number | null = null): Draft {
   const breastDefault = typeof defaults === 'number' ? { left: defaults, right: defaults } : defaults;
   return { mood: null, breastDefault, estimateMode: 'auto', estimate: '', kind: 'breast', bottleDuration: '15', breastDuration: '30', sunbathDuration: '', massageDuration: '', gymnasticsDuration: '', bottleUnknown: false,
-    breastUnknown: false, milkType: 'pre', urine: false, stool: false, heldSuccess: false, weight: '', temperature: '', amount: '', side: '', timeMode: 'now', localTime: '', exactTime: null, breastStart: null, breastEnd: null };
+    breastUnknown: false, milkType: 'pre', urine: false, stool: false, heldSuccess: false, weight: '', length: '', temperature: '', amount: '', side: '', timeMode: 'now', localTime: '', exactTime: null, breastStart: null, breastEnd: null };
 }
 export function localDateTime(value: string | Date): string {
   const date = new Date(value);
@@ -80,6 +82,7 @@ export function draftFromFeeding(entry: Feeding): Draft {
   draft.mood = entry.mood_after ?? null;
   draft.performedBy = entry.performed_by;
   draft.temperature = entry.temperature_c == null ? '' : String(entry.temperature_c);
+  draft.length = entry.length_cm == null ? '' : String(entry.length_cm);
   draft.weight = entry.weight_g == null ? '' : String(entry.weight_g);
   draft.urine = entry.urine ?? false;
   draft.stool = entry.stool ?? false;
@@ -116,6 +119,18 @@ export function temperatureC(value: string): number {
   }
   return Number(normalized);
 }
+export function optionalLength(value: string): number | null {
+  const normalized = value.trim().replace(',', '.');
+  if (!normalized) return null;
+  if (!/^\d{2,3}(\.\d)?$/.test(normalized) || Number(normalized) < 30 || Number(normalized) > 150) throw new Error('Körperlänge: Bitte 30,0 bis 150,0 cm mit höchstens einer Nachkommastelle eingeben.');
+  return Number(normalized);
+}
+export function optionalBirthWeight(value: string): number | null {
+  if (!value.trim()) return null;
+  const weight = positiveInteger(value, 'Geburtsgewicht');
+  if (weight < 300 || weight > 10000) throw new Error('Geburtsgewicht: Bitte 300 bis 10000 g eingeben.');
+  return weight;
+}
 export function feedingInput(draft: Draft, now = new Date()): FeedingInput {
   const bottle = draft.kind === 'bottle';
   const diaper = draft.kind === 'diaper';
@@ -135,7 +150,7 @@ export function feedingInput(draft: Draft, now = new Date()): FeedingInput {
   if (start && (!Number.isFinite(start.getTime()) || start > time)) throw new Error('Der Beginn muss vor dem Ende liegen.');
   return { mood_after: draft.kind === 'weight' || draft.kind === 'temperature' ? null : draft.mood, estimated_ml: estimatedMilk(draft), ...(draft.performedBy !== undefined ? { performed_by: draft.performedBy } : {}), kind: draft.kind, occurred_at: time.toISOString(), started_at: start?.toISOString() ?? null, duration_minutes: duration,
     amount_ml: amount, side: draft.kind === 'breast' ? draft.side || null : null, milk_type: bottle ? draft.milkType || null : null,
-    urine: diaper ? draft.urine : null, stool: diaper ? draft.stool : null, held_success: diaper ? draft.heldSuccess : null, temperature_c: draft.kind === 'temperature' ? temperatureC(draft.temperature) : null, weight_g: draft.kind === 'weight' ? positiveInteger(draft.weight, 'Gewicht') : null };
+    urine: diaper ? draft.urine : null, stool: diaper ? draft.stool : null, held_success: diaper ? draft.heldSuccess : null, temperature_c: draft.kind === 'temperature' ? temperatureC(draft.temperature) : null, weight_g: draft.kind === 'weight' ? positiveInteger(draft.weight, 'Gewicht') : null, length_cm: draft.kind === 'weight' ? optionalLength(draft.length ?? '') : null };
 }
 export function dayKey(iso: string): string { return localDateTime(iso).slice(0, 10); }
 export const sideLabel = (side: Side | null): string => side ? { left: 'Links', right: 'Rechts', both: 'Beide' }[side] : '';
@@ -143,13 +158,13 @@ export const kindLabel = (kind: FeedingKind): string => ({ bottle: 'Flasche', br
 export const milkLabel = (milk: MilkType | null | undefined): string => milk === 'pre' ? 'Pre-Nahrung' : milk === 'breast_milk' ? 'Muttermilch' : '';
 export function toCsv(entries: Feeding[]): string {
   const escape = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`;
-  const rows: unknown[][] = [['Ende (UTC)', 'Beginn (UTC)', 'Art', 'Dauer (Minuten)', 'Menge (ml)', 'Stillseite', 'Milchart', 'Urin', 'Stuhl', 'Abhalten erfolgreich', 'Gewicht (g)', 'Erledigt von', 'Stillmenge geschätzt (ml)', 'Befinden danach', 'Temperatur (°C)']];
-  for (const entry of entries) rows.push([entry.occurred_at, entry.started_at, kindLabel(entry.kind), entry.duration_minutes, entry.amount_ml, sideLabel(entry.side), milkLabel(entry.milk_type), entry.urine == null ? '' : entry.urine ? 'Ja' : 'Nein', entry.stool == null ? '' : entry.stool ? 'Ja' : 'Nein', entry.held_success == null ? '' : entry.held_success ? 'Ja' : 'Nein', entry.weight_g, entry.performed_by, entry.estimated_ml, entry.mood_after ? moods[entry.mood_after].label : '', entry.temperature_c == null ? '' : entry.temperature_c.toFixed(1).replace('.', ',')]);
+  const rows: unknown[][] = [['Ende (UTC)', 'Beginn (UTC)', 'Art', 'Dauer (Minuten)', 'Menge (ml)', 'Stillseite', 'Milchart', 'Urin', 'Stuhl', 'Abhalten erfolgreich', 'Gewicht (g)', 'Erledigt von', 'Stillmenge geschätzt (ml)', 'Befinden danach', 'Temperatur (°C)', 'Körperlänge liegend (cm)']];
+  for (const entry of entries) rows.push([entry.occurred_at, entry.started_at, kindLabel(entry.kind), entry.duration_minutes, entry.amount_ml, sideLabel(entry.side), milkLabel(entry.milk_type), entry.urine == null ? '' : entry.urine ? 'Ja' : 'Nein', entry.stool == null ? '' : entry.stool ? 'Ja' : 'Nein', entry.held_success == null ? '' : entry.held_success ? 'Ja' : 'Nein', entry.weight_g, entry.performed_by, entry.estimated_ml, entry.mood_after ? moods[entry.mood_after].label : '', entry.temperature_c == null ? '' : entry.temperature_c.toFixed(1).replace('.', ','), entry.length_cm == null ? '' : entry.length_cm.toFixed(1).replace('.', ',')]);
   return '\uFEFF' + rows.map(row => row.map(escape).join(';')).join('\r\n') + '\r\n';
 }
 export interface PendingCreate { id: string; input: FeedingInput }
 export function sameInput(a: FeedingInput, b: FeedingInput): boolean {
-  return (a.temperature_c ?? null) === (b.temperature_c ?? null) && (a.mood_after ?? null) === (b.mood_after ?? null) && (a.estimated_ml ?? null) === (b.estimated_ml ?? null) && (b.performed_by === undefined || (a.performed_by ?? null) === b.performed_by) && (a.started_at === b.started_at || (a.started_at !== null && b.started_at !== null && new Date(a.started_at).getTime() === new Date(b.started_at).getTime())) && a.kind === b.kind && new Date(a.occurred_at).getTime() === new Date(b.occurred_at).getTime()
+  return (a.length_cm ?? null) === (b.length_cm ?? null) && (a.temperature_c ?? null) === (b.temperature_c ?? null) && (a.mood_after ?? null) === (b.mood_after ?? null) && (a.estimated_ml ?? null) === (b.estimated_ml ?? null) && (b.performed_by === undefined || (a.performed_by ?? null) === b.performed_by) && (a.started_at === b.started_at || (a.started_at !== null && b.started_at !== null && new Date(a.started_at).getTime() === new Date(b.started_at).getTime())) && a.kind === b.kind && new Date(a.occurred_at).getTime() === new Date(b.occurred_at).getTime()
     && a.duration_minutes === b.duration_minutes && a.amount_ml === b.amount_ml && a.side === b.side && (a.milk_type ?? null) === (b.milk_type ?? null) && (a.urine ?? null) === (b.urine ?? null) && (a.stool ?? null) === (b.stool ?? null) && (a.held_success ?? null) === (b.held_success ?? null) && (a.weight_g ?? null) === (b.weight_g ?? null);
 }
 

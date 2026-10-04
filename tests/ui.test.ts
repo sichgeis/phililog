@@ -6,6 +6,8 @@ import { Window } from 'happy-dom';
 import * as domain from '../src/domain.ts';
 import * as weight from '../src/weight.ts';
 import * as report from '../src/report.ts';
+import * as growth from '../src/growth.ts';
+import * as growthView from '../src/growth-view.ts';
 
 // Execute the real entry point and handlers in a disposable DOM. Only the API is substituted.
 async function setup(t: any, person = 'Julia', reduced = false, gameLoader: () => Promise<any> = async () => { throw new Error('Game unavailable'); }, initialReference: string | null = null) {
@@ -13,23 +15,24 @@ async function setup(t: any, person = 'Julia', reduced = false, gameLoader: () =
   t.after(() => window.happyDOM.close());
   window.document.body.innerHTML = '<div id="app"></div>';
   if (initialReference) window.localStorage.setItem('phililog-weight-reference', initialReference);
-  let settings = { breast_left_ml: 25, breast_right_ml: 25, birth_date: '2026-01-01', version: 1 };
+  let settings = { breast_left_ml: 25, breast_right_ml: 25, birth_date: '2026-01-01', birth_weight_g: null as number | null, version: 1 };
   const submitted: number[] = [];
   const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
-  Object.assign(window, domain, report, weight, {
+  Object.assign(window, domain, report, weight, growth, growthView, {
     readWeightReference: () => weight.readWeightReference(window.localStorage),
     rememberWeightReference: (reference: weight.WeightReference) => weight.rememberWeightReference(reference, window.localStorage),
     loadGameForTest: gameLoader, configured: true, currentFamilyPerson: async () => person,
     matchMedia: () => ({ matches: reduced }),
     supabase: { rpc: async () => ({ data: true }), auth: { onAuthStateChange() {}, signOut: async () => ({}) } },
     getSettings: async () => ({ ...settings }),
-    saveSettings: async (values: any, version: number, birthDate: string | null) => {
+    saveSettings: async (values: any, version: number, birthDate: string | null, birthWeight: number | null) => {
       submitted.push(version);
       if (version !== settings.version) throw new Error('Die Einstellungen wurden inzwischen geändert.');
-      settings = { breast_left_ml: values.left, breast_right_ml: values.right, birth_date: birthDate!, version: version + 1 };
+      settings = { breast_left_ml: values.left, breast_right_ml: values.right, birth_date: birthDate!, birth_weight_g: birthWeight, version: version + 1 };
       return { ...settings };
     },
+    allFeedings: async () => (window as any).listFeedings(500, undefined, 'weight'),
     listFeedings: async () => [entry], latestEntry: async () => entry, latestMeal: async () => entry,
     getDailyReport: async () => [], friendlyError: (e: Error) => e.message,
     createFeeding: (p: any) => create(p), updateFeeding: async () => entry,
@@ -41,7 +44,7 @@ async function setup(t: any, person = 'Julia', reduced = false, gameLoader: () =
   await app.enterSession('test-user');
   const find = (selector: string) => { const el = window.document.querySelector(selector); assert.ok(el, selector); return el as any; };
   const input = (selector: string, value: string) => { const el = find(selector); el.value = value; el.dispatchEvent(new window.Event('input', { bubbles: true })); };
-  return { window, app, find, input, submitted, setSettings: (value: typeof settings) => { settings = value; }, setCreate: (fn: typeof create) => { create = fn; } };
+  return { window, app, find, input, submitted, setSettings: (value: Omit<typeof settings, 'birth_weight_g'> & {birth_weight_g?: number | null}) => { settings = { ...value, birth_weight_g: value.birth_weight_g ?? null }; }, setCreate: (fn: typeof create) => { create = fn; } };
 }
 
 test('Settings-Entwurf behält Version nach Refresh und verlangt ausdrückliche Übernahme', async t => {
@@ -480,4 +483,44 @@ test('Neue Ansicht lädt gemerkte Referenz und fällt bei ungültiger Präferenz
     ui.app.switchView('weight'); await ui.app.refresh();
     assert.equal(ui.find('#weight-reference').value, initial === 'kiggs' ? 'kiggs' : 'who');
   }
+});
+
+test('Vollständiger Verlauf ist unabhängig von Karten; Intervallwechsel erhält Fokus und macht keine Abfragen', async t => {
+ const ui=await setup(t);
+ const sample=(day:number)=>({...domain.feedingInput({...domain.newDraft(),kind:'weight',weight:String(3000+day*25),length:'52.5',timeMode:'custom',localTime:`2026-01-${String(day+1).padStart(2,'0')}T12:00`}),id:`g${day}`,version:1});
+ const rows=[sample(0),sample(7),sample(14),sample(28)]; let queries=0;
+ (ui.window as any).listFeedings=async()=>[rows[3]];
+ (ui.window as any).allFeedings=async()=>{queries++;return rows;};
+ ui.find('[data-kind="bottle"]').click();ui.input('#amount','75');
+ ui.app.switchView('weight');await ui.app.refresh();
+ assert.equal(ui.window.document.querySelectorAll('.weight-card').length,1);
+ assert.match(ui.find('.growth-overview').textContent,/4 geeignete Messungen/);
+ assert.equal(ui.find('#growth-start').value,'g14');assert.equal(ui.find('#growth-end').value,'g28');
+ assert.match(ui.find('.growth-summary').textContent,/\+350 g/);
+ const before=queries;const select=ui.find('#growth-start');select.focus();select.value='g7';select.dispatchEvent(new ui.window.Event('change',{bubbles:true}));
+ assert.equal(queries,before);assert.equal(ui.window.document.activeElement?.id,'growth-start');assert.match(ui.find('.growth-summary').textContent,/\+525 g/);
+ ui.find('#growth-values').open=true;ui.find('#weight-reference').value='kiggs';ui.find('#weight-reference').dispatchEvent(new ui.window.Event('change',{bubbles:true}));
+ assert.equal(ui.find('#growth-values').open,true);assert.match(ui.find('.growth-overview').textContent,/immer WHO-basiert/);
+ ui.find('#growth-end').value='g7';ui.find('#growth-end').dispatchEvent(new ui.window.Event('change',{bubbles:true}));assert.match(ui.find('.growth-overview').textContent,/zeitlich nach/);
+ ui.app.switchView('new');assert.equal(ui.find('#amount').value,'75');
+ await ui.app.enterSession(null);assert.equal(ui.window.document.querySelector('.growth-overview'),null);
+});
+test('Verlaufs-Ladefehler erhält Karten, zeigt keinen vermeintlich vollständigen alten Verlauf', async t=>{
+ const ui=await setup(t);(ui.window as any).allFeedings=async()=>{throw new Error('Verlauf offline');};
+ (ui.window as any).listFeedings=async()=>[{...domain.feedingInput({...domain.newDraft(),kind:'weight',weight:'3500',timeMode:'custom',localTime:'2026-01-08T12:00'}),id:'g1',version:1}];
+ ui.app.switchView('weight');await ui.app.refresh();assert.match(ui.find('.growth-panel').textContent,/Verlauf offline/);assert.ok(ui.find('.weight-card'));assert.equal(ui.window.document.querySelector('.growth-chart'),null);
+});
+test('Überholte private Verlaufshistorie erscheint nicht nach Logout', async t=>{
+ const ui=await setup(t);let resolve:(value:any)=>void;
+ (ui.window as any).allFeedings=async()=>new Promise(r=>{resolve=r;});
+ ui.app.switchView('weight');const refresh=ui.app.refresh();await new Promise(r=>setImmediate(r));await ui.app.enterSession(null);resolve!([]);await refresh;
+ assert.equal(ui.window.document.querySelector('.growth-panel'),null);
+});
+test('Geburtsgewicht und Länge bleiben bei Konflikt und Ereigniswechsel erhalten', async t=>{
+ const ui=await setup(t);ui.app.switchView('settings');await ui.app.refresh();ui.input('#birth-weight','2800');
+ ui.setSettings({breast_left_ml:25,breast_right_ml:25,birth_date:'2026-01-01',birth_weight_g:3000,version:2});await ui.app.refresh();await ui.app.storeSettings();
+ assert.equal(ui.find('#birth-weight').value,'2800');assert.match(ui.find('#messages').textContent,/inzwischen/);
+ ui.app.switchView('new');ui.find('[data-kind="weight"]').click();ui.input('#weight','3500');ui.input('#length','52,5');
+ ui.find('[data-kind="bottle"]').click();ui.find('[data-kind="weight"]').click();assert.equal(ui.find('#length').value,'52,5');
+ ui.input('#length','invalid');await ui.app.save();assert.match(ui.find('#messages').textContent,/Körperlänge/);
 });
