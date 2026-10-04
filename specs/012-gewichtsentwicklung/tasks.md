@@ -4,7 +4,7 @@
 - [x] WHO-Originaldaten reproduzierbar extrahieren und Fachlogik implementieren (AC-001–005).
 - [x] Profil, optionale Länge und Verlauf mit Intervallwahl implementieren (AC-001–007).
 - [x] Fach-/DOM-/lokale Supabase-/Restore- und mobile Browserprüfung durchführen (AC-001–008).
-- [ ] Produktive Migration, Commit/Push/CI und Veröffentlichung nachweisen (AC-008).
+- [x] Produktive Migration, Commit/Push/CI und Veröffentlichung nachweisen (AC-008).
 
 ## Prüfung am 04.10.2026
 
@@ -19,4 +19,12 @@
 
 Migration 021 am 04.10.2026 transaktional angewandt. SHA-256: `7af0c1752b3ac21f7b93537decb15c7fce6e86c70fd646e7656471f8ca8abbb6`. Geschützte interne Sicherung beider betroffener Tabellen, exakter Bestandsvergleich, unveränderte Policies/RLS und keine Browserrechte auf Sicherungen bestätigt. Receipt ausschließlich in `private.growth_rollout_receipt`; keine produktiven Testeinträge oder angenommenen Profilwerte.
 
-Nächster Schritt: Geprüften Client committen, pushen und mit erfolgreichen GitHub-Prüfungen veröffentlichen.
+## Veröffentlichung und Abschluss
+
+- Implementierungscommit: `ca9f8fe902c31e1a3a97c1f4eedbe4f2f80fc62d`, auf `main` gepusht.
+- [GitHub-Prüfung](https://github.com/sichgeis/phililog/actions/runs/37226531447): erfolgreich, einschließlich App, isolierter Datenbank und Restore.
+- [GitHub-Pages-Veröffentlichung](https://github.com/sichgeis/phililog/actions/runs/37226539972): erfolgreich für denselben Commit.
+- Produktions-HTML und tatsächliches Bundle `/phililog/assets/index-D-7zI_Ok.js`: HTTP 200; neue Verlauf-/Zunahmeansicht und beide neuen Felder enthalten. Anonyme REST-Zugriffe auf beide betroffenen Tabellen nach Migration weiterhin HTTP 401, ohne Familiendaten zu lesen.
+- Eigene temporäre Browsermessungen entfernt, vorheriges lokales Testprofil wiederhergestellt, Testtab geschlossen, Viewport zurückgesetzt und eigener Entwicklungsserver beendet.
+
+Alle AC-001–008 erfüllt; veröffentlicht am 04.10.2026. Grenzen: WHO-Zunahmevergleiche ausschließlich bei vorhandenen Tabellenintervallen; frühe Geburtsgewichtsgruppen benötigen das optionale tatsächliche Geburtsgewicht. Ohne konkrete Angabe bleibt dieses Feld leer. Smartphone-Viewportprüfung ersetzt keine physische PWA-/Geräteabnahme (separat Feature 001).

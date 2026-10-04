@@ -1,6 +1,6 @@
 # 012 – Gewichtsentwicklung
 
-Status: In Umsetzung. Abgestimmt durch ausdrücklichen Umsetzungs- und Produktionsveröffentlichungsauftrag vom 04.10.2026 für den im Gespräch vorgeschlagenen Verlauf, Zunahme, z-Score, passende WHO-Zunahmevergleiche und optionales Gewicht zur Länge. Commit, Push, Migration und Veröffentlichung sind autorisiert.
+Status: Abgeschlossen und veröffentlicht am 04.10.2026. Abgestimmt durch ausdrücklichen Umsetzungs- und Produktionsveröffentlichungsauftrag vom 04.10.2026 für den im Gespräch vorgeschlagenen Verlauf, Zunahme, z-Score, passende WHO-Zunahmevergleiche und optionales Gewicht zur Länge. Commit, Push, Migration und Veröffentlichung sind autorisiert.
 
 ## Anforderungen
 
