@@ -4,7 +4,7 @@
 - [x] WHO-Originaldaten reproduzierbar extrahieren und Fachlogik implementieren (AC-001–005).
 - [x] Profil, optionale Länge und Verlauf mit Intervallwahl implementieren (AC-001–007).
 - [x] Fach-/DOM-/lokale Supabase-/Restore- und mobile Browserprüfung durchführen (AC-001–008).
-- [ ] Produktive Migration, Commit/Push/CI und Veröffentlichung nachweisen (AC-008).
+- [x] Produktive Migration, Commit/Push/CI und Veröffentlichung nachweisen (AC-008).
 
 ## Prüfung am [Betriebsdatum privat]
 
@@ -19,4 +19,12 @@
 
 Migration 021 am [Betriebsdatum privat] transaktional angewandt. SHA-256: `7af0c1752b3ac21f7b93537decb15c7fce6e86c70fd646e7656471f8ca8abbb6`. Geschützte interne Sicherung beider betroffener Tabellen, exakter Bestandsvergleich, unveränderte Policies/RLS und keine Browserrechte auf Sicherungen bestätigt. Receipt ausschließlich in eine separat dokumentierte private Sicherung bzw. Ausführungsquittung; keine produktiven Testeinträge oder angenommenen Profilwerte.
 
-Nächster Schritt: Geprüften Client committen, pushen und mit erfolgreichen GitHub-Prüfungen veröffentlichen.
+## Veröffentlichung und Abschluss
+
+- Implementierungscommit: (historischer Commit), auf `main` gepusht.
+- GitHub-Prüfung (historischer Prüfnachweis): erfolgreich, einschließlich App, isolierter Datenbank und Restore.
+- GitHub-Pages-Veröffentlichung (historischer Prüfnachweis): erfolgreich für denselben Commit.
+- Produktions-HTML und tatsächliches Bundle `/phililog/assets/index-D-7zI_Ok.js`: HTTP 200; neue Verlauf-/Zunahmeansicht und beide neuen Felder enthalten. Anonyme REST-Zugriffe auf beide betroffenen Tabellen nach Migration weiterhin HTTP 401, ohne Familiendaten zu lesen.
+- Eigene temporäre Browsermessungen entfernt, vorheriges lokales Testprofil wiederhergestellt, Testtab geschlossen, Viewport zurückgesetzt und eigener Entwicklungsserver beendet.
+
+Alle AC-001–008 erfüllt; veröffentlicht am [Betriebsdatum privat]. Grenzen: WHO-Zunahmevergleiche ausschließlich bei vorhandenen Tabellenintervallen; frühe Geburtsgewichtsgruppen benötigen das optionale tatsächliche Geburtsgewicht. Ohne konkrete Angabe bleibt dieses Feld leer. Smartphone-Viewportprüfung ersetzt keine physische PWA-/Geräteabnahme (separat Feature 001).

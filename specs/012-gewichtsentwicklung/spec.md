@@ -1,6 +1,6 @@
 # 012 – Gewichtsentwicklung
 
-Status: In Umsetzung. Abgestimmt durch ausdrücklichen Umsetzungs- und Produktionsveröffentlichungsauftrag vom [Betriebsdatum privat] für den im Gespräch vorgeschlagenen Verlauf, Zunahme, z-Score, passende WHO-Zunahmevergleiche und optionales Gewicht zur Länge. Commit, Push, Migration und Veröffentlichung sind autorisiert.
+Status: Abgeschlossen und veröffentlicht am [Betriebsdatum privat]. Abgestimmt durch ausdrücklichen Umsetzungs- und Produktionsveröffentlichungsauftrag vom [Betriebsdatum privat] für den im Gespräch vorgeschlagenen Verlauf, Zunahme, z-Score, passende WHO-Zunahmevergleiche und optionales Gewicht zur Länge. Commit, Push, Migration und Veröffentlichung sind autorisiert.
 
 ## Anforderungen
 

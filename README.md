@@ -6,7 +6,7 @@ Ein gemeinsames Logbuch für den Alltag mit dem Kind. Die Smartphone-Web-App erf
 
 ## Aktueller Stand
 
-Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Person A und Person B greifen auf dasselbe geschützte Logbuch zu. Massage, Babygymnastik und das optionale Befinden bei allen drei Aktivitäten einschließlich Sonnenbad sind seit dem [Betriebsdatum privat] mit Migration 016 veröffentlicht. Seit dem [Betriebsdatum privat] sind außerdem Logbuchfilter und die Gewichtsansicht mit umschaltbaren WHO-/KiGGS-Perzentilen veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
+Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Datenhaltung. Zwei persönliche Konten für Person A und Person B greifen auf dasselbe geschützte Logbuch zu. Massage, Babygymnastik und das optionale Befinden bei allen drei Aktivitäten einschließlich Sonnenbad sind seit dem [Betriebsdatum privat] mit Migration 016 veröffentlicht. Seit dem [Betriebsdatum privat] sind außerdem Logbuchfilter und die Gewichtsansicht mit umschaltbaren WHO-/KiGGS-Perzentilen sowie Verlauf, Zunahme und WHO-z-Score veröffentlicht. Abgeschlossene Veröffentlichungen und tatsächliche Prüfnachweise stehen in den jeweiligen `tasks.md`.
 
 ## Eintragen und nachschlagen
 
