@@ -48,10 +48,12 @@ Auf ergänzenden Nutzerauftrag deutsche und niedersächsische Referenzen mit der
 
 - [x] Nutzerauftrag und Original-RKI-Tabelle in Spezifikation und Plan festhalten.
 - [x] Auswahl und KiGGS-Referenz implementieren und prüfen.
-- [ ] Autorisierten Rollout und Produktionsnachweis abschließen.
+- [x] Autorisierten Rollout und Produktionsnachweis abschließen.
 
 Nachweise AC-009–011: `npm run check` mit 100 erfolgreichen Tests, TypeScript und Produktionsbuild. Original-PDF gedruckte Seite 31 visuell geprüft; Extraktion reproduzierbar über `scripts/extract-kiggs-weight.py`, SHA-256 und Quelle in Referenzdatei. Stützwerte, Zwischenwerte, Bereich, abweichende Einordnung und Speicherausfälle geprüft. DOM: kein zusätzlicher API-Aufruf/Profil-Schreibvorgang beim Wechsel, 31 geladene Karten, Fokus, Erklärung, Entwurf und Quellenwechsel erhalten. Gemerkte sowie ungültige Präferenz beim Start geprüft.
 
 Echte lokale Browseransicht mit synthetischem Konto und drei eigenen erfundenen Messungen bei 320/390 × 844 ohne horizontalen Überlauf geprüft. KiGGS-Auswahl nach tatsächlichem Neuladen erhalten; abweichende Einordnung am Geburtstag sichtbar. Screenshot `/private/tmp/phililog-weight-screenshots/kiggs-390.jpg`. Eigene Messungen entfernt, vorheriges lokales Geburtsdatum wiederhergestellt, Testtab und eigener Server beendet. Keine Datenbank-/Zugriffsschutzänderungen; keine zusätzliche Migration notwendig. Physische Geräteabnahme bleibt offen wie bisher.
 
-Nächster Schritt: Geprüfte Version veröffentlichen und Produktion verifizieren.
+Feature-Commit `d69ab756875421de579c7af456b5aba120ba483d` gepusht. [Pages 37223515183](https://github.com/sichgeis/phililog/actions/runs/37223515183) erfolgreich; Produktionsseite und neues JavaScript HTTP 200, Referenzumschaltung, Gerätepräferenz und Interpolationshinweis im tatsächlich ausgelieferten Bundle bestätigt. [Check 37223514788](https://github.com/sichgeis/phililog/actions/runs/37223514788): vollständig erfolgreich einschließlich App-, lokaler Supabase- und Restore-Prüfung.
+
+Erweiterung vollständig abgeschlossen und veröffentlicht. Keine Migration erforderlich; physische Smartphone-Abnahme wurde nicht durchgeführt.
