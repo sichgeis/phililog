@@ -1,6 +1,6 @@
 # 011 – Logbuchfilter und Gewichtsvergleich
 
-Status: In Umsetzung. Abgestimmt durch ausdrücklichen Planungs-, Umsetzungs-, Migrations- und Veröffentlichungsauftrag vom [Betriebsdatum privat]. Der Auftrag erlaubt Commit, Push und Pages-Veröffentlichung.
+Status: Abgeschlossen und veröffentlicht am [Betriebsdatum privat]. Abgestimmt durch ausdrücklichen Planungs-, Umsetzungs-, Migrations- und Veröffentlichungsauftrag vom [Betriebsdatum privat]. Der Auftrag erlaubt Commit, Push und Pages-Veröffentlichung.
 
 ## Anforderungen und Akzeptanzkriterien
 
