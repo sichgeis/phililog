@@ -1,7 +1,39 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WHO_WEIGHT_GIRLS } from '../src/data/who-weight-girls.ts';
-import { ageInDays, ageLabel, validBirthDate, weightComparison } from '../src/weight.ts';
+import { KIGGS_WEIGHT_GIRLS } from '../src/data/kiggs-weight-girls.ts';
+import { ageInDays, ageLabel, validBirthDate, weightComparison, kiggsWeightAtAge, readWeightReference, rememberWeightReference } from '../src/weight.ts';
+
+test('KiGGS-Stützwerte, Zwischenwerte und Bereich; Quellen verändern die Einordnung', () => {
+  assert.equal(KIGGS_WEIGHT_GIRLS.length, 24);
+  assert.deepEqual(kiggsWeightAtAge(0), [2840, 3390, 3930]);
+  assert.deepEqual(kiggsWeightAtAge(2 * 30.4375), [4240, 5000, 5840]);
+  assert.deepEqual(kiggsWeightAtAge(12 * 30.4375), [8160, 9340, 10770]);
+  for (const [months, ...values] of KIGGS_WEIGHT_GIRLS) {
+    if (months * 30.4375 <= 1856) assert.deepEqual(kiggsWeightAtAge(months * 30.4375), values);
+  }
+  assert.deepEqual(kiggsWeightAtAge(0.5 * 30.4375), [3190, 3795, 4420]);
+  assert.ok(kiggsWeightAtAge(1856));
+  for (const age of [-1, 1857, NaN, Infinity]) assert.equal(kiggsWeightAtAge(age), null);
+  const who = weightComparison(3900, '2025-01-01T12:00:00Z', '2025-01-01');
+  const kiggs = weightComparison(3900, '2025-01-01T12:00:00Z', '2025-01-01', Date.now(), 'kiggs');
+  assert.equal(who.relation, 'Über P90'); assert.equal(kiggs.relation, 'Zwischen P10 und P90');
+  assert.equal(who.days, kiggs.days);
+  assert.match(weightComparison(3500, '2025-01-01Z', null, Date.now(), 'kiggs').reason!, /Geburtsdatum/);
+  assert.match(weightComparison(3500, '2024-12-31T12:00:00Z', '2025-01-01', Date.now(), 'kiggs').reason!, /vor dem/);
+  assert.match(weightComparison(3500, '2099-01-01T12:00:00Z', '2099-01-01', Date.now(), 'kiggs').reason!, /Zukunft/);
+  assert.match(weightComparison(18000, '2025-02-01T12:00:00Z', '2020-01-01', Date.now(), 'kiggs').reason!, /KiGGS/);
+});
+test('Gerätepräferenz validiert Werte und übersteht gesperrten Speicher', () => {
+  let value: string | null = null;
+  const storage = { getItem: () => value, setItem: (_key: string, next: string) => { value = next; } };
+  assert.equal(readWeightReference(storage), 'who');
+  rememberWeightReference('kiggs', storage); assert.equal(readWeightReference(storage), 'kiggs');
+  value = 'corrupt'; assert.equal(readWeightReference(storage), 'who');
+  const blocked = { getItem(): string | null { throw new Error('blocked'); }, setItem() { throw new Error('blocked'); } };
+  assert.equal(readWeightReference(blocked), 'who');
+  assert.doesNotThrow(() => rememberWeightReference('kiggs', blocked));
+});
 
 test('Alter folgt Berliner Kalendertagen einschließlich Tageswechsel und Sommerzeit', () => {
   assert.equal(ageInDays('2025-01-01', '2025-01-01T12:00:00Z'), 0);
