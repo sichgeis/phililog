@@ -1,8 +1,9 @@
 import './style.css';
 import { preserveFormState } from './render-state.ts';
-import { currentFamilyPerson, getSettings, saveSettings, getDailyReport, configured, supabase, listFeedings, allFeedings, latestMeal, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
-import { isActivity, hasDraftChanges, sameInput, moods, type Mood, type Person, estimatedMilk, newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, elapsedLabel, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type Feeding, type PendingCreate } from './domain.ts';
+import { currentFamilyPerson, getSettings, saveSettings, getDailyReport, configured, supabase, listFeedings, allFeedings, latestEntry, latestMeal, createFeeding, updateFeeding, deleteFeeding, friendlyError } from './api.ts';
+import { isActivity, hasDraftChanges, sameInput, moods, type Mood, type Person, estimatedMilk, newDraft, draftFromFeeding, feedingInput, localDateTime, dayKey, elapsedLabel, sideLabel, milkLabel, kindLabel, toCsv, PAGE_SIZE, type Draft, type FeedingKind, type Feeding, type PendingCreate } from './domain.ts';
 
+import { ageLabel, validBirthDate, weightComparison } from './weight.ts';
 import { berlinDay, shiftDay, weekRange, reportTotal, milliliters, type Settings, type BreastDefaults, type DailyReport } from './report.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -59,7 +60,7 @@ const localTimeLabel = (value: string) => {
 };
 const dateLabel = (iso: string) => new Date(iso).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
 let userId: string | null = null;
-let view: 'new' | 'history' | 'about' | 'report' | 'settings' = 'new';
+let view: 'new' | 'history' | 'about' | 'report' | 'settings' | 'weight' = 'new';
 let draft = newDraft();
 let edit: Feeding | null = null;
 let pending: PendingCreate | null = null;
@@ -67,6 +68,8 @@ let entries: Feeding[] = [];
 let latest: Feeding | null = null;
 let meal: Feeding | null = null;
 let hasMore = false;
+let historyKind: FeedingKind | '' = '';
+const eventKinds: FeedingKind[] = ['breast', 'bottle', 'diaper', 'weight', 'temperature', 'sunbath', 'massage', 'gymnastics'];
 let busy = false;
 let loading = false;
 let notice = '';
@@ -76,7 +79,7 @@ let epoch = 0;
 let refreshGeneration = 0;
 let loginEmail = '';
 let settings: Settings | null = null;
-let settingsDraft: { left: string; right: string; version: number } | null = null;
+let settingsDraft: { left: string; right: string; birthDate: string; version: number } | null = null;
 let reportWeek = berlinDay();
 let signedInPerson: Person | null = null;
 let reportRows: DailyReport[] | null = null;
@@ -184,7 +187,7 @@ function estimateLabel(): string {
   try { const value = estimatedMilk(draft); return value === null ? 'ohne Schätzung' : `ca. ${value} ml`; } catch { return 'Bitte Menge prüfen'; }
 }
 function settingsView(): string {
-  return `<section class="card settings-card"><h1>Einstellungen</h1><h2>Still-Schätzung</h2><p>Gemeinsam für Julia und Christian. Der Standard wird bei neuen Einträgen pro Brust übernommen. Gespeicherte Mengen bleiben unverändert.</p>${settings ? `<form id="settings-form" novalidate><label for="breast-default-left">Linke Brust (ml)</label><input id="breast-default-left" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.left ?? settings.breast_left_ml)}" ${busy ? 'disabled' : ''}><label for="breast-default-right">Rechte Brust (ml)</label><input id="breast-default-right" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.right ?? settings.breast_right_ml)}" ${busy ? 'disabled' : ''}><p class="field-note">Bei beiden Brüsten werden die Werte addiert. Dies ist eure persönliche Schätzung.</p><button class="primary" ${busy ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : 'Einstellungen speichern'}</button></form>${settingsDraft ? `<p class="field-note">${settingsDraft.version !== settings?.version ? 'Die Serverwerte wurden inzwischen geändert. Deine Eingaben bleiben erhalten. Übernimm die Serverwerte, um die Änderung neu einzugeben.' : 'Ungespeicherte Einstellungen'}</p><button class="secondary" id="reset-settings" ${busy ? 'disabled' : ''}>Serverwerte übernehmen</button>` : ''}` : '<p>Einstellungen werden geladen …</p>'}</section>`;
+  return `<section class="card settings-card"><h1>Einstellungen</h1><h2>Still-Schätzung</h2><p>Gemeinsam für Julia und Christian. Der Standard wird bei neuen Einträgen pro Brust übernommen. Gespeicherte Mengen bleiben unverändert.</p>${settings ? `<form id="settings-form" novalidate><label for="breast-default-left">Linke Brust (ml)</label><input id="breast-default-left" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.left ?? settings.breast_left_ml)}" ${busy ? 'disabled' : ''}><label for="breast-default-right">Rechte Brust (ml)</label><input id="breast-default-right" type="number" inputmode="numeric" min="1" step="1" value="${escape(settingsDraft?.right ?? settings.breast_right_ml)}" ${busy ? 'disabled' : ''}><p class="field-note">Bei beiden Brüsten werden die Werte addiert. Dies ist eure persönliche Schätzung.</p><h2>Gewichtsvergleich</h2><label for="birth-date">Geburtsdatum</label><input id="birth-date" type="date" min="1900-01-01" max="${berlinDay()}" value="${escape(settingsDraft?.birthDate ?? settings.birth_date)}" ${busy ? 'disabled' : ''}><p class="field-note">Gemeinsame Grundlage für das Alter am Messtag. Referenz: WHO, Mädchen. Das Datum bleibt geschützt.</p><button class="primary" ${busy ? 'disabled' : ''}>${busy ? 'Wird gespeichert …' : 'Einstellungen speichern'}</button></form>${settingsDraft ? `<p class="field-note">${settingsDraft.version !== settings?.version ? 'Die Serverwerte wurden inzwischen geändert. Deine Eingaben bleiben erhalten. Übernimm die Serverwerte, um die Änderung neu einzugeben.' : 'Ungespeicherte Einstellungen'}</p><button class="secondary" id="reset-settings" ${busy ? 'disabled' : ''}>Serverwerte übernehmen</button>` : ''}` : '<p>Einstellungen werden geladen …</p>'}</section>`;
 }
 function reportView(): string {
   const today = berlinDay();
@@ -201,11 +204,13 @@ async function storeSettings() {
   const ownEpoch = epoch;
   try {
     const value = { left: milliliters(settingsDraft?.left ?? String(settings.breast_left_ml), false), right: milliliters(settingsDraft?.right ?? String(settings.breast_right_ml), false) };
+    const birthDate = settingsDraft?.birthDate ?? settings.birth_date ?? '';
+    if (birthDate && (!validBirthDate(birthDate) || birthDate < '1900-01-01' || birthDate > berlinDay())) throw new Error('Bitte ein gültiges Geburtsdatum bis heute eingeben.');
     busy = true; error = ''; render();
-    const updated = await saveSettings(value, settingsDraft?.version ?? settings.version);
+    const updated = await saveSettings(value, settingsDraft?.version ?? settings.version, birthDate || null);
     if (ownEpoch !== epoch) return;
     settings = updated; settingsDraft = null;
-    if (!edit && !pending && !draft.side && !draft.breastStart && draft.estimateMode === 'auto') { draft.breastDefault = currentDefaults(); remember(); } notice = 'Standard gespeichert. Gilt für neue Einträge.';
+    if (!edit && !pending && !draft.side && !draft.breastStart && draft.estimateMode === 'auto') { draft.breastDefault = currentDefaults(); remember(); } notice = 'Einstellungen gespeichert. Der Gewichtsvergleich verwendet das gemeinsame Geburtsdatum.';
   } catch (e) { if (ownEpoch === epoch) error = friendlyError(e); }
   finally { if (ownEpoch === epoch) { busy = false; render(); } }
 }
@@ -215,7 +220,7 @@ function bindReports() {
     settingsDraft = null; error = ''; await refresh(); render();
   });
   document.querySelector('#settings-form')?.addEventListener('submit', e => { e.preventDefault(); void storeSettings(); });
-  document.querySelector('#settings-form')?.addEventListener('input', () => { settingsDraft = { version: settingsDraft?.version ?? settings!.version, left: document.querySelector<HTMLInputElement>('#breast-default-left')!.value, right: document.querySelector<HTMLInputElement>('#breast-default-right')!.value }; });
+  document.querySelector('#settings-form')?.addEventListener('input', () => { settingsDraft = { version: settingsDraft?.version ?? settings!.version, left: document.querySelector<HTMLInputElement>('#breast-default-left')!.value, right: document.querySelector<HTMLInputElement>('#breast-default-right')!.value, birthDate: document.querySelector<HTMLInputElement>('#birth-date')!.value }; });
   const changeWeek = (day: string) => { reportWeek = weekRange(day).start; reportRows = null; void refresh(); render(); };
   document.querySelector('#report-prev')?.addEventListener('click', () => changeWeek(shiftDay(weekRange(reportWeek).start, -7)));
   document.querySelector('#report-next')?.addEventListener('click', () => changeWeek(shiftDay(weekRange(reportWeek).start, 7)));
@@ -229,7 +234,18 @@ function historyView(): string {
     previous = day;
     return heading + entryCard(entry);
   }).join('');
-  return `<div class="page-heading"><h1>Logbuch</h1><button id="export" class="secondary" ${busy ? 'disabled' : ''}>${icon('download')}<span>CSV exportieren</span></button></div><section class="history-list">${list || `<div class="card empty-history">${icon('book')}<h2>${loading ? 'Einen Moment …' : 'Euer Logbuch wartet auf euch.'}</h2><p>${loading ? 'Wir laden eure Einträge.' : 'Der erste Eintrag erscheint hier, sobald ihr ihn gespeichert habt.'}</p><button id="first-entry" class="secondary">Neuen Eintrag erstellen</button></div>`}${hasMore ? `<button class="secondary load-more" id="load-more" ${loading ? 'disabled' : ''}>${loading ? 'Wird geladen …' : 'Weitere Einträge laden'}</button>` : ''}</section>`;
+  return `<div class="page-heading"><h1>Logbuch</h1><button id="export" class="secondary" ${busy ? 'disabled' : ''}>${icon('download')}<span>CSV exportieren</span></button></div><div class="history-filter"><label for="history-kind">Ereignisart</label><select id="history-kind"><option value="">Alle Ereignisse</option>${eventKinds.map(kind => `<option value="${kind}" ${historyKind === kind ? 'selected' : ''}>${kindLabel(kind)}</option>`).join('')}</select></div><section class="history-list">${list || `<div class="card empty-history">${icon('book')}<h2>${loading ? 'Einen Moment …' : historyKind ? 'Keine Einträge dieser Art.' : 'Euer Logbuch wartet auf euch.'}</h2><p>${loading ? 'Wir laden eure Einträge.' : historyKind ? 'Wähle eine andere Ereignisart oder erfasse einen neuen Eintrag.' : 'Der erste Eintrag erscheint hier, sobald ihr ihn gespeichert habt.'}</p><button id="first-entry" class="secondary">Neuen Eintrag erstellen</button></div>`}${hasMore ? `<button class="secondary load-more" id="load-more" ${loading ? 'disabled' : ''}>${loading ? 'Wird geladen …' : 'Weitere Einträge laden'}</button>` : ''}</section>`;
+}
+function weightView(): string {
+  const weightDate = (iso: string) => new Date(iso).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Berlin' });
+  const weightTime = (iso: string) => new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' });
+  const grams = (value: number) => `${value.toLocaleString('de-DE')} g`;
+  const list = entries.map(entry => {
+    const value = entry.weight_g!;
+    const comparison = weightComparison(value, entry.occurred_at, settings?.birth_date ?? null);
+    return `<article class="card weight-card"><div class="weight-card-heading"><div><time datetime="${escape(entry.occurred_at)}">${escape(weightDate(entry.occurred_at))} · ${weightTime(entry.occurred_at)}</time><h2>${grams(value)}</h2></div><button class="edit-button" data-edit="${entry.id}" aria-label="Gewicht vom ${escape(weightDate(entry.occurred_at))} bearbeiten">${icon('edit')}</button></div>${comparison.days !== undefined ? `<p class="weight-age">Alter: ${ageLabel(comparison.days)}</p>` : ''}${'reason' in comparison ? `<p class="field-note">${comparison.reason}</p>` : `<div class="weight-scale" role="img" aria-label="${escape(`${grams(value)}. ${comparison.relation}. P10: ${grams(comparison.p10)}, Median P50: ${grams(comparison.median)}, P90: ${grams(comparison.p90)}.`)}"><div class="weight-axis"></div><div class="weight-band" style="left:${comparison.left}%;width:${comparison.right - comparison.left}%"></div><span class="weight-bound" style="left:${comparison.left}%"></span><span class="weight-median" style="left:${comparison.center}%"></span><span class="weight-bound" style="left:${comparison.right}%"></span><span class="weight-point" style="left:${comparison.point}%"></span></div><div class="weight-references"><span>P10<b>${grams(comparison.p10)}</b></span><span>Median · P50<b>${grams(comparison.median)}</b></span><span>P90<b>${grams(comparison.p90)}</b></span></div><p class="weight-relation">● Messwert · ${comparison.relation}</p>`}</article>`;
+  }).join('');
+  return `<section class="weight-view"><h1>Gewicht</h1><p class="muted">Jede Messung im Vergleich zum Alter am Messtag.</p>${!settings?.birth_date ? '<div class="card weight-explanation"><p>Für den Vergleich fehlt noch das gemeinsame Geburtsdatum.</p><button class="secondary" data-view="settings">Geburtsdatum hinterlegen</button></div>' : ''}<details class="weight-explanation card"><summary>So liest du die Karten</summary><p>Die Banden zeigen P10 und P90: 10 % der Mädchen in der WHO-Referenz wiegen weniger als P10, 90 % weniger als P90. Die mittlere Linie ist P50, der Median. Der Punkt zeigt euren Messwert auf einer linearen Gewichtsskala. Die Skala passt sich pro Karte an, damit auch äußere Messwerte sichtbar bleiben.</p><p>Die mittleren 80 % sind ein statistischer Referenzbereich, keine Bewertung der Gesundheit. Körperlänge und Verlauf gehören zur Einordnung; das Alter wird ab Geburt berechnet, ohne Frühgeburtskorrektur.</p><p>Quelle: <a href="https://www.who.int/tools/child-growth-standards/standards/weight-for-age" target="_blank" rel="noopener noreferrer">WHO Child Growth Standards · Mädchen</a>, taggenaue Referenz von Geburt bis 1856 Tage (etwa 5 Jahre). Alter und Messtag werden in deutscher Zeit berechnet.</p></details>${list || `<div class="card empty-history"><h2>${loading ? 'Gewichte werden geladen …' : error ? 'Gewichte konnten nicht geladen werden.' : 'Noch keine Gewichtsmessungen.'}</h2><button class="secondary" data-view="new">Eintrag erfassen</button></div>`}${hasMore ? `<button class="secondary load-more" id="load-more" ${loading ? 'disabled' : ''}>${loading ? 'Wird geladen …' : 'Weitere Gewichte laden'}</button>` : ''}</section>`;
 }
 function aboutView(): string {
   return `<section class="card about-card"><h1>Über Phililog</h1><p>Ein kleines gemeinsames Logbuch für den Alltag mit Philine. Mahlzeiten schnell festhalten, gemeinsam den Überblick behalten und mehr Zeit füreinander haben.</p><p>Von Christian und Julia für Philine vibe-gecodet – mit Liebe in Göttingen entstanden.</p><p>Die Aquarellfarben erinnern an ihre Geburtskarte: ein bisschen Blau, Türkis und Violett begleitet euch durch den Alltag.</p><button class="secondary" data-view="new">Zurück zur Eingabe</button></section>`;
@@ -237,7 +253,7 @@ function aboutView(): string {
 function render() {
   if (!userId) return renderLogin();
   const restoreFormState = preserveFormState(app);
-  app.innerHTML = `<main class="app-main">${authorized ? `<div class="navigation-bar"><nav class="main-nav" aria-label="Hauptansichten"><button data-view="new" class="${view === 'new' ? 'active' : ''}" aria-current="${view === 'new' ? 'page' : 'false'}">${icon('plus')}Eintragen</button><button data-view="history" class="${view === 'history' ? 'active' : ''}" aria-current="${view === 'history' ? 'page' : 'false'}">${icon('book')}Logbuch</button><button data-view="report" class="${view === 'report' ? 'active' : ''}" aria-current="${view === 'report' ? 'page' : 'false'}">Tagesbericht</button></nav></div><div id="messages" aria-live="polite">${notice ? `<p class="message success">${icon('check')}${escape(notice)}</p>` : ''}${error ? `<p class="message error" role="alert">${escape(error)} <button id="refresh" class="text-button">Aktualisieren</button></p>` : ''}</div>${view === 'new' ? formView() : view === 'history' ? historyView() : view === 'report' ? reportView() : view === 'settings' ? settingsView() : aboutView()}` : `<section class="card access-card"><h1>${loading ? 'Euer Logbuch wird geöffnet …' : 'Zugang noch nicht freigeschaltet'}</h1><p>${escape(error || 'Dieses Konto muss für euer gemeinsames Logbuch freigeschaltet sein.')}</p><button id="refresh-access" class="secondary">Erneut prüfen</button></section>`}</main><footer class="app-footer"><span>phililog.</span>${authorized ? `<button class="text-button" data-view="about" aria-current="${view === 'about' ? 'page' : 'false'}">Über das Projekt</button><button class="text-button" data-view="settings">Einstellungen</button>${GAME_ENABLED ? `<button class="text-button" id="open-game" ${busy ? 'disabled' : ''}>Kleine Schritte · Spiel</button>` : ''}` : ''}<button class="text-button logout" id="logout">Abmelden</button></footer>`;
+  app.innerHTML = `<main class="app-main">${authorized ? `<div class="navigation-bar"><nav class="main-nav" aria-label="Hauptansichten"><button data-view="new" class="${view === 'new' ? 'active' : ''}" aria-current="${view === 'new' ? 'page' : 'false'}">${icon('plus')}Eintragen</button><button data-view="history" class="${view === 'history' ? 'active' : ''}" aria-current="${view === 'history' ? 'page' : 'false'}">${icon('book')}Logbuch</button><button data-view="report" class="${view === 'report' ? 'active' : ''}" aria-current="${view === 'report' ? 'page' : 'false'}">Tagesbericht</button><button data-view="weight" class="${view === 'weight' ? 'active' : ''}" aria-current="${view === 'weight' ? 'page' : 'false'}">${icon('weight')}Gewicht</button></nav></div><div id="messages" aria-live="polite">${notice ? `<p class="message success">${icon('check')}${escape(notice)}</p>` : ''}${error ? `<p class="message error" role="alert">${escape(error)} <button id="refresh" class="text-button">Aktualisieren</button></p>` : ''}</div>${view === 'new' ? formView() : view === 'history' ? historyView() : view === 'report' ? reportView() : view === 'settings' ? settingsView() : view === 'weight' ? weightView() : aboutView()}` : `<section class="card access-card"><h1>${loading ? 'Euer Logbuch wird geöffnet …' : 'Zugang noch nicht freigeschaltet'}</h1><p>${escape(error || 'Dieses Konto muss für euer gemeinsames Logbuch freigeschaltet sein.')}</p><button id="refresh-access" class="secondary">Erneut prüfen</button></section>`}</main><footer class="app-footer"><span>phililog.</span>${authorized ? `<button class="text-button" data-view="about" aria-current="${view === 'about' ? 'page' : 'false'}">Über das Projekt</button><button class="text-button" data-view="settings">Einstellungen</button>${GAME_ENABLED ? `<button class="text-button" id="open-game" ${busy ? 'disabled' : ''}>Kleine Schritte · Spiel</button>` : ''}` : ''}<button class="text-button logout" id="logout">Abmelden</button></footer>`;
   bindLogout();
   document.querySelector('#open-game')?.addEventListener('click', () => void openGame());
   document.querySelector('#refresh-access')?.addEventListener('click', () => void enterSession(userId));
@@ -252,6 +268,11 @@ function render() {
     if ((edit || hasDraftChanges(draft)) && !await confirmAction('Den aktuellen Entwurf verwerfen und diesen Eintrag bearbeiten?')) return;
     edit = entry; draft = draftFromFeeding(entry); view = 'new'; notice = ''; error = ''; remember(); render(); window.scrollTo(0, 0);
   }));
+  const filterSelect = document.querySelector<HTMLSelectElement>('#history-kind');
+  if (filterSelect) filterSelect.value = historyKind;
+  document.querySelector('#history-kind')?.addEventListener('change', e => {
+    historyKind = (e.target as HTMLSelectElement).value as typeof historyKind; entries = []; hasMore = false; error = ''; void refresh(); render();
+  });
   document.querySelector('#load-more')?.addEventListener('click', () => void refresh(true));
   document.querySelector('#export')?.addEventListener('click', () => void exportEntries());
   bindForm();
@@ -260,7 +281,7 @@ function render() {
 }
 function switchView(next: typeof view) {
   if (busy) return;
-  captureForm(); remember(); if (next === 'report') reportRows = null; view = next; notice = ''; error = ''; render(); window.scrollTo(0, 0); if (next !== 'about') void refresh();
+  captureForm(); remember(); if (next === 'report') reportRows = null; if (next !== view && (next === 'history' || next === 'weight')) { entries = []; hasMore = false; } view = next; notice = ''; error = ''; render(); window.scrollTo(0, 0); if (next !== 'about') void refresh();
 }
 function bindLogout() {
   document.querySelector('#logout')?.addEventListener('click', async () => {
@@ -430,15 +451,16 @@ async function refresh(more = false) {
   const ownRefresh = ++refreshGeneration;
   const last = more ? entries.at(-1) : undefined;
   try {
-    const [rows, recentMeal, currentSettings, dailyRows] = await Promise.all([
-      listFeedings(PAGE_SIZE, last ? { time: last.occurred_at, id: last.id } : undefined),
+    const [rows, recentMeal, currentSettings, dailyRows, recentEntry] = await Promise.all([
+      listFeedings(PAGE_SIZE, last ? { time: last.occurred_at, id: last.id } : undefined, view === 'weight' ? 'weight' : view === 'history' ? historyKind || undefined : undefined),
       more ? Promise.resolve(meal) : latestMeal(),
       getSettings(),
       view === 'report' ? getDailyReport(weekRange(reportWeek).start, weekRange(reportWeek).end) : Promise.resolve(null),
+      more ? Promise.resolve(latest) : latestEntry(),
     ]);
     if (ownEpoch !== epoch || ownRefresh !== refreshGeneration) return;
     if (more) entries = [...entries, ...rows.filter(row => !entries.some(e => e.id === row.id))];
-    else { entries = rows; latest = rows[0] ?? null; meal = recentMeal; }
+    else { entries = rows; latest = recentEntry; meal = recentMeal; }
     settings = currentSettings;
     if (!edit && !pending && (draft.breastDefault === null || (!draft.side && !draft.breastStart && draft.estimateMode === 'auto'))) { draft.breastDefault = currentDefaults(); remember(); }
     if (dailyRows) reportRows = dailyRows;
@@ -453,7 +475,7 @@ async function enterSession(id: string | null) {
   const previous = userId;
   const ownEpoch = ++epoch;
   if (previous && previous !== id) { try { localStorage.removeItem(storageKey()); } catch { /* no storage */ } }
-  settings = null; settingsDraft = null; reportRows = null; reportWeek = berlinDay(); signedInPerson = null;
+  historyKind = ''; hasMore = false; settings = null; settingsDraft = null; reportRows = null; reportWeek = berlinDay(); signedInPerson = null;
   userId = id; authorized = false; entries = []; latest = null; meal = null; draft = newDraft(); pending = null; edit = null;
   error = ''; notice = ''; view = 'new'; busy = false; loading = Boolean(id);
   if (!id) { render(); return; }

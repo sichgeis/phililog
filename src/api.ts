@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { PAGE_SIZE, type Feeding, type FeedingInput, type PendingCreate } from './domain.ts';
+import { PAGE_SIZE, type Feeding, type FeedingInput, type PendingCreate, type FeedingKind } from './domain.ts';
 
 const url = import.meta.env?.VITE_SUPABASE_URL;
 const key = import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -7,12 +7,17 @@ export const configured = Boolean(url && key && !url.includes('YOUR_PROJECT') &&
 export const supabase = configured ? createClient(url, key, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
 }) : null;
-export async function listFeedings(limit = PAGE_SIZE, before?: { time: string; id: string }): Promise<Feeding[]> {
+export async function listFeedings(limit = PAGE_SIZE, before?: { time: string; id: string }, kind?: FeedingKind): Promise<Feeding[]> {
   let query = supabase!.from('feedings').select('*').order('occurred_at', { ascending: false }).order('id', { ascending: false }).limit(limit);
+  if (kind) query = query.eq('kind', kind);
   if (before) query = query.or(`occurred_at.lt.${before.time},and(occurred_at.eq.${before.time},id.lt.${before.id})`);
   const { data, error } = await query;
   if (error) throw error;
   return data as Feeding[];
+}
+export async function latestEntry(): Promise<Feeding | null> {
+  const rows = await listFeedings(1);
+  return rows[0] ?? null;
 }
 export async function latestMeal(): Promise<Feeding | null> {
   const { data, error } = await supabase!.from('feedings').select('*').in('kind', ['bottle', 'breast'])
@@ -67,12 +72,12 @@ export function friendlyError(error: unknown): string {
 }
 
 export async function getSettings(): Promise<import('./report.ts').Settings> {
-  const { data, error } = await supabase!.from('family_settings').select('breast_left_ml,breast_right_ml,version').eq('id', true).single();
+  const { data, error } = await supabase!.from('family_settings').select('breast_left_ml,breast_right_ml,birth_date,version').eq('id', true).single();
   if (error) throw error;
   return data;
 }
-export async function saveSettings(defaults: import('./report.ts').BreastDefaults, version: number): Promise<import('./report.ts').Settings> {
-  const { data, error } = await supabase!.from('family_settings').update({ breast_left_ml: defaults.left, breast_right_ml: defaults.right }).eq('id', true).eq('version', version).select('breast_left_ml,breast_right_ml,version').maybeSingle();
+export async function saveSettings(defaults: import('./report.ts').BreastDefaults, version: number, birthDate: string | null): Promise<import('./report.ts').Settings> {
+  const { data, error } = await supabase!.from('family_settings').update({ breast_left_ml: defaults.left, breast_right_ml: defaults.right, birth_date: birthDate }).eq('id', true).eq('version', version).select('breast_left_ml,breast_right_ml,birth_date,version').maybeSingle();
   if (error) throw error;
   if (!data) throw new Error('Die Einstellungen wurden inzwischen geändert. Deine Eingaben bleiben erhalten. Bitte Serverwerte übernehmen und die Änderung erneut eingeben.');
   return data;

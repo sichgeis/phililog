@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { Window } from 'happy-dom';
 import * as domain from '../src/domain.ts';
+import * as weight from '../src/weight.ts';
 import * as report from '../src/report.ts';
 
 // Execute the real entry point and handlers in a disposable DOM. Only the API is substituted.
@@ -11,22 +12,22 @@ async function setup(t: any, person = 'Julia', reduced = false, gameLoader: () =
   const window = new Window({ url: 'http://localhost:5173' });
   t.after(() => window.happyDOM.close());
   window.document.body.innerHTML = '<div id="app"></div>';
-  let settings = { breast_left_ml: 25, breast_right_ml: 25, version: 1 };
+  let settings = { breast_left_ml: 25, breast_right_ml: 25, birth_date: '2026-01-01', version: 1 };
   const submitted: number[] = [];
   const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
-  Object.assign(window, domain, report, {
+  Object.assign(window, domain, report, weight, {
     loadGameForTest: gameLoader, configured: true, currentFamilyPerson: async () => person,
     matchMedia: () => ({ matches: reduced }),
     supabase: { rpc: async () => ({ data: true }), auth: { onAuthStateChange() {}, signOut: async () => ({}) } },
     getSettings: async () => ({ ...settings }),
-    saveSettings: async (values: any, version: number) => {
+    saveSettings: async (values: any, version: number, birthDate: string | null) => {
       submitted.push(version);
       if (version !== settings.version) throw new Error('Die Einstellungen wurden inzwischen geändert.');
-      settings = { breast_left_ml: values.left, breast_right_ml: values.right, version: version + 1 };
+      settings = { breast_left_ml: values.left, breast_right_ml: values.right, birth_date: birthDate!, version: version + 1 };
       return { ...settings };
     },
-    listFeedings: async () => [entry], latestMeal: async () => entry,
+    listFeedings: async () => [entry], latestEntry: async () => entry, latestMeal: async () => entry,
     getDailyReport: async () => [], friendlyError: (e: Error) => e.message,
     createFeeding: (p: any) => create(p), updateFeeding: async () => entry,
   });
@@ -45,7 +46,7 @@ test('Settings-Entwurf behält Version nach Refresh und verlangt ausdrückliche 
   ui.app.switchView('settings'); await ui.app.refresh();
   ui.input('#breast-default-left', '20');
   ui.find('#breast-default-left').focus();
-  ui.setSettings({ breast_left_ml: 35, breast_right_ml: 25, version: 2 });
+  ui.setSettings({ breast_left_ml: 35, breast_right_ml: 25, birth_date: '2026-01-01', version: 2 });
   await ui.app.refresh();
   assert.equal(ui.find('#breast-default-left').value, '20');
   assert.equal(ui.window.document.activeElement?.id, 'breast-default-left');
@@ -370,4 +371,70 @@ test('Spielmodul isoliert Darstellung; Logbuchrefresh, Settings-Entwurf und Kont
   await ui.app.refresh(); assert.equal(config.container.textContent, 'Synthetic game mount');
   config.onExit(); assert.equal(ui.find('#app').hidden, false); assert.equal(ui.find('#breast-default-left').value, '45');
   await ui.app.enterSession(null); assert.equal(disposed, true); assert.equal(config.container.isConnected, false);
+});
+
+test('Geburtsdatum bleibt im Einstellungsentwurf; Konflikt überschreibt keine neuen Serverwerte', async t => {
+  const ui = await setup(t);
+  ui.app.switchView('settings'); await ui.app.refresh();
+  ui.input('#birth-date', '2025-12-25');
+  ui.setSettings({ breast_left_ml: 25, breast_right_ml: 25, birth_date: '2025-12-26', version: 2 });
+  await ui.app.refresh();
+  assert.equal(ui.find('#birth-date').value, '2025-12-25');
+  await ui.app.storeSettings();
+  assert.match(ui.find('#messages').textContent, /inzwischen/);
+  assert.deepEqual(ui.submitted, [1]);
+});
+
+test('Logbuchfilter fragt serverseitig ab, paginiert und verwirft überholte Antworten', async t => {
+  const ui = await setup(t);
+  const bottle = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'bottle', version: 1 };
+  const sample = (id: string) => ({ ...domain.feedingInput({ ...domain.newDraft(), kind: 'weight', weight: '3500', timeMode: 'custom', localTime: '2026-01-08T12:00' }), id, version: 1 });
+  const calls: any[] = [];
+  (ui.window as any).listFeedings = async (_limit: number, cursor: any, kind: string) => { calls.push({ cursor, kind }); return kind === 'weight' ? cursor ? [sample('older')] : Array.from({ length: 30 }, (_, i) => sample(`w${i}`)) : [bottle]; };
+  ui.find('[data-kind="bottle"]').click(); ui.input('#amount', '75');
+  ui.app.switchView('history'); await ui.app.refresh();
+  const select = ui.find('#history-kind'); select.value = 'weight'; select.dispatchEvent(new ui.window.Event('change', { bubbles: true }));
+  await ui.app.refresh();
+  assert.equal(calls.at(-1).kind, 'weight');
+  assert.equal(ui.window.document.querySelectorAll('[data-edit]').length, 30);
+  await ui.app.refresh(true);
+  assert.ok(calls.at(-1).cursor);
+  assert.equal(ui.window.document.querySelectorAll('[data-edit]').length, 31);
+  ui.app.switchView('new'); assert.equal(ui.find('#amount').value, '75');
+  ui.app.switchView('history'); await ui.app.refresh();
+  let resolveOld: (value: any) => void;
+  (ui.window as any).listFeedings = async (_limit: number, _cursor: any, kind: string) => kind === 'weight' ? new Promise(resolve => { resolveOld = resolve; }) : [bottle];
+  const old = ui.app.refresh();
+  const changed = ui.find('#history-kind'); changed.value = 'bottle'; changed.dispatchEvent(new ui.window.Event('change', { bubbles: true }));
+  await ui.app.refresh(); resolveOld!([sample('stale')]); await old;
+  assert.equal(ui.find('#history-kind').value, 'bottle');
+  assert.equal(ui.find('[data-edit]').getAttribute('data-edit'), 'bottle');
+});
+
+test('Gewichtskarten zeigen Alter, Referenzen, äußere Punkte und erlauben Bearbeitung; Logout leert private Ansicht', async t => {
+  const ui = await setup(t);
+  const sample = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'weight', weight: '6000', timeMode: 'custom', localTime: '2026-01-08T12:00' }), id: 'synthetic-weight', version: 1 };
+  (ui.window as any).listFeedings = async (_limit: number, _cursor: any, kind: string) => kind === 'weight' ? [sample] : [];
+  ui.app.switchView('weight'); await ui.app.refresh();
+  assert.match(ui.find('.weight-age').textContent, /7 Tage/);
+  assert.match(ui.find('.weight-relation').textContent, /Über P90/);
+  assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /P10.*Median P50.*P90/);
+  ui.find('[data-edit]').click();
+  assert.equal(ui.find('#weight').value, '6000');
+  ui.find('#cancel-edit').click();
+  await ui.app.enterSession(null);
+  assert.equal(ui.window.document.querySelector('.weight-card'), null);
+});
+
+test('Geburtsdatum speichern aktualisiert gemeinsame Karten; fehlendes Datum zeigt Einrichtungshinweis', async t => {
+  const ui = await setup(t);
+  ui.app.switchView('settings'); await ui.app.refresh();
+  ui.input('#birth-date', '2025-12-25'); await ui.app.storeSettings();
+  assert.deepEqual(ui.submitted, [1]);
+  ui.app.switchView('settings'); await ui.app.refresh();
+  assert.equal(ui.find('#birth-date').value, '2025-12-25');
+  ui.input('#birth-date', ''); await ui.app.storeSettings();
+  (ui.window as any).listFeedings = async () => [];
+  ui.app.switchView('weight'); await ui.app.refresh();
+  assert.match(ui.find('.weight-explanation').textContent, /fehlt.*Geburtsdatum/);
 });

@@ -186,6 +186,18 @@ try {
     assert.ifError((await admin.from('feedings').insert(newerDiapers)).error);
     assert.equal((await api.listFeedings()).every(row => row.kind === 'diaper'), true);
     assert.equal((await api.latestMeal()).id, mealId, 'Last meal ignores diapers beyond first history page');
+    const weights = Array.from({ length: 35 }, (_, i) => ({ id: randomUUID(), kind: 'weight', occurred_at: '2089-01-01T00:00:00Z', weight_g: 3500 + i, created_by: julia.user.id }));
+    ids.push(...weights.map(row => row.id));
+    assert.ifError((await admin.from('feedings').insert(weights)).error);
+    const weightPage = await api.listFeedings(30, undefined, 'weight');
+    assert.equal(weightPage.length, 30);
+    assert.equal(weightPage.every(row => row.kind === 'weight'), true);
+    const weightLast = weightPage.at(-1);
+    const weightNext = await api.listFeedings(30, { time: weightLast.occurred_at, id: weightLast.id }, 'weight');
+    assert.equal(weightNext.some(row => weightPage.some(previous => previous.id === row.id)), false);
+    assert.equal(weights.every(row => [...weightPage, ...weightNext].some(item => item.id === row.id)), true, 'Filter reaches older weights, including tied times');
+    assert.equal((await api.latestEntry()).kind, 'diaper', 'Filtered view does not change latest input context');
+    assert.ifError((await admin.from('feedings').delete().in('id', weights.map(row => row.id))).error);
     assert.ifError((await admin.from('feedings').delete().in('id', [mealId, ...newerDiapers.map(row => row.id)])).error);
     const bulk = Array.from({ length: 505 }, (_, i) => ({ ...payload, id: randomUUID(), created_by: julia.user.id, occurred_at: new Date(Date.UTC(2025, 0, 1, 0, i)).toISOString() }));
     ids.push(...bulk.map(row => row.id));
@@ -204,11 +216,18 @@ try {
   } finally { await vite.close(); }
   const originalSettings = await julia.client.from('family_settings').select().single(); assert.ifError(originalSettings.error);
   try {
+    const profile = await julia.client.from('family_settings').update({ birth_date: '2025-01-01' }).eq('id', true).eq('version', originalSettings.data.version).select().single();
+    assert.ifError(profile.error);
+    assert.equal((await christian.client.from('family_settings').select().single()).data.birth_date, '2025-01-01');
+    assert.deepEqual((await christian.client.from('family_settings').update({ birth_date: '2025-02-01' }).eq('version', originalSettings.data.version).select()).data, []);
+    assert.deepEqual((await outsider.client.from('family_settings').update({ birth_date: '2025-02-01' }).eq('id', true).select()).data, []);
+    assert.ok((await anonymous.from('family_settings').update({ birth_date: '2025-02-01' }).eq('id', true)).error);
+    for (const date of ['infinity', '1800-01-01', '2099-01-01', '2025-02-30']) assert.ok((await julia.client.from('family_settings').update({ birth_date: date }).eq('id', true)).error);
     assert.deepEqual((await outsider.client.from('family_settings').select()).data, []);
     assert.ok((await anonymous.from('family_settings').select()).error);
     assert.deepEqual((await outsider.client.from('family_settings').update({ breast_ml: 99 }).eq('id',true).select()).data, []);
     assert.ok((await julia.client.from('family_settings').update({ breast_ml: 0 }).eq('id',true)).error);
-    const changed = await julia.client.from('family_settings').update({ breast_left_ml: 20, breast_right_ml: 35 }).eq('id',true).eq('version',originalSettings.data.version).select().single(); assert.ifError(changed.error);
+    const changed = await julia.client.from('family_settings').update({ breast_left_ml: 20, breast_right_ml: 35 }).eq('id',true).eq('version',originalSettings.data.version + 1).select().single(); assert.ifError(changed.error);
     assert.equal((await christian.client.from('family_settings').select().single()).data.breast_left_ml,20);
     assert.equal((await christian.client.from('family_settings').select().single()).data.breast_right_ml,35);
     assert.ok((await julia.client.from('family_settings').update({ breast_left_ml: -1, breast_right_ml: 40 }).eq('id',true)).error);
@@ -233,7 +252,7 @@ try {
     assert.equal((await julia.client.rpc('daily_report',{first_day:'2088-03-28',last_day:'2088-03-28'})).data[0].breast_ml,70);
     assert.ifError((await christian.client.from('feedings').delete().eq('id',samples[1].id)).error);
     assert.equal((await julia.client.rpc('daily_report',{first_day:'2088-03-28',last_day:'2088-03-28'})).data[0].breast_ml,0);
-  } finally { assert.ifError((await admin.from('family_settings').update({ breast_left_ml: originalSettings.data.breast_left_ml, breast_right_ml: originalSettings.data.breast_right_ml }).eq('id',true)).error); }
+  } finally { assert.ifError((await admin.from('family_settings').update({ breast_left_ml: originalSettings.data.breast_left_ml, breast_right_ml: originalSettings.data.breast_right_ml, birth_date: originalSettings.data.birth_date }).eq('id',true)).error); }
   const { readFileSync } = await import('node:fs');
   const correction = readFileSync('supabase/migrations/202609130008_backfill_family_events.sql','utf8');
   const seed = `begin;
