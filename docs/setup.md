@@ -179,3 +179,10 @@ Frontend V2 aus (historischer Commit) über Publish GitHub Pages 35343487380 (hi
 `202609180019_nachtpost.sql` ergänzt einen eigenen Abenteuerstand, private Speichernachweise und zwei Familien-RPCs. V1-/V2-Spieltabellen bleiben unverändert. Der lokale Migrationshelfer berücksichtigt 019; ein frischer Testaufbau lädt sie automatisch. Erst Datenbank, dann Client veröffentlichen. Ein Rückfall auf den alten Client erfordert keine Datenlöschung; der Abenteuerstand bleibt erhalten.
 
 Prüfung: `npm run check`, `node scripts/test-local-supabase.mjs` und `node scripts/test-restore.mjs`. Der Browser-Test nutzt ausschließlich die lokale Datenbank und erfundene Teststände. Ausgeführt wurden Mechanik-, Konflikt-, Touch- und Endprüfungen; Vierstunden- und Geräteabnahme bleiben ausdrücklich offen.
+
+
+## Gewichtsvergleich: Migration 020
+
+`202610040020_weight_profile.sql` ergänzt das optionale gemeinsame Geburtsdatum in `family_settings`. Bestehende Familien-RLS und Versionstrigger gelten weiter; ältere Clients behalten ihre bisherigen Spalten und Rechte. Keine Messwertkorrektur oder rückwirkliche Änderung von Einträgen. Migration vor dem neuen Frontend anwenden, dann das Geburtsdatum separat und ausschließlich in der geschützten Produktion setzen. Keine privaten Profilwerte in Migrationen oder Repository übernehmen.
+
+Am [Betriebsdatum privat] über den vorhandenen Management-Zugang transaktional produktiv angewandt. Interne private Sicherung eine separat dokumentierte private Sicherung bzw. Ausführungsquittung, exakter Logbuchvergleich, unveränderte alte Einstellungswerte und RLS-/Policyvergleich bestätigt. Privates Geburtsdatum initialisiert; Migration-Prüfsumme im ausschließlich administrativ zugänglichen eine separat dokumentierte private Sicherung bzw. Ausführungsquittung. Lokale RLS-/Filter-/Profiltests und vollständiger synthetischer Restore über alle 20 Migrationen bestanden. Veröffentlichungsnachweis: [Feature 011](../specs/011-gewichtsvergleich/tasks.md).
