@@ -198,3 +198,5 @@ Am [Betriebsdatum privat] auf ausdrücklichen Auftrag vor dem neuen Client trans
 ## Geburtseinordnung ab Migration 022
 
 Migration `202610220022_birth_gestation.sql` ergänzt optional das geschützte Schwangerschaftsalter bei Geburt in Tagen. Eingabe in den Einstellungen als volle Wochen plus zusätzliche Tage; vorhandene Profile und alte Clients bleiben kompatibel. Das ausdrücklich hinterlegte Geburtsgewicht und die Schwangerschaftsdauer bilden die separate INTERGROWTH‑21st-Geburtskarte. Private Werte werden nur im geschützten Profil gesetzt. Frühere Messungen oder das Geburtsdatum werden nicht umgeschrieben. Frontend nach der additiven Migration veröffentlichen.
+
+Migration 022 am [Betriebsdatum privat] produktiv mit interner privater Sicherung und Receipt angewandt; Logbuchbestand und bestehende Profilfelder erhalten, RLS/Policies unverändert. Pages-Veröffentlichung (historischer Prüfnachweis) aus (historischer Commit) erfolgreich; App-, Datenbank- und Restore-CI erfolgreich.
