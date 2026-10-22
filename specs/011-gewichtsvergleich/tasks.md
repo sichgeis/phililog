@@ -63,8 +63,9 @@ Erweiterung vollständig abgeschlossen und veröffentlicht. Keine Migration erfo
 - [x] Auftrag, fachliche Berechnung und Grenzen dokumentiert (AC-012–014).
 - [x] Berechnung und Kartenanzeige einschließlich zugänglicher Beschreibung und Referenzwechsel ergänzt (AC-012–014).
 - [x] `npm run check`: 116 Tests, TypeScript und Produktionsbuild erfolgreich. Neue Fachtests: WHO P3/P10/P50/P90, extreme Grenzen, Normalverteilungsfunktion gegen bekannte Werte sowie Monotonie/Symmetrie; alle sieben KiGGS-Stützwerte in allen verfügbaren Alterszeilen, Alters-/Gewichtsinterpolation und Extrapolationsgrenzen. DOM-Test: jede Karte, zugängliche Beschreibung, Referenzwechsel und fehlendes Geburtsdatum.
-- [ ] Commit/Push, CI und Pages-Veröffentlichung nachweisen.
+- [x] Implementierungscommit (historischer Commit) auf `main` gepusht. Check 39852449104 (historischer Prüfnachweis) vollständig erfolgreich, einschließlich App-, isolierter Supabase- und Restore-Prüfung.
+- [x] Pages 39852449139 (historischer Prüfnachweis) erfolgreich für denselben Commit. Produktions-HTML und `/phililog/assets/index-C8KFOSF7.js` HTTP 200; konkrete Perzentilanzeige, WHO-Extreme und KiGGS-Schätzung/-Grenzen im ausgelieferten Bundle bestätigt.
 
 WHO-Beispielberechnung zusätzlich unabhängig mit Python `math.erf` abgeglichen. RKI-Original-PDF erneut abgerufen; unveränderte SHA-256 zur bisherigen Quelle, Extraktionsskript reproduziert die sieben Perzentilen (gedruckte Seite 31). Quellen: [WHO](https://www.who.int/tools/child-growth-standards/standards/weight-for-age), [CDC zur Umrechnung](https://www.cdc.gov/growth-chart-training/hcp/computer-programs/sas-who.html), [RKI](https://edoc.rki.de/bitstream/handle/176904/3254/28jWMa04ZjppM.pdf?sequence=). Keine Datenbank-/Zugriffsänderung oder Migration. Tests ausschließlich mit erfundenen Daten; keine neue physische Geräteprüfung.
 
-Nächster Schritt: geprüfte Änderung committen, hochladen und veröffentlichen.
+Änderung am [Betriebsdatum privat] abgeschlossen und veröffentlicht. Grenzen: KiGGS ist zwischen Tabellenwerten ausdrücklich geschätzt und außerhalb P3–P97 nur als Grenze verfügbar; WHO-Anzeige außerhalb P0,1–P99,9 ebenfalls als Grenze. Keine offenen Aufgaben für diesen Änderungsauftrag.
