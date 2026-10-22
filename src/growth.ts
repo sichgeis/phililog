@@ -46,7 +46,7 @@ export function intervalChange(start: GrowthPoint | undefined, end: GrowthPoint 
   const days = (end.time - start.time) / 86400000;
   if (days <= 0) return { reason: 'Das Ende muss zeitlich nach dem Start liegen.' } as const;
   const grams = end.grams - start.grams;
-  return { grams, days, perDay: grams / days, zChange: end.z - start.z } as const;
+  return { grams, days, perDay: grams / days, zChange: start.days >= 14 && end.days >= 14 ? end.z - start.z : null } as const;
 }
 interface Endpoint { unit: string; age: number }
 interface VelocityTable { label: string; start: Endpoint; end: Endpoint; centiles: readonly (readonly [number, number])[] }

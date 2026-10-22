@@ -229,9 +229,16 @@ try {
   } finally { await vite.close(); }
   const originalSettings = await caregiver_a.client.from('family_settings').select().single(); assert.ifError(originalSettings.error);
   try {
-    const profile = await caregiver_a.client.from('family_settings').update({ birth_date: '2025-01-01', birth_weight_g: 2800 }).eq('id', true).eq('version', originalSettings.data.version).select().single();
+    const profile = await caregiver_a.client.from('family_settings').update({ birth_date: '2025-01-01', birth_weight_g: 2800, gestational_age_days: 39*7+2 }).eq('id', true).eq('version', originalSettings.data.version).select().single();
     assert.ifError(profile.error);
     assert.equal((await caregiver_b.client.from('family_settings').select().single()).data.birth_weight_g, 2800);
+    assert.equal((await caregiver_b.client.from('family_settings').select().single()).data.gestational_age_days, 39*7+2);
+    for (const gestation of [153,315,200.5]) assert.ok((await caregiver_a.client.from('family_settings').update({gestational_age_days:gestation}).eq('id',true)).error);
+    assert.ok((await anonymous.from('family_settings').update({gestational_age_days:280}).eq('id',true)).error);
+    assert.deepEqual((await outsider.client.from('family_settings').update({gestational_age_days:280}).eq('id',true).select()).data, []);
+    assert.deepEqual((await caregiver_b.client.from('family_settings').update({gestational_age_days:280}).eq('version',originalSettings.data.version).select()).data, []);
+    assert.ifError((await caregiver_b.client.from('family_settings').update({breast_left_ml:26}).eq('id',true)).error);
+    assert.equal((await caregiver_a.client.from('family_settings').select().single()).data.gestational_age_days,39*7+2,'Old clients preserve gestation');
     for (const birthWeight of [0, 299, 10001]) assert.ok((await caregiver_a.client.from('family_settings').update({birth_weight_g:birthWeight}).eq('id',true)).error);
     assert.ok((await anonymous.from('family_settings').update({birth_weight_g:3000}).eq('id',true)).error);
     assert.deepEqual((await outsider.client.from('family_settings').update({birth_weight_g:3000}).eq('id',true).select()).data, []);
@@ -244,7 +251,7 @@ try {
     assert.ok((await anonymous.from('family_settings').select()).error);
     assert.deepEqual((await outsider.client.from('family_settings').update({ breast_ml: 99 }).eq('id',true).select()).data, []);
     assert.ok((await caregiver_a.client.from('family_settings').update({ breast_ml: 0 }).eq('id',true)).error);
-    const changed = await caregiver_a.client.from('family_settings').update({ breast_left_ml: 20, breast_right_ml: 35 }).eq('id',true).eq('version',originalSettings.data.version + 1).select().single(); assert.ifError(changed.error);
+    const changed = await caregiver_a.client.from('family_settings').update({ breast_left_ml: 20, breast_right_ml: 35 }).eq('id',true).eq('version',originalSettings.data.version + 2).select().single(); assert.ifError(changed.error);
     assert.equal((await caregiver_b.client.from('family_settings').select().single()).data.breast_left_ml,20);
     assert.equal((await caregiver_b.client.from('family_settings').select().single()).data.breast_right_ml,35);
     assert.ok((await caregiver_a.client.from('family_settings').update({ breast_left_ml: -1, breast_right_ml: 40 }).eq('id',true)).error);
@@ -269,7 +276,7 @@ try {
     assert.equal((await caregiver_a.client.rpc('daily_report',{first_day:'2088-03-28',last_day:'2088-03-28'})).data[0].breast_ml,70);
     assert.ifError((await caregiver_b.client.from('feedings').delete().eq('id',samples[1].id)).error);
     assert.equal((await caregiver_a.client.rpc('daily_report',{first_day:'2088-03-28',last_day:'2088-03-28'})).data[0].breast_ml,0);
-  } finally { assert.ifError((await admin.from('family_settings').update({ breast_left_ml: originalSettings.data.breast_left_ml, breast_right_ml: originalSettings.data.breast_right_ml, birth_date: originalSettings.data.birth_date, birth_weight_g: originalSettings.data.birth_weight_g }).eq('id',true)).error); }
+  } finally { assert.ifError((await admin.from('family_settings').update({ breast_left_ml: originalSettings.data.breast_left_ml, breast_right_ml: originalSettings.data.breast_right_ml, birth_date: originalSettings.data.birth_date, birth_weight_g: originalSettings.data.birth_weight_g, gestational_age_days: originalSettings.data.gestational_age_days }).eq('id',true)).error); }
   const { readFileSync } = await import('node:fs');
   const correction = readFileSync('supabase/migrations/202609130008_backfill_family_events.sql','utf8');
   const seed = `begin;

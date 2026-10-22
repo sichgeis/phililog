@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { growthPoints, defaultInterval, intervalChange, velocityComparison, velocityPosition, weightZScore, whoZScore, weightForLength, monthDay } from '../src/growth.ts';
 import { WHO_WEIGHT_LMS, WHO_LENGTH_LMS, WHO_VELOCITY } from '../src/data/who-growth-girls.ts';
 import { newDraft, feedingInput, draftFromFeeding, sameInput, toCsv, optionalBirthWeight } from '../src/domain.ts';
+import { weightComparison } from '../src/weight.ts';
 import { growthChart } from '../src/growth-view.ts';
 import type { Feeding } from '../src/domain.ts';
 const birth = '2025-01-01';
@@ -73,7 +74,7 @@ test('Längeneingabe, Bearbeitung, Retryvergleich und CSV erhalten optionalen Me
 });
 test('Diagramme haben echte Zeitpositionen, zugängliche Beschreibung und keine ungültigen SVG-Zahlen',()=>{
  const points=growthPoints([entry(0),entry(7),entry(28)],birth,'who');
- for(const z of [true,false]){const svg=growthChart(points,birth,'who',z);assert.match(svg,/role="img"/);assert.doesNotMatch(svg,/NaN|Infinity/);assert.match(svg,/3 Messpunkte/);}
+ for(const z of [true,false]){const svg=growthChart(points,birth,'who',z);assert.match(svg,/role="img"/);assert.doesNotMatch(svg,/NaN|Infinity/);assert.match(svg,z ? /1 Messpunkte/ : /3 Messpunkte/);}
  assert.doesNotMatch(growthChart([points[0]],birth,'who'),/NaN|Infinity/);
 });
 
@@ -84,4 +85,40 @@ test('Normalverteilungsfunktion reproduziert bekannte Perzentilen, Symmetrie und
  }
  let previous = -1;
  for(let z=-8;z<=8;z+=0.1) {const value=zPercentile(z);assert.ok(value>=previous && value>=0 && value<=100);previous=value;}
+});
+
+test('Karten und beide Verläufe verwenden durchgängig Lebenstage ab tatsächlicher Geburt', () => {
+ const days = [0, 1, 7, 28, 60, 800];
+ const entries = days.map(day => entry(day, WHO_WEIGHT_LMS[day][1] * 1000, 52));
+ for (const reference of ['who', 'kiggs'] as const) {
+   const points = growthPoints(entries, birth, reference, Date.parse('2030-01-01T12:00:00Z'));
+   assert.deepEqual(points.map(point => point.days), days);
+   points.forEach((point, i) => {
+     const card = weightComparison(entries[i].weight_g!, entries[i].occurred_at, birth, Date.parse('2030-01-01T12:00:00Z'), reference);
+     assert.ok(!('reason' in card));
+     assert.equal(card.days, point.days);
+     assert.equal(point.p10, card.p10);assert.equal(point.median, card.median);assert.equal(point.p90, card.p90);
+     assert.ok(Math.abs(point.z) < 1e-12);
+     if (reference === 'who') assert.equal(card.percentile, 'ca. P50,0');
+   });
+   const change = intervalChange(points[0], points[3]);
+   assert.ok(!('reason' in change));
+   assert.equal(change.days, 28);
+   assert.equal(change.grams, entries[3].weight_g! - entries[0].weight_g!);
+   assert.equal(change.perDay, change.grams / 28);
+   assert.equal(change.zChange, null);
+   const velocity = velocityComparison(points[0], points[3], birth, null);
+   assert.ok(!('reason' in velocity));
+   assert.match(velocity.label, /0\s*–\s*4 Wochen/);
+   assert.equal(velocity.centiles.find(([p]) => p === 50)![1], 879);
+ }
+});
+
+test('Gewicht zur Länge nutzt die gemessene Länge; Altersgrenze liegt am zweiten tatsächlichen Geburtstag', () => {
+ const days = [0, 700, 730];
+ const rows = days.map(day => entry(day, 3500, 52));
+ const points = growthPoints(rows, birth, 'who', Date.parse('2030-01-01T12:00:00Z'));
+ assert.equal(points[0].lengthZ, points[1].lengthZ);
+ assert.equal(points[0].lengthZ, weightForLength(3500, 52));
+ assert.equal(points[2].lengthZ, null);
 });

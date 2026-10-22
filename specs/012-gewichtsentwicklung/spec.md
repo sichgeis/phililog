@@ -22,3 +22,15 @@ Status: Abgeschlossen und veröffentlicht am [Betriebsdatum privat]. Abgestimmt 
 ## Änderung am [Betriebsdatum privat]
 
 Durch ausdrücklichen Nutzerauftrag abgestimmt: Standardzeitraum von der ersten bis zur neuesten Messung statt eines etwa 14-tägigen Intervalls (REQ-002 / AC-002). Umsetzung, Commit, Push und Veröffentlichung autorisiert. Die Grenzen werden aus der Historie ermittelt; kein festes Datum wird hinterlegt.
+
+## Geburtseinordnung und Anfangsphase – abgestimmt am [Betriebsdatum privat]
+
+Der Auftraggeber hat den Vorschlag zur getrennten Geburtseinordnung und späterem WHO-Verlauf ausdrücklich zur Umsetzung und Veröffentlichung freigegeben. Commit, Push, notwendige additive Migration und geschützte Initialisierung des mitgeteilten Schwangerschaftsalters sind Teil dieses Auftrags. Private Profilwerte werden nicht in Repository, Migration oder Testdaten übernommen.
+
+- REQ-009 / AC-009: Eigene Geburtskarte aus ausdrücklich hinterlegtem Geburtsgewicht und Schwangerschaftsalter in Wochen plus Tagen. INTERGROWTH-21st-Geburtsgewichtsreferenz für Mädchen, taggenau 33+0 bis 42+6; konkrete Perzentile zwischen veröffentlichten P3/P5/P10/P50/P90/P95/P97 linear geschätzt, außerhalb nur Grenze. Quelle und Näherung klar benennen. Fehlende Angaben oder außerhalb des Referenzbereichs verständlich erklären; keine Annahme aus der ältesten Logbuchmessung.
+- REQ-010 / AC-010: Schwangerschaftsalter optional in geschützten gemeinsamen Einstellungen, mit Versionsschutz und gültigen Tagen 0–6. Keine Veränderung alter Messungen; alte Clients erhalten die neue Angabe. Keine Verschiebung des Lebensalters oder der Messzeitpunkte.
+- REQ-011 / AC-011: Messungen an Lebenstag 0–13 als Anfangsphase kennzeichnen; Veränderung zum ausdrücklich hinterlegten Geburtsgewicht in Gramm und Prozent zeigen. Keine gewöhnliche WHO-/KiGGS-Perzentile oder WHO-z-Score als vermeintlichen geburtsbezogenen Ausgangspunkt ausgeben. Die gestationsbezogene Geburtsperzentile bleibt ausschließlich auf der Geburtskarte.
+- REQ-012 / AC-012: Ab Lebenstag 14 bisherige WHO-/KiGGS-Karten und Referenzen nach tatsächlichem Lebensalter fortführen. Rohgewichtsverlauf enthält weiterhin alle geeigneten Messungen; Referenzlinien beginnen erst ab Tag 14. WHO-z-Score-Kurve und sichtbare z-Werte erst ab Tag 14; keine Verbindung oder Differenz von Geburtsreferenz zu WHO-Werten. z-Änderung bei Intervall mit Anfangsphase nicht berechnen. Tatsächliche Gramm/g pro Tag und vorhandene WHO-Zunahmevergleiche bleiben erhalten.
+- REQ-013 / AC-013: Geschützte neue Profilangabe über lokale Familien-/Fremd-/Anonym- und Versionskonflikttests prüfen; synthetischer Restore, Fach-/DOM-Tests, mobiler Browser bei 320/390 px, `npm run check`. Produktionsmigration vor Frontend, Bestand erhalten, CI und Veröffentlichung nachweisen.
+
+Quellen: [INTERGROWTH-21st, Oxford](https://intergrowth21.ndog.ox.ac.uk/) und [Originaltabelle Mädchen](https://media.tghn.org/articles/INTERGROWTH-21st_Birth_Weight_Standards_Girls_1.pdf); [RCPCH zur getrennten Anfangsphase](https://www.rcpch.ac.uk/resources/growth-charts-information-parents-carers). Keine Übernahme des vollständigen britischen RCPCH-Rechenverfahrens.

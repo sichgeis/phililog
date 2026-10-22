@@ -6,6 +6,7 @@ import { Window } from 'happy-dom';
 import * as domain from '../src/domain.ts';
 import * as weight from '../src/weight.ts';
 import * as report from '../src/report.ts';
+import * as birthWeight from '../src/birth-weight.ts';
 import * as growth from '../src/growth.ts';
 import * as growthView from '../src/growth-view.ts';
 
@@ -15,21 +16,21 @@ async function setup(t: any, person = 'caregiver_a', reduced = false, gameLoader
   t.after(() => window.happyDOM.close());
   window.document.body.innerHTML = '<div id="app"></div>';
   if (initialReference) window.localStorage.setItem('phililog-weight-reference', initialReference);
-  let settings = { breast_left_ml: 25, breast_right_ml: 25, birth_date: '2026-01-01', birth_weight_g: null as number | null, version: 1 };
+  let settings = { breast_left_ml: 25, breast_right_ml: 25, birth_date: '2026-01-01', birth_weight_g: null as number | null, gestational_age_days: null as number | null, version: 1 };
   const submitted: number[] = [];
   const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
-  Object.assign(window, domain, report, weight, growth, growthView, {
+  Object.assign(window, domain, report, weight, growth, growthView, birthWeight, {
     readWeightReference: () => weight.readWeightReference(window.localStorage),
     rememberWeightReference: (reference: weight.WeightReference) => weight.rememberWeightReference(reference, window.localStorage),
     loadGameForTest: gameLoader, configured: true, currentFamilyPerson: async () => person,
     matchMedia: () => ({ matches: reduced }),
     supabase: { rpc: async () => ({ data: true }), auth: { onAuthStateChange() {}, signOut: async () => ({}) } },
     getSettings: async () => ({ ...settings }),
-    saveSettings: async (values: any, version: number, birthDate: string | null, birthWeight: number | null) => {
+    saveSettings: async (values: any, version: number, birthDate: string | null, birthWeight: number | null, gestation: number | null) => {
       submitted.push(version);
       if (version !== settings.version) throw new Error('Die Einstellungen wurden inzwischen geändert.');
-      settings = { breast_left_ml: values.left, breast_right_ml: values.right, birth_date: birthDate!, birth_weight_g: birthWeight, version: version + 1 };
+      settings = { breast_left_ml: values.left, breast_right_ml: values.right, birth_date: birthDate!, birth_weight_g: birthWeight, gestational_age_days: gestation, version: version + 1 };
       return { ...settings };
     },
     allFeedings: async () => (window as any).listFeedings(500, undefined, 'weight'),
@@ -44,7 +45,7 @@ async function setup(t: any, person = 'caregiver_a', reduced = false, gameLoader
   await app.enterSession('test-user');
   const find = (selector: string) => { const el = window.document.querySelector(selector); assert.ok(el, selector); return el as any; };
   const input = (selector: string, value: string) => { const el = find(selector); el.value = value; el.dispatchEvent(new window.Event('input', { bubbles: true })); };
-  return { window, app, find, input, submitted, setSettings: (value: Omit<typeof settings, 'birth_weight_g'> & {birth_weight_g?: number | null}) => { settings = { ...value, birth_weight_g: value.birth_weight_g ?? null }; }, setCreate: (fn: typeof create) => { create = fn; } };
+  return { window, app, find, input, submitted, setSettings: (value: Omit<typeof settings, 'birth_weight_g' | 'gestational_age_days'> & {birth_weight_g?: number | null; gestational_age_days?: number | null}) => { settings = { ...value, birth_weight_g: value.birth_weight_g ?? null, gestational_age_days: value.gestational_age_days ?? null }; }, setCreate: (fn: typeof create) => { create = fn; } };
 }
 
 test('Settings-Entwurf behält Version nach Refresh und verlangt ausdrückliche Übernahme', async t => {
@@ -419,10 +420,10 @@ test('Logbuchfilter fragt serverseitig ab, paginiert und verwirft überholte Ant
 
 test('Gewichtskarten zeigen Alter, Referenzen, äußere Punkte und erlauben Bearbeitung; Logout leert private Ansicht', async t => {
   const ui = await setup(t);
-  const sample = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'weight', weight: '6000', timeMode: 'custom', localTime: '2026-01-08T12:00' }), id: 'synthetic-weight', version: 1 };
+  const sample = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'weight', weight: '6000', timeMode: 'custom', localTime: '2026-01-15T12:00' }), id: 'synthetic-weight', version: 1 };
   (ui.window as any).listFeedings = async (_limit: number, _cursor: any, kind: string) => kind === 'weight' ? [sample] : [];
   ui.app.switchView('weight'); await ui.app.refresh();
-  assert.match(ui.find('.weight-age').textContent, /7 Tage/);
+  assert.match(ui.find('.weight-age').textContent, /14 Tage/);
   assert.match(ui.find('.weight-relation').textContent, /Über P90/);
   assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /P10.*Median P50.*P90/);
   ui.find('[data-edit]').click();
@@ -448,7 +449,7 @@ test('Geburtsdatum speichern aktualisiert gemeinsame Karten; fehlendes Datum zei
 
 test('Referenzwechsel aktualisiert Karten ohne Abfrage, erhält Pagination, Fokus und Entwurf', async t => {
   const ui = await setup(t);
-  const sample = (id: string) => ({ ...domain.feedingInput({ ...domain.newDraft(), kind: 'weight', weight: '3900', timeMode: 'custom', localTime: '2026-01-01T12:00' }), id, version: 1 });
+  const sample = (id: string) => ({ ...domain.feedingInput({ ...domain.newDraft(), kind: 'weight', weight: '4300', timeMode: 'custom', localTime: '2026-01-15T12:00' }), id, version: 1 });
   let calls = 0;
   (ui.window as any).listFeedings = async (_limit: number, cursor: any) => { calls++; return cursor ? [sample('older')] : Array.from({ length: 30 }, (_, i) => sample(`w${i}`)); };
   ui.find('[data-kind="bottle"]').click(); ui.input('#amount', '75');
@@ -465,9 +466,9 @@ test('Referenzwechsel aktualisiert Karten ohne Abfrage, erhält Pagination, Foku
   assert.equal(ui.find('#weight-explanation').open, true);
   assert.match(ui.find('.weight-relation').textContent, /Zwischen P10 und P90/);
   assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /KiGGS/);
-  assert.match(ui.find('.weight-references').textContent, /2.840.*3.390.*3.930/);
-  assert.match(ui.find('.weight-card h2').textContent, /3.900 g/);
-  assert.match(ui.find('.weight-age').textContent, /0 Tage/);
+  assert.match(ui.find('.weight-references').textContent, /3.162.*3.763.*4.381/);
+  assert.match(ui.find('.weight-card h2').textContent, /4.300 g/);
+  assert.match(ui.find('.weight-age').textContent, /14 Tage/);
   assert.match(ui.find('#weight-explanation').textContent, /linear interpoliert.*ein und zwei Monate/);
   assert.match(ui.find('#weight-explanation a').href, /edoc.rki.de/);
   assert.equal(ui.window.localStorage.getItem('phililog-weight-reference'), 'kiggs');
@@ -530,16 +531,45 @@ test('Geburtsgewicht und Länge bleiben bei Konflikt und Ereigniswechsel erhalte
 
 test('Jede Gewichtskarte zeigt referenzgerechte Perzentile sichtbar und zugänglich', async t => {
  const ui = await setup(t);
- const sample = (grams:number, id:string) => ({...domain.feedingInput({...domain.newDraft(),kind:'weight',weight:String(grams),timeMode:'custom',localTime:'2026-01-01T12:00'}),id,version:1});
+ const sample = (grams:number, id:string) => ({...domain.feedingInput({...domain.newDraft(),kind:'weight',weight:String(grams),timeMode:'custom',localTime:'2026-01-15T12:00'}),id,version:1});
  (ui.window as any).listFeedings = async () => [sample(3000,'low'),sample(6000,'high')];
  ui.app.switchView('weight');await ui.app.refresh();
  const labels = () => [...ui.window.document.querySelectorAll('.weight-percentile')].map(el => el.textContent);
- assert.deepEqual(labels(), ['Perzentile: ca. P30,2','Perzentile: über P99,9']);
- assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /Perzentile: ca. P30,2/);
+ assert.deepEqual(labels(), ['Perzentile: ca. P11,7','Perzentile: über P99,9']);
+ assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /Perzentile: ca. P11,7/);
  ui.find('#weight-reference').value='kiggs';ui.find('#weight-reference').dispatchEvent(new ui.window.Event('change',{bubbles:true}));
- assert.deepEqual(labels(), ['Perzentile: ca. P19,2 (geschätzt)','Perzentile: über P97']);
- assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /KiGGS.*Perzentile: ca. P19,2/);
+ assert.deepEqual(labels(), ['Perzentile: ca. P5,8 (geschätzt)','Perzentile: über P97']);
+ assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /KiGGS.*Perzentile: ca. P5,8/);
  ui.setSettings({breast_left_ml:25,breast_right_ml:25,birth_date:null,birth_weight_g:null,version:2});
  await ui.app.refresh();assert.equal(ui.window.document.querySelector('.weight-percentile'),null);
  assert.match(ui.find('.weight-card').textContent,/Geburtsdatum/);
+});
+
+test('Geburtskarte, Anfangsphase und spätere Referenz bleiben getrennt; Profil ist versioniert', async t => {
+ const ui=await setup(t);
+ ui.app.switchView('settings');await ui.app.refresh();
+ ui.input('#birth-weight','2800');ui.input('#gestation-weeks','39');ui.input('#gestation-days','2');
+ await ui.app.storeSettings();
+ assert.deepEqual(ui.submitted,[1]);
+ const sample=(day:number, grams:number)=>({...domain.feedingInput({...domain.newDraft(),kind:'weight',weight:String(grams),timeMode:'custom',localTime:`2026-01-${String(day+1).padStart(2,'0')}T12:00`}),id:`birth-${day}`,version:1});
+ (ui.window as any).listFeedings=async()=>[sample(14,3100),sample(13,3000),sample(0,2800)];
+ ui.app.switchView('weight');await ui.app.refresh();
+ assert.match(ui.find('.birth-card').textContent,/2.800 g bei 39\+2 SSW/);
+ assert.match(ui.find('.birth-percentile').textContent,/geschätzt/);
+ assert.equal(ui.window.document.querySelectorAll('.weight-percentile').length,1);
+ const early=ui.window.document.querySelectorAll('.weight-card')[1];
+ assert.match(early.textContent,/Anfangsphase.*200 g.*7,1 %/);
+ assert.match(ui.find('.growth-summary').textContent,/Anfangsphase im Zeitraum/);
+ const charts=ui.window.document.querySelectorAll('.growth-chart');
+ assert.equal(charts[0].querySelectorAll('circle').length,3);
+ assert.equal(charts[1].querySelectorAll('circle').length,1);
+ const birthText=ui.find('.birth-percentile').textContent;
+ ui.find('#weight-reference').value='kiggs';ui.find('#weight-reference').dispatchEvent(new ui.window.Event('change',{bubbles:true}));
+ assert.equal(ui.find('.birth-percentile').textContent,birthText);
+ ui.app.switchView('settings');await ui.app.refresh();
+ ui.input('#gestation-days','7');await ui.app.storeSettings();assert.match(ui.find('#messages').textContent,/0–6/);
+ ui.input('#gestation-days','3');
+ ui.setSettings({breast_left_ml:25,breast_right_ml:25,birth_date:'2026-01-01',birth_weight_g:2800,gestational_age_days:39*7+4,version:3});
+ await ui.app.refresh();await ui.app.storeSettings();assert.equal(ui.find('#gestation-days').value,'3');assert.match(ui.find('#messages').textContent,/inzwischen/);
+ await ui.app.enterSession(null);assert.equal(ui.window.document.querySelector('.birth-card'),null);
 });

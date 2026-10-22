@@ -72,12 +72,12 @@ export function friendlyError(error: unknown): string {
 }
 
 export async function getSettings(): Promise<import('./report.ts').Settings> {
-  const { data, error } = await supabase!.from('family_settings').select('breast_left_ml,breast_right_ml,birth_date,birth_weight_g,version').eq('id', true).single();
+  const { data, error } = await supabase!.from('family_settings').select('breast_left_ml,breast_right_ml,birth_date,birth_weight_g,gestational_age_days,version').eq('id', true).single();
   if (error) throw error;
   return data;
 }
-export async function saveSettings(defaults: import('./report.ts').BreastDefaults, version: number, birthDate: string | null, birthWeight?: number | null): Promise<import('./report.ts').Settings> {
-  const { data, error } = await supabase!.from('family_settings').update({ breast_left_ml: defaults.left, breast_right_ml: defaults.right, birth_date: birthDate, ...(birthWeight !== undefined ? { birth_weight_g: birthWeight } : {}) }).eq('id', true).eq('version', version).select('breast_left_ml,breast_right_ml,birth_date,birth_weight_g,version').maybeSingle();
+export async function saveSettings(defaults: import('./report.ts').BreastDefaults, version: number, birthDate: string | null, birthWeight?: number | null, gestation?: number | null): Promise<import('./report.ts').Settings> {
+  const { data, error } = await supabase!.from('family_settings').update({ breast_left_ml: defaults.left, breast_right_ml: defaults.right, birth_date: birthDate, ...(birthWeight !== undefined ? { birth_weight_g: birthWeight } : {}), ...(gestation !== undefined ? { gestational_age_days: gestation } : {}) }).eq('id', true).eq('version', version).select('breast_left_ml,breast_right_ml,birth_date,birth_weight_g,gestational_age_days,version').maybeSingle();
   if (error) throw error;
   if (!data) throw new Error('Die Einstellungen wurden inzwischen geändert. Deine Eingaben bleiben erhalten. Bitte Serverwerte übernehmen und die Änderung erneut eingeben.');
   return data;

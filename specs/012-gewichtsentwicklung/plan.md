@@ -9,3 +9,9 @@
 ## Standardzeitraum ab [Betriebsdatum privat]
 
 Die chronologisch sortierten geeigneten Verlaufspunkte liefern erste und letzte Messung. Ein lokales Kennzeichen unterscheidet automatische von manuell gewählten Grenzen. Beim Öffnen der Gewichtsansicht wird es zurückgesetzt; innerhalb der Ansicht bleiben gültige manuelle Grenzen erhalten. Fachtests prüfen Standard und Randfälle; DOM-Regressionen prüfen vollständige Historie, manuelle Auswahl, Aktualisierung und erneutes Öffnen. Keine Datenbankänderung.
+
+## Geburtseinordnung ([Betriebsdatum privat])
+
+Additive Migration 022: nullable `gestational_age_days` in `family_settings` (22+0 bis 44+6 als Speicherbereich, Referenz separat begrenzt). Bestehende RLS, Versionsschutz und Spaltenrechte verwenden. API und Einstellungsentwurf um Angabe in Wochen/Tagen ergänzen; leer bleibt unbekannt. Produktion nur mit mitgeteilter Angabe initialisieren, private transaktionale Sicherung und Receipt; keine privaten Werte in Migration.
+
+Reproduzierbare Extraktion der sieben Mädchenperzentilen aus dem Original-PDF mit SHA-256; lineare Interpolation ausschließlich innerhalb einer taggenauen Zeile. Reines Fachmodul für Geburtseinordnung und Gewichtsänderung zum Geburtsgewicht. Separate Karte vor dem Verlauf. Frühe Messkarten statt Altersperzentilen mit Geburtgewichtsänderung, Referenzkurven ab Tag 14, z-Kurve/-Tabelle und z-Differenzen entsprechend begrenzen. Rohgewichtslinie und Gramm/g pro Tag erhalten. Keine Umrechnung zwischen den Referenzsystemen. Fach-/DOM-/lokale Supabase-/Restore- und mobile Browserprüfung vor Veröffentlichung.
