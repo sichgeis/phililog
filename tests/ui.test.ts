@@ -527,3 +527,19 @@ test('Geburtsgewicht und Länge bleiben bei Konflikt und Ereigniswechsel erhalte
  ui.find('[data-kind="bottle"]').click();ui.find('[data-kind="weight"]').click();assert.equal(ui.find('#length').value,'52,5');
  ui.input('#length','invalid');await ui.app.save();assert.match(ui.find('#messages').textContent,/Körperlänge/);
 });
+
+test('Jede Gewichtskarte zeigt referenzgerechte Perzentile sichtbar und zugänglich', async t => {
+ const ui = await setup(t);
+ const sample = (grams:number, id:string) => ({...domain.feedingInput({...domain.newDraft(),kind:'weight',weight:String(grams),timeMode:'custom',localTime:'2026-01-01T12:00'}),id,version:1});
+ (ui.window as any).listFeedings = async () => [sample(3000,'low'),sample(6000,'high')];
+ ui.app.switchView('weight');await ui.app.refresh();
+ const labels = () => [...ui.window.document.querySelectorAll('.weight-percentile')].map(el => el.textContent);
+ assert.deepEqual(labels(), ['Perzentile: ca. P30,2','Perzentile: über P99,9']);
+ assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /Perzentile: ca. P30,2/);
+ ui.find('#weight-reference').value='kiggs';ui.find('#weight-reference').dispatchEvent(new ui.window.Event('change',{bubbles:true}));
+ assert.deepEqual(labels(), ['Perzentile: ca. P19,2 (geschätzt)','Perzentile: über P97']);
+ assert.match(ui.find('.weight-scale').getAttribute('aria-label'), /KiGGS.*Perzentile: ca. P19,2/);
+ ui.setSettings({breast_left_ml:25,breast_right_ml:25,birth_date:null,birth_weight_g:null,version:2});
+ await ui.app.refresh();assert.equal(ui.window.document.querySelector('.weight-percentile'),null);
+ assert.match(ui.find('.weight-card').textContent,/Geburtsdatum/);
+});

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WHO_WEIGHT_GIRLS } from '../src/data/who-weight-girls.ts';
-import { KIGGS_WEIGHT_GIRLS } from '../src/data/kiggs-weight-girls.ts';
-import { ageInDays, ageLabel, validBirthDate, weightComparison, kiggsWeightAtAge, readWeightReference, rememberWeightReference } from '../src/weight.ts';
+import { KIGGS_WEIGHT_GIRLS, KIGGS_WEIGHT_CENTILES } from '../src/data/kiggs-weight-girls.ts';
+import { ageInDays, ageLabel, validBirthDate, weightComparison, kiggsWeightAtAge, kiggsPercentile, readWeightReference, rememberWeightReference } from '../src/weight.ts';
 
 test('KiGGS-Stützwerte, Zwischenwerte und Bereich; Quellen verändern die Einordnung', () => {
   assert.equal(KIGGS_WEIGHT_GIRLS.length, 24);
@@ -67,4 +67,33 @@ test('Keine erfundene Referenz bei fehlendem Datum, Zukunft, vor Geburt oder au�
   const atDay = (days: number) => new Date(Date.parse('2020-01-01T12:00:00Z') + days * 86400000).toISOString();
   assert.ok(!('reason' in weightComparison(18000, atDay(1856), '2020-01-01')));
   assert.match(weightComparison(18000, atDay(1857), '2020-01-01').reason!, /Außerhalb/);
+});
+
+test('WHO-Perzentilen aus LMS: Originalstützwerte, Randbereiche und monotone Einordnung', () => {
+  const compare = (weight: number) => weightComparison(weight, '2025-01-01T12:00:00Z', '2025-01-01');
+  assert.equal(compare(3232.2).percentile, 'ca. P50,0');
+  assert.equal(compare(2678).percentile, 'ca. P10,0');
+  assert.equal(compare(3853).percentile, 'ca. P90,0');
+  assert.equal(compare(2440).percentile, 'ca. P3,0');
+  assert.equal(compare(1500).percentile, 'unter P0,1');
+  assert.equal(compare(6000).percentile, 'über P99,9');
+  assert.equal(compare(3000).percentile, 'ca. P30,2');
+  for (const value of [NaN, Infinity, 0, -1]) assert.ok('reason' in compare(value));
+});
+
+test('KiGGS nutzt alle sieben Originalperzentilen, interpoliert Alter/Gewicht und extrapoliert nicht', () => {
+  const centiles = [3, 10, 25, 50, 75, 90, 97];
+  assert.equal(KIGGS_WEIGHT_CENTILES.length, 24);
+  assert.deepEqual(KIGGS_WEIGHT_CENTILES[0], [0, 2590, 2840, 3100, 3390, 3670, 3930, 4180]);
+  for (const [months, ...values] of KIGGS_WEIGHT_CENTILES) {
+    if (months * 30.4375 > 1856) continue;
+    values.forEach((weight, index) => assert.equal(kiggsPercentile(weight, months * 30.4375), `ca. P${centiles[index]},0 (geschätzt)`));
+    for (let i = 1; i < values.length; i++) assert.ok(values[i] > values[i - 1]);
+  }
+  assert.equal(kiggsPercentile(3245, 0), 'ca. P37,5 (geschätzt)');
+  assert.equal(kiggsPercentile(3795, 0.5 * 30.4375), 'ca. P50,0 (geschätzt)');
+  assert.equal(kiggsPercentile(2589, 0), 'unter P3');
+  assert.equal(kiggsPercentile(4181, 0), 'über P97');
+  for (const value of [NaN, Infinity, 0, -1]) assert.equal(kiggsPercentile(value, 0), null);
+  for (const day of [NaN, -1, 1857]) assert.equal(kiggsPercentile(3500, day), null);
 });

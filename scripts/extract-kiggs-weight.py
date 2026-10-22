@@ -9,6 +9,7 @@ import sys
 source = Path(sys.argv[1])
 page = subprocess.check_output(['pdftotext', '-f', '33', '-l', '33', '-layout', str(source), '-'], text=True)
 rows = []
+centile_rows = []
 for line in page.splitlines():
     match = re.match(r'\s*(\d+,\d+)\s+(Monate|Jahre)\s+(.*)', line)
     if not match:
@@ -21,6 +22,7 @@ for line in page.splitlines():
     p10, p50, p90 = values[1], values[3], values[5]
     assert 0 < p10 < p50 < p90
     rows.append(f'  [{int(months)}, {p10}, {p50}, {p90}],')
+    centile_rows.append(f'  [{int(months)}, {", ".join(map(str, values))}],')
 assert len(rows) == 24
 output = '''// RKI: Referenzperzentile, zweite erweiterte Ausgabe (2013), printed p. 31 (PDF p. 33).
 // Girls: KiGGS 2003–2006 and German perinatal data 1995–2000.
@@ -30,4 +32,6 @@ output = '''// RKI: Referenzperzentile, zweite erweiterte Ausgabe (2013), printe
 // Reproduce: python3 scripts/extract-kiggs-weight.py /path/to/download.pdf
 export const KIGGS_WEIGHT_GIRLS: readonly (readonly [number, number, number, number])[] = [
 ''' + '\n'.join(rows) + '\n];\n'
+output += '// [Alter in Monaten, P3, P10, P25, P50, P75, P90, P97 in Gramm].\n'
+output += 'export const KIGGS_WEIGHT_CENTILES: readonly (readonly number[])[] = [\n' + '\n'.join(centile_rows) + '\n];\n'
 Path('src/data/kiggs-weight-girls.ts').write_text(output)

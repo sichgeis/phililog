@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { zPercentile } from '../src/percentile.ts';
 import assert from 'node:assert/strict';
 import { growthPoints, defaultInterval, intervalChange, velocityComparison, velocityPosition, weightZScore, whoZScore, weightForLength, monthDay } from '../src/growth.ts';
 import { WHO_WEIGHT_LMS, WHO_LENGTH_LMS, WHO_VELOCITY } from '../src/data/who-growth-girls.ts';
@@ -74,4 +75,13 @@ test('Diagramme haben echte Zeitpositionen, zugängliche Beschreibung und keine 
  const points=growthPoints([entry(0),entry(7),entry(28)],birth,'who');
  for(const z of [true,false]){const svg=growthChart(points,birth,'who',z);assert.match(svg,/role="img"/);assert.doesNotMatch(svg,/NaN|Infinity/);assert.match(svg,/3 Messpunkte/);}
  assert.doesNotMatch(growthChart([points[0]],birth,'who'),/NaN|Infinity/);
+});
+
+test('Normalverteilungsfunktion reproduziert bekannte Perzentilen, Symmetrie und Reihenfolge', () => {
+ for (const [z, percentile] of [[0,50],[1,84.1344746069],[-1,15.8655253931],[1.95996398454,97.5],[-3,0.1349898032],[3,99.8650101968]]) {
+   assert.ok(Math.abs(zPercentile(z) - percentile) < 0.000008);
+   assert.ok(Math.abs(zPercentile(z) + zPercentile(-z) - 100) < 1e-10);
+ }
+ let previous = -1;
+ for(let z=-8;z<=8;z+=0.1) {const value=zPercentile(z);assert.ok(value>=previous && value>=0 && value<=100);previous=value;}
 });

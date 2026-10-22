@@ -1,5 +1,6 @@
+import { weightZScore, zPercentile, percentileLabel } from './percentile.ts';
 import { WHO_WEIGHT_GIRLS } from './data/who-weight-girls.ts';
-import { KIGGS_WEIGHT_GIRLS } from './data/kiggs-weight-girls.ts';
+import { KIGGS_WEIGHT_CENTILES } from './data/kiggs-weight-girls.ts';
 import { berlinDay } from './report.ts';
 
 export type WeightReference = 'who' | 'kiggs';
@@ -14,14 +15,29 @@ export function readWeightReference(storage?: Pick<Storage, 'getItem'>): WeightR
 export function rememberWeightReference(reference: WeightReference, storage?: Pick<Storage, 'setItem'>): void {
   try { (storage ?? localStorage).setItem('phililog-weight-reference', reference); } catch { /* Selection remains usable in memory. */ }
 }
-export function kiggsWeightAtAge(days: number): readonly [number, number, number] | null {
+function kiggsCentilesAtAge(days: number): number[] | null {
   if (!Number.isFinite(days) || days < 0 || days > 1856) return null;
   const months = days / (365.25 / 12);
-  const upper = KIGGS_WEIGHT_GIRLS.findIndex(row => row[0] >= months);
-  if (upper === 0) return KIGGS_WEIGHT_GIRLS[0].slice(1) as [number, number, number];
-  const a = KIGGS_WEIGHT_GIRLS[upper - 1], b = KIGGS_WEIGHT_GIRLS[upper];
+  const upper = KIGGS_WEIGHT_CENTILES.findIndex(row => row[0] >= months);
+  if (upper === 0) return KIGGS_WEIGHT_CENTILES[0].slice(1);
+  const a = KIGGS_WEIGHT_CENTILES[upper - 1], b = KIGGS_WEIGHT_CENTILES[upper];
   const fraction = (months - a[0]) / (b[0] - a[0]);
-  return [1, 2, 3].map(column => a[column] + fraction * (b[column] - a[column])) as [number, number, number];
+  return a.slice(1).map((value, i) => value + fraction * (b[i + 1] - value));
+}
+export function kiggsWeightAtAge(days: number): readonly [number, number, number] | null {
+  const values = kiggsCentilesAtAge(days);
+  return values ? [values[1], values[3], values[5]] : null;
+}
+export function kiggsPercentile(weight: number, days: number): string | null {
+  const values = kiggsCentilesAtAge(days);
+  if (!values || !Number.isFinite(weight) || weight <= 0) return null;
+  if (weight < values[0]) return 'unter P3';
+  if (weight > values[6]) return 'über P97';
+  const centiles = [3, 10, 25, 50, 75, 90, 97];
+  const upper = values.findIndex(value => value >= weight);
+  const value = upper === 0 ? 3 : centiles[upper - 1] + (weight - values[upper - 1])
+    / (values[upper] - values[upper - 1]) * (centiles[upper] - centiles[upper - 1]);
+  return `${percentileLabel(value)} (geschätzt)`;
 }
 
 export function validBirthDate(value: string): boolean {
@@ -49,6 +65,7 @@ export function weightComparison(weight: number, occurredAt: string, birthDate: 
   const padding = (p90 - p10) * 0.18;
   const min = Math.min(p10, weight) - padding, max = Math.max(p90, weight) + padding;
   const position = (value: number) => (value - min) / (max - min) * 100;
-  return { days, p10, median, p90, left: position(p10), center: position(median), right: position(p90), point: position(weight),
+  const percentile = reference === 'who' ? percentileLabel(zPercentile(weightZScore(weight, days)!)) : kiggsPercentile(weight, days)!;
+  return { days, p10, median, p90, percentile, left: position(p10), center: position(median), right: position(p90), point: position(weight),
     relation: weight < p10 ? 'Unter P10' : weight > p90 ? 'Über P90' : 'Zwischen P10 und P90' } as const;
 }

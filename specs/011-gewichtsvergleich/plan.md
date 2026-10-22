@@ -12,3 +12,7 @@
 - Fachmodul um explizite Referenz und lineare Perzentilinterpolation ergänzen; WHO unverändert. Obergrenze 1856 Tage für beide Quellen.
 - Auswahl direkt auf der Gewichtsseite, nicht personenbezogene Gerätepräferenz in localStorage mit Fehlerbehandlung. Keine Datenbankmigration. Quellen und Interpolationshinweis dynamisch; keine neuen Datenabfragen beim Wechsel.
 - Stützwerte, Interpolation, Grenzfälle und Speicherausfälle fachlich prüfen; DOM prüft sofortigen Wechsel, Fokus, Pagination, Entwürfe und Quelle. Gesamtcheck, echte mobile Browseransicht mit synthetischen Daten, anschließend bestehender autorisierter Pages-Rollout.
+
+## Individuelle Perzentile ([Betriebsdatum privat])
+
+Gemeinsames reines Modul `percentile.ts` für bestehende WHO-LMS-Berechnung und kumulative Standardnormalverteilung, ohne Importzyklus zwischen Gewicht und Verlauf. WHO-Zunahme/z-Score bleibt unverändert. KiGGS-Extraktion um alle sieben veröffentlichten Perzentilen erweitern; bisherige P10/P50/P90 bleiben identisch. Gewichtsinterpolation nur zwischen veröffentlichten Perzentilen und ausdrücklich als Näherung kennzeichnen. Quelle: RKI, gedruckte Seite 31; WHO/CDC beschreiben Perzentile als Normalverteilungsfunktion des z-Scores. Fachtests gegen bekannte Verteilungswerte und offizielle Stützpunkte, Grenzen/Monotonie und DOM-Tests für Quellenwechsel, zugängliche Beschriftung und fehlende Referenz; anschließend `npm run check` und Pages-Veröffentlichung. Keine Migration.

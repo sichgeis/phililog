@@ -1,23 +1,10 @@
-import { WHO_WEIGHT_LMS, WHO_LENGTH_LMS, WHO_VELOCITY, WHO_BIRTH_VELOCITY } from './data/who-growth-girls.ts';
+import { WHO_LENGTH_LMS, WHO_VELOCITY, WHO_BIRTH_VELOCITY } from './data/who-growth-girls.ts';
 import { weightComparison, type WeightReference } from './weight.ts';
 import { berlinDay } from './report.ts';
 import type { Feeding } from './domain.ts';
 
-type Lms = readonly [number, number, number];
-export function lmsCentile(z: number, [l, m, s]: Lms): number {
-  return l === 0 ? m * Math.exp(s * z) : m * Math.pow(1 + l * s * z, 1 / l);
-}
-export function whoZScore(grams: number, lms: Lms): number | null {
-  if (!Number.isFinite(grams) || grams <= 0) return null;
-  const kg = grams / 1000, [l, m, s] = lms;
-  const z = l === 0 ? Math.log(kg / m) / s : (Math.pow(kg / m, l) - 1) / (s * l);
-  if (z > 3) return 3 + (kg - lmsCentile(3, lms)) / (lmsCentile(3, lms) - lmsCentile(2, lms));
-  if (z < -3) return -3 + (kg - lmsCentile(-3, lms)) / (lmsCentile(-2, lms) - lmsCentile(-3, lms));
-  return z;
-}
-export function weightZScore(grams: number, days: number): number | null {
-  return Number.isInteger(days) && days >= 0 && days < WHO_WEIGHT_LMS.length ? whoZScore(grams, WHO_WEIGHT_LMS[days]) : null;
-}
+import { whoZScore, weightZScore, type Lms } from './percentile.ts';
+export { lmsCentile, whoZScore, weightZScore } from './percentile.ts';
 export function weightForLength(grams: number, cm: number): number | null {
   if (!Number.isFinite(cm) || cm < 45 || cm > 110) return null;
   const index = (cm - 45) * 2, lower = Math.floor(index), upper = Math.ceil(index), fraction = index - lower;
