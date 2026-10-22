@@ -70,6 +70,7 @@ let entries: Feeding[] = [];
 let weightHistory: Feeding[] | null = null;
 let growthError = '';
 let growthStart = '', growthEnd = '';
+let growthIntervalManual = false;
 let latest: Feeding | null = null;
 let meal: Feeding | null = null;
 let hasMore = false;
@@ -246,7 +247,8 @@ function historyView(): string {
 function weightView(): string {
   const reference = weightReferences[weightReference];
   const points = growthPoints(weightHistory ?? [], settings?.birth_date ?? null, weightReference);
-  if (!points.some(p => p.entry.id === growthStart) || !points.some(p => p.entry.id === growthEnd)) {
+  if (!growthIntervalManual || !points.some(p => p.entry.id === growthStart) || !points.some(p => p.entry.id === growthEnd)) {
+    growthIntervalManual = false;
     const interval = defaultInterval(points); growthStart = interval.start; growthEnd = interval.end;
   }
   const weightDate = (iso: string) => new Date(iso).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Berlin' });
@@ -290,7 +292,7 @@ function render() {
     const control = document.querySelector<HTMLSelectElement>(`#${id}`);
     if (!control) continue;
     control.value = id === 'growth-start' ? growthStart : growthEnd;
-    control.addEventListener('change', () => { if (id === 'growth-start') growthStart = control.value; else growthEnd = control.value; render(); });
+    control.addEventListener('change', () => { growthIntervalManual = true; if (id === 'growth-start') growthStart = control.value; else growthEnd = control.value; render(); });
   }
   const referenceSelect = document.querySelector<HTMLSelectElement>('#weight-reference');
   if (referenceSelect) referenceSelect.value = weightReference;
@@ -310,6 +312,7 @@ function render() {
 }
 function switchView(next: typeof view) {
   if (busy) return;
+  if (next === 'weight' && next !== view) growthIntervalManual = false;
   captureForm(); remember(); if (next === 'report') reportRows = null; if (next !== view && (next === 'history' || next === 'weight')) { entries = []; hasMore = false; } view = next; notice = ''; error = ''; render(); window.scrollTo(0, 0); if (next !== 'about') void refresh();
 }
 function bindLogout() {
@@ -507,7 +510,7 @@ async function enterSession(id: string | null) {
   const previous = userId;
   const ownEpoch = ++epoch;
   if (previous && previous !== id) { try { localStorage.removeItem(storageKey()); } catch { /* no storage */ } }
-  weightHistory = null; growthError = ''; growthStart = ''; growthEnd = '';
+  weightHistory = null; growthError = ''; growthStart = ''; growthEnd = ''; growthIntervalManual = false;
   historyKind = ''; hasMore = false; settings = null; settingsDraft = null; reportRows = null; reportWeek = berlinDay(); signedInPerson = null;
   userId = id; authorized = false; entries = []; latest = null; meal = null; draft = newDraft(); pending = null; edit = null;
   error = ''; notice = ''; view = 'new'; busy = false; loading = Boolean(id);

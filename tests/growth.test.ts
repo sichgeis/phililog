@@ -33,8 +33,11 @@ test('Verlauf sortiert echte Zeiten, schließt ungeeignete Daten aus und respekt
  const who=growthPoints([entry(14)],birth,'who')[0],kiggs=growthPoints([entry(14)],birth,'kiggs')[0];
  assert.equal(who.z,kiggs.z);assert.notEqual(who.median,kiggs.median);
 });
-test('Messintervall: 14-Tage-Standard, echte Teil-Tage, negative Zunahme und gleiche Zeiten',()=>{
- const points=growthPoints([entry(0),entry(7),entry(21)],birth,'who');assert.deepEqual(defaultInterval(points),{start:'w7',end:'w21'});
+test('Messintervall: erste bis letzte Messung, echte Teil-Tage, negative Zunahme und gleiche Zeiten',()=>{
+ const points=growthPoints([entry(0),entry(7),entry(21)],birth,'who');assert.deepEqual(defaultInterval(points),{start:'w0',end:'w21'});
+ assert.deepEqual(defaultInterval([]),{start:'',end:''});
+ assert.deepEqual(defaultInterval([points[0]]),{start:'',end:'w0'});
+ assert.deepEqual(defaultInterval([points[0],{...points[0],entry:{...points[0].entry,id:'duplicate'}}]),{start:'',end:'duplicate'});
  const a=point(7,3500),b=point(21,3800),change=intervalChange(a,b);assert.ok(!('reason' in change));assert.equal(change.grams,300);assert.equal(change.perDay,300/14);
  assert.match(intervalChange(b,a).reason!,/nach/);assert.match(intervalChange(a,a).reason!,/nach/);assert.match(intervalChange(undefined,b).reason!,/zwei/);
  const negative=intervalChange(b,{...b,time:b.time+1.5*86400000,grams:3700});assert.ok(!('reason' in negative));assert.equal(negative.perDay,-100/1.5);

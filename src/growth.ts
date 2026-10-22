@@ -51,9 +51,7 @@ export function growthPoints(entries: Feeding[], birthDate: string | null, refer
 export function defaultInterval(points: GrowthPoint[]): { start: string; end: string } {
   const end = points.at(-1);
   if (!end) return { start: '', end: '' };
-  const before = points.filter(p => p.time < end.time);
-  const target = end.time - 14 * 86400000;
-  const start = before.reduce<GrowthPoint | undefined>((best, p) => !best || Math.abs(p.time - target) < Math.abs(best.time - target) ? p : best, undefined);
+  const start = points.find(p => p.time < end.time);
   return { start: start?.entry.id ?? '', end: end.entry.id };
 }
 export function intervalChange(start: GrowthPoint | undefined, end: GrowthPoint | undefined) {

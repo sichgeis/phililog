@@ -5,3 +5,7 @@
 - API lädt alle Gewichte serverseitig gefiltert mit Cursor; getrennte private Verlaufshistorie, Epoch-/Refreshschutz. Kartenpagination und Verlaufssatz unabhängig. Intervallauswahl rein lokal, keine Profil-Schreibvorgänge; bei Fehler vollständige Historie nicht als aktuell darstellen.
 - Migration 021 ergänzt nullable Geburtsgewicht und nullable length_cm ausschließlich bei Gewichtseinträgen. Bestehende RLS/Versionstrigger, Spaltenrechte ergänzt. Neue Felder optional, alte Clients kompatibel, Export um letzte Längenspalte erweitern. Entwurfsrestore alter Clients ergänzt Standard für neues Feld.
 - Prüfen: offizielle LMS-/Zunahmestützwerte, ±3-Regel, Zeitabstände/Tagesgrenzen, Reihenfolge/Duplikate, ungültige/future Werte, gleiche Zeit, Geburtssonderfall, Gruppen-/Längengrenzen, Intervallgültigkeit, vollständige Historie und Abmeldung. Lokal echte API prüft Nullable-/Kind-/Grenzconstraints, Familie/Fremd/Anon und Versionskonflikt. Migration transaktional mit interner privater Sicherung und exaktem Bestands-/Policyvergleich.
+
+## Standardzeitraum ab [Betriebsdatum privat]
+
+Die chronologisch sortierten geeigneten Verlaufspunkte liefern erste und letzte Messung. Ein lokales Kennzeichen unterscheidet automatische von manuell gewählten Grenzen. Beim Öffnen der Gewichtsansicht wird es zurückgesetzt; innerhalb der Ansicht bleiben gültige manuelle Grenzen erhalten. Fachtests prüfen Standard und Randfälle; DOM-Regressionen prüfen vollständige Historie, manuelle Auswahl, Aktualisierung und erneutes Öffnen. Keine Datenbankänderung.

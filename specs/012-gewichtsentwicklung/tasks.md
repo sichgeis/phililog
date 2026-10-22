@@ -28,3 +28,14 @@ Migration 021 am [Betriebsdatum privat] transaktional angewandt. SHA-256: `7af0c
 - Eigene temporäre Browsermessungen entfernt, vorheriges lokales Testprofil wiederhergestellt, Testtab geschlossen, Viewport zurückgesetzt und eigener Entwicklungsserver beendet.
 
 Alle AC-001–008 erfüllt; veröffentlicht am [Betriebsdatum privat]. Grenzen: WHO-Zunahmevergleiche ausschließlich bei vorhandenen Tabellenintervallen; frühe Geburtsgewichtsgruppen benötigen das optionale tatsächliche Geburtsgewicht. Ohne konkrete Angabe bleibt dieses Feld leer. Smartphone-Viewportprüfung ersetzt keine physische PWA-/Geräteabnahme (separat Feature 001).
+
+## Änderung Standardzeitraum am [Betriebsdatum privat]
+
+- [x] Nutzerauftrag in Spezifikation und Plan übernommen.
+- [x] Standard erste bis letzte geeignete Messung implementiert; manuelle Auswahl innerhalb der Ansicht erhalten.
+- [x] `npm run check`: 112 Tests bestanden, TypeScript und Produktionsbuild erfolgreich. Fachtest prüft erste/letzte Messung sowie leere Historie, Einzelmessung und gleiche Zeitpunkte. DOM-Test prüft vollständige Historie trotz Kartenpagination, manuelle Auswahl mit Aktualisierung/Referenzwechsel, erneutes Öffnen und neue letzte Messung.
+- [ ] Commit, Push, CI und Veröffentlichung nachweisen.
+
+Keine Datenbank- oder Zugriffsänderung; keine Migration erforderlich. Ausschließlich erfundene Testdaten verwendet.
+
+Nächster Schritt: geprüfte Änderung committen, hochladen und veröffentlichen.

@@ -495,14 +495,17 @@ test('Vollständiger Verlauf ist unabhängig von Karten; Intervallwechsel erhäl
  ui.app.switchView('weight');await ui.app.refresh();
  assert.equal(ui.window.document.querySelectorAll('.weight-card').length,1);
  assert.match(ui.find('.growth-overview').textContent,/4 geeignete Messungen/);
- assert.equal(ui.find('#growth-start').value,'g14');assert.equal(ui.find('#growth-end').value,'g28');
- assert.match(ui.find('.growth-summary').textContent,/\+350 g/);
+ assert.equal(ui.find('#growth-start').value,'g0');assert.equal(ui.find('#growth-end').value,'g28');
+ assert.match(ui.find('.growth-summary').textContent,/\+700 g/);
  const before=queries;const select=ui.find('#growth-start');select.focus();select.value='g7';select.dispatchEvent(new ui.window.Event('change',{bubbles:true}));
  assert.equal(queries,before);assert.equal(ui.window.document.activeElement?.id,'growth-start');assert.match(ui.find('.growth-summary').textContent,/\+525 g/);
  ui.find('#growth-values').open=true;ui.find('#weight-reference').value='kiggs';ui.find('#weight-reference').dispatchEvent(new ui.window.Event('change',{bubbles:true}));
  assert.equal(ui.find('#growth-values').open,true);assert.match(ui.find('.growth-overview').textContent,/immer WHO-basiert/);
+ await ui.app.refresh();assert.equal(ui.find('#growth-start').value,'g7');assert.equal(ui.find('#growth-end').value,'g28');
  ui.find('#growth-end').value='g7';ui.find('#growth-end').dispatchEvent(new ui.window.Event('change',{bubbles:true}));assert.match(ui.find('.growth-overview').textContent,/zeitlich nach/);
  ui.app.switchView('new');assert.equal(ui.find('#amount').value,'75');
+ ui.app.switchView('weight');await ui.app.refresh();assert.equal(ui.find('#growth-start').value,'g0');assert.equal(ui.find('#growth-end').value,'g28');
+ rows.push(sample(30));await ui.app.refresh();assert.equal(ui.find('#growth-start').value,'g0');assert.equal(ui.find('#growth-end').value,'g30');
  await ui.app.enterSession(null);assert.equal(ui.window.document.querySelector('.growth-overview'),null);
 });
 test('Verlaufs-Ladefehler erhält Karten, zeigt keinen vermeintlich vollständigen alten Verlauf', async t=>{
