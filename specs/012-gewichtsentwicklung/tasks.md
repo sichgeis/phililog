@@ -34,8 +34,9 @@ Alle AC-001–008 erfüllt; veröffentlicht am [Betriebsdatum privat]. Grenzen: 
 - [x] Nutzerauftrag in Spezifikation und Plan übernommen.
 - [x] Standard erste bis letzte geeignete Messung implementiert; manuelle Auswahl innerhalb der Ansicht erhalten.
 - [x] `npm run check`: 112 Tests bestanden, TypeScript und Produktionsbuild erfolgreich. Fachtest prüft erste/letzte Messung sowie leere Historie, Einzelmessung und gleiche Zeitpunkte. DOM-Test prüft vollständige Historie trotz Kartenpagination, manuelle Auswahl mit Aktualisierung/Referenzwechsel, erneutes Öffnen und neue letzte Messung.
-- [ ] Commit, Push, CI und Veröffentlichung nachweisen.
+- [x] Implementierungscommit (historischer Commit) auf `main` hochgeladen. CI 39851480913 (historischer Prüfnachweis) erfolgreich: App sowie isolierte Supabase-/Restore-Prüfungen.
+- [x] GitHub Pages 39851491854 (historischer Prüfnachweis) erfolgreich für denselben Commit. Produktions-HTML und `/phililog/assets/index-BmN99dZL.js` liefern HTTP 200; erste/früheste bis letzte Messung im ausgelieferten Bundle bestätigt.
 
 Keine Datenbank- oder Zugriffsänderung; keine Migration erforderlich. Ausschließlich erfundene Testdaten verwendet.
 
-Nächster Schritt: geprüfte Änderung committen, hochladen und veröffentlichen.
+Änderung abgeschlossen und am [Betriebsdatum privat] veröffentlicht. Keine offenen Aufgaben für diesen Änderungsauftrag.
