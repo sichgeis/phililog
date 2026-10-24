@@ -116,4 +116,4 @@ Familienrollen und Betriebsbeispiele sind neutral beschrieben. Bestehende techni
 
 ## Private Darstellung der Bezugspersonen
 
-Ein lokal geprüfter Kandidat entfernt persönliche Namensliterale aus der neuen Oberfläche und lädt vertraute Labels und Speichereffekte aus geschützter Konfiguration. Bestehende Identitäten und Zugänge bleiben erhalten. Noch nicht veröffentlicht: [Umfang und Grenzen](specs/013-private-bezugspersonen/spec.md), [Rollout und Rückfall](docs/caregiver-privacy-rollout.md).
+Die veröffentlichte Oberfläche enthält keine persönlichen Namensliterale und lädt vertraute Labels und Speichereffekte aus geschützter Konfiguration. Bestehende Identitäten und Zugänge bleiben erhalten. Beide Git-Historien wurden zusätzlich bereinigt; alte GitHub-Caches benötigen gesonderte Entfernung. [Umfang und Grenzen](specs/013-private-bezugspersonen/spec.md), [Rollout und Rückfall](docs/caregiver-privacy-rollout.md).

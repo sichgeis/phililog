@@ -1,6 +1,6 @@
 # 013 – Private Darstellung der Bezugspersonen
 
-Status: In Umsetzung; lokaler Kandidat, produktive Freigabe ausstehend.
+Status: Abgeschlossen und veröffentlicht am 24.10.2026; Nachweise in tasks.md.
 
 ## Abstimmung
 

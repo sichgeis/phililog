@@ -1,6 +1,6 @@
 # Private Bezugspersonen: Veröffentlichung und Grenzen
 
-Produktionsrollout und koordinierte Historienbereinigung am 24.10.2026 ausdrücklich freigegeben; tatsächliche Ergebnisse stehen in den Feature-Aufgaben. [Anforderungen](../specs/013-private-bezugspersonen/spec.md).
+Produktionsrollout und koordinierte Historienbereinigung am 24.10.2026 ausdrücklich freigegeben und erfolgreich ausgeführt; tatsächliche Ergebnisse stehen in den Feature-Aufgaben. [Anforderungen](../specs/013-private-bezugspersonen/spec.md).
 
 ## Vor Freigabe
 
