@@ -91,5 +91,12 @@ export async function getDailyReport(first: string, last: string): Promise<impor
 export async function currentFamilyPerson(): Promise<import('./domain.ts').Person | null> {
   const { data, error } = await supabase!.rpc('current_family_person');
   if (error) throw error;
-  return data === 'caregiver_a' || data === 'caregiver_b' ? data : null;
+  return typeof data === 'string' && data.length > 0 ? data : null;
+}
+
+// Presentation is private runtime data, never build-time VITE configuration.
+export async function familyCaregivers(): Promise<import('./caregivers.ts').Caregiver[]> {
+  const { data, error } = await supabase!.rpc('family_caregivers').abortSignal(AbortSignal.timeout(3000));
+  if (error) throw error;
+  return data ?? [];
 }

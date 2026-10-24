@@ -7,3 +7,7 @@ Diese Bereinigung verändert weder bestehende Rollenwerte der Datenbank/API noch
 Das lokale Administrationshilfsprogramm benötigt die separat verwaltete Zielkennung in `PHILILOG_SUPABASE_PROJECT`. Ohne gültige Kennung bricht es vor Tokenzugriff und API-Aufruf ab. Beispielbefehle mit `PROJECT_REF` müssen vor Verwendung durch die eigene Kennung ersetzt werden. Geheimnisse weiterhin ausschließlich außerhalb von Git verwalten.
 
 Nach einer Git-Historienbereinigung frische Klone verwenden. Alte Klone oder historische GitHub-Kopien können die ursprünglichen Dokumente weiterhin enthalten; eine Veröffentlichung alter Branches würde sie wieder einführen. GitHub-Supportanfragen werden separat gesammelt.
+
+## Neutrale Installationsverträge und bestehende Produktion
+
+Die zusätzliche Historienbereinigung ersetzt persönliche Namensliterale auch in SQL-Installationsvorlagen durch neutrale Rollen. Bestehende Datenbanken behalten ihren bisherigen Vertragsstand. Niemals alte Migrationen erneut ausführen oder bestehende Mitgliedschaften/Einträge zur Angleichung umschreiben. Neue Oberfläche und additive Migration 023 unterstützen beide Formen als opake Identitäten. Alte Commits sind keine Rollback-Kandidaten für die bestehende Produktion.

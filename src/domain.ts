@@ -5,7 +5,8 @@ export function isActivity(kind: FeedingKind): kind is 'sunbath' | 'massage' | '
 }
 export const moods = { fussy: { label: 'Quengelig', icon: '😣' }, sleepy: { label: 'Schläfrig', icon: '😴' }, calm: { label: 'Ruhig', icon: '😌' }, alert: { label: 'Aufmerksam', icon: '👀' }, angry: { label: 'Zornig', icon: '😠' }, asleep: { label: 'Eingeschlafen', icon: '💤' } } as const;
 export type Mood = keyof typeof moods;
-export type Person = 'caregiver_a' | 'caregiver_b';
+// Opaque, server-managed identity. Keep legacy values in records and local drafts.
+export type Person = string;
 export type MilkType = 'pre' | 'breast_milk';
 export type Side = 'left' | 'right' | 'both';
 export interface Draft {

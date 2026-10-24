@@ -1,3 +1,4 @@
+import { legacyPeople } from './legacy-test-people.mjs';
 // Invoked by test-local-supabase against the guarded local API. Preserve existing synthetic game data.
 import assert from 'node:assert/strict';
 import { evaluate } from '../src/game/pacifier.ts';
@@ -8,48 +9,48 @@ const sql = input => execFileSync('docker', ['exec', '-i', 'supabase_db_phililog
 const tables = ['game_state', 'game_unlocks', 'game_stats', 'game_operations', 'game_scores'];
 const snapshot = () => tables.map(t => sql(`select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from public.${t} t;`));
 const quote = s => "'" + s.replaceAll("'", "''") + "'";
-export async function testGame({ caregiver_a, caregiver_b, outsider, anonymous }) {
+export async function testGame({ caregiverA, caregiverB, outsider, anonymous }) {
   const original = snapshot();
-  const op = (kind, payload, actor = caregiver_a, id = randomUUID(), extra = {}) => ({ client: actor.client, args: { operation_id: id, actor_id: actor.user.id, operation_kind: kind, operation_payload: payload, rules: 1, client_schema: 1, ...extra } });
-  const round = (bonus = 5, actor = caregiver_a) => op('round', { game: 'pacifier', completed: 5, bonus }, actor);
-  const buy = (skill, actor = caregiver_a) => op('buy', { skill }, actor);
+  const op = (kind, payload, actor = caregiverA, id = randomUUID(), extra = {}) => ({ client: actor.client, args: { operation_id: id, actor_id: actor.user.id, operation_kind: kind, operation_payload: payload, rules: 1, client_schema: 1, ...extra } });
+  const round = (bonus = 5, actor = caregiverA) => op('round', { game: 'pacifier', completed: 5, bonus }, actor);
+  const buy = (skill, actor = caregiverA) => op('buy', { skill }, actor);
   const apply = async o => { const result = await o.client.rpc('game_apply', o.args); assert.ifError(result.error); return result.data; };
-  const load = async (actor = caregiver_a) => { const result = await actor.client.rpc('game_snapshot'); assert.ifError(result.error); return result.data; };
+  const load = async (actor = caregiverA) => { const result = await actor.client.rpc('game_snapshot'); assert.ifError(result.error); return result.data; };
   try {
     sql('begin; delete from public.game_scores; delete from public.game_operations; delete from public.game_stats; delete from public.game_unlocks; update public.game_state set xp_total=0,xp_balance=0,revision=0,schema_version=1; commit;');
     assert.equal((await load()).xp_total, 0);
-    assert.deepEqual(await load(), await load(caregiver_b));
+    assert.deepEqual(await load(), await load(caregiverB));
     for (const denied of [outsider.client, anonymous]) {
       assert.ok((await denied.rpc('game_snapshot')).error);
       assert.ok((await denied.rpc('game_apply', round().args)).error);
     }
     for (const table of tables) {
-      assert.equal((await caregiver_a.client.from(table).insert({})).error?.code, '42501', `Direct insert denied by privilege: ${table}`);
-      assert.equal((await caregiver_a.client.from(table).delete().eq(table === 'game_state' ? 'id' : 'state_id', true)).error?.code, '42501', `Direct delete denied by privilege: ${table}`);
+      assert.equal((await caregiverA.client.from(table).insert({})).error?.code, '42501', `Direct insert denied by privilege: ${table}`);
+      assert.equal((await caregiverA.client.from(table).delete().eq(table === 'game_state' ? 'id' : 'state_id', true)).error?.code, '42501', `Direct delete denied by privilege: ${table}`);
     }
     assert.deepEqual((await outsider.client.from('game_state').select()).data, []);
-    assert.ok((await caregiver_a.client.from('game_operations').select()).error);
-    assert.ok((await caregiver_a.client.from('game_state').update({ xp_balance: 999 }).eq('id', true)).error);
+    assert.ok((await caregiverA.client.from('game_operations').select()).error);
+    assert.ok((await caregiverA.client.from('game_state').update({ xp_balance: 999 }).eq('id', true)).error);
     const repeated = round();
     const results = await Promise.all([apply(repeated), apply(repeated)]);
     assert.deepEqual(results, [{ status: 'saved', xp: 15 }, { status: 'saved', xp: 15 }]);
     assert.equal((await load()).xp_total, 15);
     assert.ok((await repeated.client.rpc('game_apply', { ...repeated.args, operation_payload: { game: 'pacifier', completed: 5, bonus: 4 } })).error);
-    assert.ok((await caregiver_b.client.rpc('game_apply', repeated.args)).error, 'Actor cannot be spoofed');
+    assert.ok((await caregiverB.client.rpc('game_apply', repeated.args)).error, 'Actor cannot be spoofed');
     for (const payload of [{ game: 'pacifier', completed: 4, bonus: 5 }, { game: 'pacifier', completed: null, bonus: 5 }, { game: 'pacifier', completed: 5, bonus: 6 }, { game: 'pacifier', completed: 5, bonus: -1 }, { game: 'pacifier', completed: 5, bonus: 2.5 }, { game: 'grasp', completed: 5, bonus: 5 }, { game: 'unknown', completed: 5, bonus: 5 }]) {
       const invalid = op('round', payload); assert.ok((await invalid.client.rpc('game_apply', invalid.args)).error);
     }
     assert.equal((await apply(buy('targeted_grasp'))).status, 'missing_prerequisite');
     assert.equal((await apply(buy('hands_discovered'))).status, 'insufficient_xp');
     await apply(round(0)); // balance 25
-    const racing = await Promise.all([apply(buy('hands_discovered')), apply(buy('eye_contact', caregiver_b))]);
+    const racing = await Promise.all([apply(buy('hands_discovered')), apply(buy('eye_contact', caregiverB))]);
     assert.equal(racing.filter(r => r.status === 'purchased').length, 1);
     assert.equal(racing.filter(r => r.status === 'insufficient_xp').length, 1);
     assert.equal((await load()).xp_balance, 5);
-    await Promise.all([apply(round()), apply(round(5, caregiver_b))]);
+    await Promise.all([apply(round()), apply(round(5, caregiverB))]);
     assert.equal((await load()).xp_total, 55);
     const missing = (await load()).unlocks.includes('hands_discovered') ? 'eye_contact' : 'hands_discovered';
-    const sameBuy = await Promise.all([apply(buy(missing)), apply(buy(missing, caregiver_b))]);
+    const sameBuy = await Promise.all([apply(buy(missing)), apply(buy(missing, caregiverB))]);
     assert.equal(sameBuy.filter(r => r.status === 'purchased').length, 1);
     assert.equal(sameBuy.filter(r => r.status === 'already_owned').length, 1);
     assert.equal((await load()).xp_balance, 15);
@@ -64,7 +65,7 @@ export async function testGame({ caregiver_a, caregiver_b, outsider, anonymous }
     assert.deepEqual(snapshot(), before, 'Repeatable installation preserves every game row and timestamp');
     assert.deepEqual(await apply(grasp), { status: 'saved', xp: 13 });
     const oldPending = round(2); await apply(oldPending); assert.equal((await load()).xp_total, 215);
-    const v2 = (offsets = Array(12).fill(0), extra = {}, actor = caregiver_a) => op('round', { game: 'pacifier', tempo: 'steady', assists: 0, offsets, ...extra }, actor, randomUUID(), { rules: 2 });
+    const v2 = (offsets = Array(12).fill(0), extra = {}, actor = caregiverA) => op('round', { game: 'pacifier', tempo: 'steady', assists: 0, offsets, ...extra }, actor, randomUUID(), { rules: 2 });
     const applyV2 = async o => { const r = await o.client.rpc('game_apply_v2', o.args); assert.ifError(r.error); return r.data; };
     for (const denied of [outsider.client, anonymous]) {
       assert.ok((await denied.rpc('game_snapshot_v2')).error);
@@ -75,10 +76,10 @@ export async function testGame({ caregiver_a, caregiver_b, outsider, anonymous }
     const scored = await Promise.all([applyV2(perfect), applyV2(perfect)]);
     assert.deepEqual(scored[0], { status: 'saved', xp: 15, score: 3900, hits: 12, perfect: 12, bestCombo: 12, medal: 'Gold' });
     assert.deepEqual(scored[0], scored[1]);
-    assert.ok((await caregiver_b.client.rpc('game_apply_v2', perfect.args)).error);
-    assert.ok((await caregiver_a.client.rpc('game_apply_v2', { ...perfect.args, operation_payload: { ...perfect.args.operation_payload, assists: 1 } })).error);
+    assert.ok((await caregiverB.client.rpc('game_apply_v2', perfect.args)).error);
+    assert.ok((await caregiverA.client.rpc('game_apply_v2', { ...perfect.args, operation_payload: { ...perfect.args.operation_payload, assists: 1 } })).error);
     for (const payload of [ { offsets: [] }, { offsets: Array(12).fill(0.5) }, { offsets: Array(12).fill(1201) }, { assists: 4 }, { tempo: 'unknown' }, { assists: null }, { offsets: Array(12).fill('0') }, { bonus: 5 } ]) {
-      assert.ok((await caregiver_a.client.rpc('game_apply_v2', v2(undefined,payload).args)).error, JSON.stringify(payload));
+      assert.ok((await caregiverA.client.rpc('game_apply_v2', v2(undefined,payload).args)).error, JSON.stringify(payload));
     }
     const misses = await applyV2(v2(Array(12).fill(null), { assists: 3, tempo: 'alternating' }));
     assert.equal(misses.hits,1); assert.equal(misses.score,100); assert.equal(misses.xp,10);
@@ -89,7 +90,7 @@ export async function testGame({ caregiver_a, caregiver_b, outsider, anonymous }
       const expected=evaluate(offsets,assists), actual=await applyV2(v2(offsets,{assists,tempo:'alternating'}));
       for (const key of ['score','hits','perfect','bestCombo','medal','xp']) assert.equal(actual[key],expected[key],`V2 parity ${assists}/${key}`);
     }
-    const snapshotV2 = await caregiver_a.client.rpc('game_snapshot_v2'); assert.ifError(snapshotV2.error);
+    const snapshotV2 = await caregiverA.client.rpc('game_snapshot_v2'); assert.ifError(snapshotV2.error);
     assert.equal(snapshotV2.data.rules_version,2); assert.equal(snapshotV2.data.scores.length,6);
     assert.equal(snapshotV2.data.stats.find(s => s.game_id==='grasp').best_bonus,3);
     const beforeV2 = snapshot();
@@ -97,23 +98,23 @@ export async function testGame({ caregiver_a, caregiver_b, outsider, anonymous }
     assert.deepEqual(snapshot(),beforeV2);
     assert.deepEqual(await applyV2(perfect),scored[0]);
     sql("delete from public.game_unlocks where skill_id='hands_discovered';");
-    assert.ok((await caregiver_a.client.rpc('game_apply_v2',v2(undefined,{assists:1}).args)).error);
+    assert.ok((await caregiverA.client.rpc('game_apply_v2',v2(undefined,{assists:1}).args)).error);
     sql("insert into public.game_unlocks(skill_id,price) values('hands_discovered',20);");
     sql("update public.game_state set schema_version=2; insert into public.game_unlocks(skill_id,price) values('future_skill',0);");
     assert.equal((await load()).schema_version, 2);
     assert.deepEqual(await apply(repeated), results[0], 'Known receipt is retrievable even after schema change');
-    assert.ok((await caregiver_a.client.rpc('game_apply', round().args)).error, 'Unknown schema rejects new writes');
-    assert.ok((await caregiver_a.client.rpc('game_apply_v2', v2().args)).error);
+    assert.ok((await caregiverA.client.rpc('game_apply', round().args)).error, 'Unknown schema rejects new writes');
+    assert.ok((await caregiverA.client.rpc('game_apply_v2', v2().args)).error);
     assert.deepEqual(await applyV2(perfect),scored[0]);
-    assert.ok((await caregiver_a.client.rpc('game_apply', { ...round().args, client_schema: 2 })).error);
+    assert.ok((await caregiverA.client.rpc('game_apply', { ...round().args, client_schema: 2 })).error);
     assert.ok((await load()).unlocks.includes('future_skill'));
     sql('update public.game_state set schema_version=1;');
     await apply(round()); assert.ok((await load()).unlocks.includes('future_skill'), 'No snapshot overwrite');
     sql(`delete from private.members where user_id='${outsider.user.id}';`);
     // Revocation checked within every RPC, even for a formerly successful UUID.
-    sql(`delete from private.members where user_id='${caregiver_b.user.id}';`);
-    try { assert.ok((await caregiver_b.client.rpc('game_snapshot')).error); assert.ok((await caregiver_b.client.rpc('game_apply', round(5, caregiver_b).args)).error); }
-    finally { sql(`insert into private.members(user_id,person) values('${caregiver_b.user.id}','caregiver_b');`); }
+    sql(`delete from private.members where user_id='${caregiverB.user.id}';`);
+    try { assert.ok((await caregiverB.client.rpc('game_snapshot')).error); assert.ok((await caregiverB.client.rpc('game_apply', round(5, caregiverB).args)).error); }
+    finally { sql(`insert into private.members(user_id,person) values('${caregiverB.user.id}','${legacyPeople[1]}');`); }
     console.log('Spiel-Supabase bestanden: RLS, Validierung, gemeinsame XP, Parallelität, Idempotenz, alle Käufe, Wiederholbarkeit und versionierter Bestand.');
   } finally {
     sql(`begin; delete from public.game_scores; delete from public.game_operations; delete from public.game_stats; delete from public.game_unlocks; delete from public.game_state; ${tables.map((table, i) => `insert into public.${table} select * from jsonb_populate_recordset(null::public.${table},${quote(original[i])}::jsonb);`).join('\n')} commit;`);

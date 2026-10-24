@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { Window } from 'happy-dom';
+import * as caregiverHelpers from '../src/caregivers.ts';
 import * as domain from '../src/domain.ts';
 import * as weight from '../src/weight.ts';
 import * as report from '../src/report.ts';
@@ -11,19 +12,23 @@ import * as growth from '../src/growth.ts';
 import * as growthView from '../src/growth-view.ts';
 
 // Execute the real entry point and handlers in a disposable DOM. Only the API is substituted.
-async function setup(t: any, person = 'caregiver_a', reduced = false, gameLoader: () => Promise<any> = async () => { throw new Error('Game unavailable'); }, initialReference: string | null = null) {
+async function setup(t: any, person = 'legacy-a', reduced = false, gameLoader: () => Promise<any> = async () => { throw new Error('Game unavailable'); }, initialReference: string | null = null) {
   const window = new Window({ url: 'http://localhost:5173' });
   t.after(() => window.happyDOM.close());
   window.document.body.innerHTML = '<div id="app"></div>';
   if (initialReference) window.localStorage.setItem('phililog-weight-reference', initialReference);
   let settings = { breast_left_ml: 25, breast_right_ml: 25, birth_date: '2026-01-01', birth_weight_g: null as number | null, gestational_age_days: null as number | null, version: 1 };
   const submitted: number[] = [];
-  const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', created_by: 'test-user', version: 1 };
+  const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', performed_by: person, created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
-  Object.assign(window, domain, report, weight, growth, growthView, birthWeight, {
+  Object.assign(window, domain, caregiverHelpers, report, weight, growth, growthView, birthWeight, {
     readWeightReference: () => weight.readWeightReference(window.localStorage),
     rememberWeightReference: (reference: weight.WeightReference) => weight.rememberWeightReference(reference, window.localStorage),
     loadGameForTest: gameLoader, configured: true, currentFamilyPerson: async () => person,
+    familyCaregivers: async () => [
+      { id: 'caregiver_a', person: 'legacy-a', display_name: 'Ada', badge: 'violet', celebration: 'watercolor' },
+      { id: 'caregiver_b', person: 'legacy-b', display_name: 'Bela', badge: 'turquoise', celebration: 'stars' },
+    ],
     matchMedia: () => ({ matches: reduced }),
     supabase: { rpc: async () => ({ data: true }), auth: { onAuthStateChange() {}, signOut: async () => ({}) } },
     getSettings: async () => ({ ...settings }),
@@ -115,7 +120,7 @@ test('Ungewisse Übermittlung wiederholt dieselbe ID; fremde Korrektur und Lösc
 
 test('Neues Layout erhält Bereiche per ID bei Artwechsel, Stillfokus und Befinden-Abwahl', async t => {
   const ui = await setup(t);
-  assert.match(ui.find('#time-options').textContent, /caregiver_a/);
+  assert.match(ui.find('#time-options').textContent, /Ada/);
   ui.find('#estimate-options').open = true;
   ui.find('#mood-options').open = true;
   ui.find('#time-options').open = false;
@@ -167,8 +172,8 @@ test('Temperatur unter Mehr, Footer-Einstellungen und Dezimaleingabe bleiben erh
   assert.match(ui.find('#messages').textContent, /Io triumphe/);
 });
 
-for (const kind of ['bottle', 'diaper']) test(`caregiver_b erhält Sterne und Regenbogen nach ${kind}`, async t => {
-  const ui = await setup(t, 'caregiver_b');
+for (const kind of ['bottle', 'diaper']) test(`legacy-b erhält Sterne und Regenbogen nach ${kind}`, async t => {
+  const ui = await setup(t, 'legacy-b');
   ui.find(`[data-kind="${kind}"]`).click();
   if (kind === 'bottle') ui.input('#amount', '65');
   await ui.app.save();
@@ -176,7 +181,7 @@ for (const kind of ['bottle', 'diaper']) test(`caregiver_b erhält Sterne und Re
   assert.equal(ui.find('.celebration-rainbow').textContent, '🌈');
 });
 
-test('caregiver_as Konfetti bleibt erhalten; Fehler haben keinen Effekt', async t => {
+test('Aquarellkonfetti bleibt erhalten; Fehler haben keinen Effekt', async t => {
   const ui = await setup(t);
   ui.find('[data-kind="bottle"]').click();
   await ui.app.save();
@@ -191,8 +196,8 @@ test('caregiver_as Konfetti bleibt erhalten; Fehler haben keinen Effekt', async 
   assert.equal(ui.window.document.querySelector('.star-celebration'), null);
 });
 
-test('caregiver_b erhält bei reduzierter Bewegung eine ruhige Grafik', async t => {
-  const ui = await setup(t, 'caregiver_b', true);
+test('legacy-b erhält bei reduzierter Bewegung eine ruhige Grafik', async t => {
+  const ui = await setup(t, 'legacy-b', true);
   ui.find('[data-kind="diaper"]').click();
   await ui.app.save();
   assert.ok(ui.find('.star-celebration.reduced-celebration .celebration-rainbow'));
@@ -372,7 +377,7 @@ test('Spiel-Ladefehler erhält laufende Stillzeit und Eingaben; Footer ist ein s
 test('Spielmodul isoliert Darstellung; Logbuchrefresh, Settings-Entwurf und Kontoabmeldung bleiben korrekt', async t => {
   let config: any; let disposed = false;
   const controller = { show() {}, hide() {}, dispose() { disposed = true; } };
-  const ui = await setup(t, 'caregiver_a', false, async () => ({ mountGame(options: any) { config = options; options.container.textContent = 'Synthetic game mount'; return controller; } }));
+  const ui = await setup(t, 'legacy-a', false, async () => ({ mountGame(options: any) { config = options; options.container.textContent = 'Synthetic game mount'; return controller; } }));
   ui.app.switchView('settings'); await ui.app.refresh(); ui.input('#breast-default-left', '45');
   await ui.app.openGame(); assert.equal(ui.find('#app').hidden, true);
   await ui.app.refresh(); assert.equal(config.container.textContent, 'Synthetic game mount');
@@ -479,7 +484,7 @@ test('Referenzwechsel aktualisiert Karten ohne Abfrage, erhält Pagination, Foku
 
 test('Neue Ansicht lädt gemerkte Referenz und fällt bei ungültiger Präferenz auf WHO zurück', async t => {
   for (const initial of ['kiggs', 'unknown']) {
-    const ui = await setup(t, 'caregiver_a', false, undefined, initial);
+    const ui = await setup(t, 'legacy-a', false, undefined, initial);
     (ui.window as any).listFeedings = async () => [];
     ui.app.switchView('weight'); await ui.app.refresh();
     assert.equal(ui.find('#weight-reference').value, initial === 'kiggs' ? 'kiggs' : 'who');
@@ -572,4 +577,64 @@ test('Geburtskarte, Anfangsphase und spätere Referenz bleiben getrennt; Profil 
  ui.setSettings({breast_left_ml:25,breast_right_ml:25,birth_date:'2026-01-01',birth_weight_g:2800,gestational_age_days:39*7+4,version:3});
  await ui.app.refresh();await ui.app.storeSettings();assert.equal(ui.find('#gestation-days').value,'3');assert.match(ui.find('#messages').textContent,/inzwischen/);
  await ui.app.enterSession(null);assert.equal(ui.window.document.querySelector('.birth-card'),null);
+});
+
+
+test('Private Namen werden maskiert dargestellt, Identitäten beim Personenwechsel erhalten', async t => {
+  const ui = await setup(t);
+  (ui.window as any).familyCaregivers = async () => [
+    { id: 'caregiver_a', person: 'legacy-a', display_name: '<Ada & Co>', badge: 'violet', celebration: 'watercolor' },
+    { id: 'caregiver_b', person: 'legacy-b', display_name: 'Bela', badge: 'turquoise', celebration: 'stars' },
+  ];
+  await ui.app.enterSession(null);
+  await ui.app.enterSession('test-user');
+  assert.match(ui.find('#time-options').textContent, /<Ada & Co>/);
+  assert.equal(ui.window.document.querySelector('ada'), null);
+  ui.app.switchView('history'); await ui.app.refresh(); ui.find('[data-edit]').click();
+  assert.equal(ui.find('#performed-by option[value="legacy-a"]').textContent, '<Ada & Co>');
+  assert.equal(ui.find('#performed-by option[value="legacy-b"]').textContent, 'Bela');
+});
+
+test('Ausfall der Darstellung erhält Anmeldung, Entwurf und Speicherung', async t => {
+  const ui = await setup(t, 'legacy-b');
+  (ui.window as any).familyCaregivers = async () => { throw new Error('Offline'); };
+  await ui.app.enterSession(null);
+  await ui.app.enterSession('test-user');
+  assert.match(ui.find('#time-options').textContent, /legacy-b/);
+  ui.find('[data-kind="bottle"]').click(); ui.input('#amount', '65');
+  await ui.app.refresh();
+  assert.equal(ui.find('#amount').value, '65');
+  await ui.app.save();
+  assert.match(ui.find('#messages').textContent, /Io triumphe/);
+  assert.equal(ui.window.document.querySelector('#login-form'), null);
+});
+
+
+test('Historischer Bearbeitungsentwurf behält Zuordnung und Version beim Wiederherstellen', async t => {
+  const ui = await setup(t);
+  const input = domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65', performedBy: 'legacy-b' });
+  const edit = { ...input, id: 'old-entry', version: 7, created_by: 'original-creator' };
+  const draft = domain.draftFromFeeding(edit as domain.Feeding);
+  ui.window.localStorage.setItem('phililog-draft:restored-user', JSON.stringify({ draft, edit, pending: null }));
+  let submitted: any;
+  (ui.window as any).updateFeeding = async (entry: any, values: any) => { submitted = { entry, values }; return { ...entry, ...values }; };
+  await ui.app.enterSession('restored-user');
+  assert.equal(ui.find('#performed-by').value, 'legacy-b');
+  assert.equal(ui.find('#performed-by option[value="legacy-b"]').textContent, 'Bela');
+  await ui.app.save();
+  assert.equal(submitted.entry.version, 7);
+  assert.equal(submitted.entry.created_by, 'original-creator');
+  assert.equal(submitted.values.performed_by, 'legacy-b');
+});
+
+
+test('Private Profile erhalten beide bisherigen Farbzuordnungen im Logbuch', async t => {
+  for (const [person, label, badge] of [['legacy-a', 'Ada', 'person-violet'], ['legacy-b', 'Bela', 'person-turquoise']]) {
+    const ui = await setup(t, person);
+    ui.app.switchView('history'); await ui.app.refresh();
+    assert.equal(ui.find('.person-badge').textContent, label);
+    assert.equal(ui.find('.person-badge').classList.contains(badge), true);
+    await ui.app.enterSession(null);
+    assert.equal(ui.window.document.body.textContent.includes(label), false);
+  }
 });

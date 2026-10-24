@@ -8,7 +8,7 @@ test('Alle fachlichen Abweichungen schützen den Entwurf, Standardladung allein 
     { kind: 'diaper' }, { urine: true }, { stool: true }, { heldSuccess: true },
     { milkType: 'breast_milk' }, { side: 'left' }, { bottleDuration: '20' }, { breastDuration: '0' },
     { timeMode: 'custom' }, { localTime: '2026-09-12T12:34' }, { mood: 'calm' },
-    { estimateMode: 'manual' }, { amount: '65' }, { weight: '3500' }, { performedBy: 'caregiver_a' },
+    { estimateMode: 'manual' }, { amount: '65' }, { weight: '3500' }, { performedBy: 'legacy-a' },
     { breastStart: '2026-09-12T12:34:00Z' },
   ];
   for (const change of changes) assert.equal(hasDraftChanges({ ...newDraft(), ...change }), true, JSON.stringify(change));

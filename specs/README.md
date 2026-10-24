@@ -39,6 +39,7 @@ Die Übersicht trennt Implementierung von noch offener Geräteabnahme. Historisc
 
 | ID | Feature / Link | Status |
 | --- | --- | --- |
+| 013 | [Private Darstellung der Bezugspersonen](013-private-bezugspersonen/spec.md) | In Umsetzung (lokaler Kandidat; Produktionsfreigabe offen) |
 | 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung (Geräteabnahme offen) |
 | 002 | [Tagesbericht und Still-Schätzung](002-tagesbericht/spec.md) | Abgeschlossen |
 | 003 | [Befinden nach einem Ereignis](003-befinden/spec.md) | Abgeschlossen |

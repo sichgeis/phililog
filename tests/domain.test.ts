@@ -129,14 +129,14 @@ test('Wiegen erfasst nur positives Grammgewicht und Zeitpunkt, inklusive Bearbei
 test('Personenzuordnung bleibt bei Korrektur und CSV erhalten; neue Einträge nutzen die Serverzuordnung', () => {
   const input = feedingInput(newDraft(), now);
   assert.equal(input.performed_by, undefined);
-  const entry = { ...input, performed_by: 'caregiver_a' as const, id: 'id', created_by: 'creator', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
+  const entry = { ...input, performed_by: 'legacy-a' as const, id: 'id', created_by: 'creator', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1 };
   const draft = draftFromFeeding(entry);
-  assert.equal(draft.performedBy, 'caregiver_a');
-  draft.performedBy = 'caregiver_b';
-  assert.equal(feedingInput(draft, now).performed_by, 'caregiver_b');
-  assert.match(toCsv([entry]), /Erledigt von/); assert.match(toCsv([entry]), /caregiver_a/);
+  assert.equal(draft.performedBy, 'legacy-a');
+  draft.performedBy = 'legacy-b';
+  assert.equal(feedingInput(draft, now).performed_by, 'legacy-b');
+  assert.match(toCsv([entry]), /Erledigt von/); assert.match(toCsv([entry]), /legacy-a/);
   assert.equal(sameInput(entry, input), true);
-  assert.equal(sameInput(entry, { ...input, performed_by: 'caregiver_b' }), false);
+  assert.equal(sameInput(entry, { ...input, performed_by: 'legacy-b' }), false);
   assert.equal(feedingInput(draftFromFeeding({ ...entry, performed_by: null }), now).performed_by, null);
 });
 
@@ -195,13 +195,13 @@ test('Sonnenbad trennt optionale Dauer von Mahlzeiten und erhält Nachtrag, Korr
  for (const key of ['estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
  for (const sunbathDuration of ['', '0']) assert.equal(feedingInput({ ...draft, sunbathDuration }, now).duration_minutes, null);
  for (const sunbathDuration of ['-1', '1.5', 'abc', '2147483648']) assert.throws(() => feedingInput({ ...draft, sunbathDuration }, now), /Dauer/);
- const entry = { ...input, id: 'sunbath-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'caregiver_b' as const };
+ const entry = { ...input, id: 'sunbath-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'legacy-b' as const };
  const restored = draftFromFeeding(entry);
  assert.equal(restored.sunbathDuration, '5');
  assert.equal(restored.breastDuration, '30');
  assert.equal(restored.bottleDuration, '15');
  assert.equal(feedingInput({ ...restored, sunbathDuration: '7' }).occurred_at, input.occurred_at);
- assert.equal(feedingInput(restored).performed_by, 'caregiver_b');
+ assert.equal(feedingInput(restored).performed_by, 'legacy-b');
  assert.equal(sameInput(input, { ...input, duration_minutes: 7 }), false);
  assert.match(toCsv([entry]), /"Sonnenbad";"5"/);
  assert.equal(draftFromFeeding({ ...entry, duration_minutes: null }).sunbathDuration, '');
@@ -217,13 +217,13 @@ test('Massage trennt optionale Dauer von Mahlzeiten und erhält Nachtrag, Korrek
  for (const key of ['estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
  for (const massageDuration of ['', '0']) assert.equal(feedingInput({ ...draft, massageDuration }, now).duration_minutes, null);
  for (const massageDuration of ['-1', '1.5', 'abc', '2147483648']) assert.throws(() => feedingInput({ ...draft, massageDuration }, now), /Dauer/);
- const entry = { ...input, id: 'massage-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'caregiver_b' as const };
+ const entry = { ...input, id: 'massage-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'legacy-b' as const };
  const restored = draftFromFeeding(entry);
  assert.equal(restored.massageDuration, '5');
  assert.equal(restored.breastDuration, '30');
  assert.equal(restored.bottleDuration, '15');
  assert.equal(feedingInput({ ...restored, massageDuration: '7' }).occurred_at, input.occurred_at);
- assert.equal(feedingInput(restored).performed_by, 'caregiver_b');
+ assert.equal(feedingInput(restored).performed_by, 'legacy-b');
  assert.equal(sameInput(input, { ...input, duration_minutes: 7 }), false);
  assert.match(toCsv([entry]), /"Massage";"5"/);
  assert.equal(draftFromFeeding({ ...entry, duration_minutes: null }).massageDuration, '');
@@ -239,13 +239,13 @@ test('Babygymnastik trennt optionale Dauer von Mahlzeiten und erhält Nachtrag, 
  for (const key of ['estimated_ml', 'started_at', 'amount_ml', 'side', 'milk_type', 'urine', 'stool', 'held_success', 'temperature_c', 'weight_g'] as const) assert.equal(input[key], null, key);
  for (const gymnasticsDuration of ['', '0']) assert.equal(feedingInput({ ...draft, gymnasticsDuration }, now).duration_minutes, null);
  for (const gymnasticsDuration of ['-1', '1.5', 'abc', '2147483648']) assert.throws(() => feedingInput({ ...draft, gymnasticsDuration }, now), /Dauer/);
- const entry = { ...input, id: 'gymnastics-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'caregiver_b' as const };
+ const entry = { ...input, id: 'gymnastics-test', created_by: 'test', created_at: now.toISOString(), updated_at: now.toISOString(), version: 1, performed_by: 'legacy-b' as const };
  const restored = draftFromFeeding(entry);
  assert.equal(restored.gymnasticsDuration, '5');
  assert.equal(restored.breastDuration, '30');
  assert.equal(restored.bottleDuration, '15');
  assert.equal(feedingInput({ ...restored, gymnasticsDuration: '7' }).occurred_at, input.occurred_at);
- assert.equal(feedingInput(restored).performed_by, 'caregiver_b');
+ assert.equal(feedingInput(restored).performed_by, 'legacy-b');
  assert.equal(sameInput(input, { ...input, duration_minutes: 7 }), false);
  assert.match(toCsv([entry]), /"Babygymnastik";"5"/);
  assert.equal(draftFromFeeding({ ...entry, duration_minutes: null }).gymnasticsDuration, '');
