@@ -109,3 +109,7 @@ Die physische Smartphone-/PWA-Abnahme bleibt in [Feature 001](specs/001-fuettern
 ## Lizenz
 
 Noch nicht festgelegt.
+
+## Datenschutz in der öffentlichen Dokumentation
+
+Familienrollen und Betriebsbeispiele sind neutral beschrieben. Bestehende technische Rollenwerte bleiben mit dem laufenden Backend kompatibel; diese Dokumentationsbereinigung ändert keine Produktionsdaten oder veröffentlichte App. [Grenzen und Umgang mit privaten Betriebsnotizen](docs/privacy.md).
