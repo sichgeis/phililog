@@ -1,6 +1,6 @@
 # 014 – Gewicht und Körperlänge im Vordergrund
 
-Status: In Umsetzung. Der Auftrag zur direkten Umsetzung auf `main`, zum Schließen der integrierten Feature-Branches und zum Schutz privater Daten ist am 19. November 2026 ausdrücklich erteilt.
+Status: Abgeschlossen und veröffentlicht. Der Auftrag zur direkten Umsetzung auf `main`, zum Schließen der integrierten Feature-Branches und zum Schutz privater Daten ist am 19. November 2026 ausdrücklich erteilt.
 
 - REQ-001 / AC-001. Die App öffnet die Eingabe mit Gewicht als erster Auswahl. Gewicht und Körperlänge sind direkt erfassbar und haben jeweils einen sichtbaren Einstieg zum Verlauf. Die zuletzt erfassten Messwerte sind in der Eingabe sichtbar. Stillen, Flasche, Wickeln, Temperatur und Aktivitäten stehen unter „Mehr“. Logbuch, Tagesbericht, Einstellungen und Spiele bleiben erreichbar.
 - REQ-002 / AC-002. Körperlänge ist eigenständig in Zentimetern mit höchstens einer Nachkommastelle erfassbar, einschließlich Zeit und Messart (liegend oder stehend). Speichern, Bearbeiten, Löschen, Logbuchfilter und CSV folgen den vorhandenen Abläufen. Die optionale zusammen mit dem Gewicht erfasste Länge im Liegen bleibt möglich. Diese älteren und neuen Längen erscheinen im selben Längenverlauf, ohne Kopien oder neue Zuordnung zu Gewichtsmessungen.

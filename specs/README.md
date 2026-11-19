@@ -39,7 +39,7 @@ Die Übersicht trennt Implementierung von noch offener Geräteabnahme. Historisc
 
 | ID | Feature / Link | Status |
 | --- | --- | --- |
-| 014 | [Gewicht und Körperlänge im Vordergrund](014-wachstumsfokus/spec.md) | In Umsetzung |
+| 014 | [Gewicht und Körperlänge im Vordergrund](014-wachstumsfokus/spec.md) | Abgeschlossen und veröffentlicht |
 | 013 | [Private Darstellung der Bezugspersonen](013-private-bezugspersonen/spec.md) | Abgeschlossen und veröffentlicht; Historienbereinigung erfolgt |
 | 001 | [Fütterung erfassen und Logbuch ansehen](001-fuettern/spec.md) | In Umsetzung (Geräteabnahme offen) |
 | 002 | [Tagesbericht und Still-Schätzung](002-tagesbericht/spec.md) | Abgeschlossen |
