@@ -200,3 +200,10 @@ Am [Betriebsdatum privat] auf ausdrücklichen Auftrag vor dem neuen Client trans
 Migration `202610220022_birth_gestation.sql` ergänzt optional das geschützte Schwangerschaftsalter bei Geburt in Tagen. Eingabe in den Einstellungen als volle Wochen plus zusätzliche Tage; vorhandene Profile und alte Clients bleiben kompatibel. Das ausdrücklich hinterlegte Geburtsgewicht und die Schwangerschaftsdauer bilden die separate INTERGROWTH‑21st-Geburtskarte. Private Werte werden nur im geschützten Profil gesetzt. Frühere Messungen oder das Geburtsdatum werden nicht umgeschrieben. Frontend nach der additiven Migration veröffentlichen.
 
 Migration 022 am [Betriebsdatum privat] produktiv mit interner privater Sicherung und Receipt angewandt; Logbuchbestand und bestehende Profilfelder erhalten, RLS/Policies unverändert. Pages-Veröffentlichung (historischer Prüfnachweis) aus (historischer Commit) erfolgreich; App-, Datenbank- und Restore-CI erfolgreich.
+
+
+## Wachstumsfokus ab Migration 024
+
+`202611190024_length_events.sql` ergänzt die Ereignisart `length` und die Messart `length_standing`. Eigenständige Längen verwenden dieselbe Ereignistabelle, Zugriffsschutz und Versionsprüfung wie Gewicht. Bisher beim Wiegen gespeicherte Längen bleiben als liegend erhalten. Erst die Migration anwenden, danach den Client veröffentlichen. Bei einem Rückfall auf den bisherigen Client bleiben neue Längen gespeichert, der Client kennt ihre Ereignisart noch nicht.
+
+Eine neue lokale Testinstanz lädt die Migration automatisch. Bei einer bestehenden lokalen Instanz ausschließlich Migration 024 transaktional anwenden, im lokalen Migrationsprotokoll erfassen und den PostgREST-Schemacache erneuern. Beide synthetischen Restore-Varianten prüfen das Upgrade einer befüllten Vorgängerdatenbank und die Wiederherstellung einer eigenständigen Länge. [Anforderungen und Prüfnachweise](../specs/014-wachstumsfokus/tasks.md).

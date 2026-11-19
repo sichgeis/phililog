@@ -29,7 +29,7 @@ try {
   // Supabase bootstrap grants on a fresh platform database.
   sql(source, 'grant usage on schema public to anon, authenticated, service_role;');
   sql(source, 'create schema supabase_migrations; create table supabase_migrations.schema_migrations(version text primary key, statements text[], name text);');
-  for (const file of migrations.filter(file => !file.startsWith('202609180018') && !file.startsWith('202610240023'))) {
+  for (const file of migrations.filter(file => !file.startsWith('202609180018') && !file.startsWith('202610240023') && !file.startsWith('202611190024'))) {
     const version = file.split('_')[0];
     sql(source, `begin; ${migrationSource(file)}\ninsert into supabase_migrations.schema_migrations(version,name) values ('${version}','${file}'); commit;`);
   }
@@ -106,6 +106,14 @@ try {
   assert.deepEqual(legacySnapshot(), beforePresentation, 'Private rollout config preserves all existing data and Auth');
   assert.throws(() => sql(source, configure), 'Repeated configuration must abort without changing the mapping');
   sql(source, "update private.caregiver_profiles set display_name=case id when 'caregiver_a' then 'Ada' else 'Bela' end;");
+  const beforeLength = legacySnapshot();
+  const lengthMigration = migrations.find(file => file.startsWith('202611190024'));
+  sql(source, `begin; ${migrationSource(lengthMigration)}
+    insert into supabase_migrations.schema_migrations(version,name) values ('202611190024','${lengthMigration}'); commit;`);
+  const afterLength = [sql(source, `select coalesce(jsonb_agg(to_jsonb(t) - 'length_standing' order by (to_jsonb(t) - 'length_standing')::text),'[]') from public.feedings t;`), ...legacySnapshot().slice(1)];
+  assert.deepEqual(afterLength, beforeLength, '024 preserves historical rows, settings, members, and Auth');
+  sql(source, `insert into public.feedings(id,kind,occurred_at,length_cm,length_standing,created_by) values
+    ('dddddddd-dddd-4ddd-8ddd-eeeeeeeeeeee','length','2088-01-02Z',65.7,false,'${caregiverB}');`);
   const tables = ['private.caregiver_profiles','auth.sessions','auth.refresh_tokens','public.adventure_state','private.adventure_receipts','public.game_scores','public.game_state','public.game_unlocks','public.game_stats','public.game_operations','private.events_before_20260913_layout', 'private.settings_before_20260913_layout', 'private.members_before_20260913_layout', 'public.feedings', 'public.family_settings', 'private.members', 'private.feeding_create_receipts', 'private.events_before_20260913_correction', 'auth.users', 'auth.identities', 'supabase_migrations.schema_migrations'];
   const snapshot = db => tables.map(table => sql(db, `select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from ${table} t;`));
   const historical = snapshot(source);
@@ -144,7 +152,8 @@ try {
       assert public.adventure_load()->>'revision' = '6';
       assert public.adventure_load()->'payload'->>'sparks' = '18';
       assert public.current_family_person() = '${legacyPeople[0]}';
-      assert (select count(*)=8 from public.feedings);
+      assert (select count(*)=9 from public.feedings);
+      assert (select length_cm=65.7 and length_standing=false and weight_g is null from public.feedings where kind='length');
       assert public.feeding_create_known('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee');
       update public.feedings set amount_ml=75 where id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' and version=1;
       assert not found;
@@ -157,7 +166,7 @@ try {
       exception when unique_violation then null; end;
     end $$;
     select set_config('request.jwt.claim.sub','${caregiverB}',true);
-    do $$ begin assert public.is_family_member(); assert (select count(*)=8 from public.feedings); end $$;
+    do $$ begin assert public.is_family_member(); assert (select count(*)=9 from public.feedings); end $$;
     select set_config('request.jwt.claim.sub','${outsider}',true);
     do $$ begin assert not public.is_family_member(); assert (select count(*)=0 from public.feedings); assert (select count(*)=0 from public.family_caregivers()); end $$;
     reset role;

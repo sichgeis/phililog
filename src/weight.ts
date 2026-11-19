@@ -1,4 +1,4 @@
-import { weightZScore, zPercentile, percentileLabel } from './percentile.ts';
+import { weightZScore, zPercentile, percentileLabel, interpolateCentiles, estimateCentile } from './percentile.ts';
 import { WHO_WEIGHT_GIRLS } from './data/who-weight-girls.ts';
 import { KIGGS_WEIGHT_CENTILES } from './data/kiggs-weight-girls.ts';
 import { berlinDay } from './report.ts';
@@ -17,12 +17,7 @@ export function rememberWeightReference(reference: WeightReference, storage?: Pi
 }
 function kiggsCentilesAtAge(days: number): number[] | null {
   if (!Number.isFinite(days) || days < 0 || days > 1856) return null;
-  const months = days / (365.25 / 12);
-  const upper = KIGGS_WEIGHT_CENTILES.findIndex(row => row[0] >= months);
-  if (upper === 0) return KIGGS_WEIGHT_CENTILES[0].slice(1);
-  const a = KIGGS_WEIGHT_CENTILES[upper - 1], b = KIGGS_WEIGHT_CENTILES[upper];
-  const fraction = (months - a[0]) / (b[0] - a[0]);
-  return a.slice(1).map((value, i) => value + fraction * (b[i + 1] - value));
+  return interpolateCentiles(KIGGS_WEIGHT_CENTILES, days);
 }
 export function kiggsWeightAtAge(days: number): readonly [number, number, number] | null {
   const values = kiggsCentilesAtAge(days);
@@ -31,13 +26,7 @@ export function kiggsWeightAtAge(days: number): readonly [number, number, number
 export function kiggsPercentile(weight: number, days: number): string | null {
   const values = kiggsCentilesAtAge(days);
   if (!values || !Number.isFinite(weight) || weight <= 0) return null;
-  if (weight < values[0]) return 'unter P3';
-  if (weight > values[6]) return 'über P97';
-  const centiles = [3, 10, 25, 50, 75, 90, 97];
-  const upper = values.findIndex(value => value >= weight);
-  const value = upper === 0 ? 3 : centiles[upper - 1] + (weight - values[upper - 1])
-    / (values[upper] - values[upper - 1]) * (centiles[upper] - centiles[upper - 1]);
-  return `${percentileLabel(value)} (geschätzt)`;
+  return estimateCentile(weight, values);
 }
 
 export function validBirthDate(value: string): boolean {

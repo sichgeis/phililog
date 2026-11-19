@@ -211,6 +211,35 @@ try {
     assert.ok((await caregiverA.client.from('feedings').update({length_cm:52}).eq('id',mealId)).error);
     assert.deepEqual((await outsider.client.from('feedings').update({length_cm:53}).eq('id',lengthId).select()).data,[]);
     assert.ok((await anonymous.from('feedings').update({length_cm:53}).eq('id',lengthId)).error);
+    const growthId = randomUUID();
+    ids.push(growthId);
+    const bodyLength = { id: growthId, kind: 'length', occurred_at: '2089-01-01T01:00:00Z', length_cm: 62.4, length_standing: false, created_by: caregiverA.user.id };
+    const savedLength = await caregiverA.client.from('feedings').insert(bodyLength).select().single();
+    assert.ifError(savedLength.error);
+    assert.equal(savedLength.data.weight_g, null);
+    assert.equal(savedLength.data.length_standing, false);
+    assert.equal((await caregiverB.client.from('feedings').select().eq('id', growthId).single()).data.length_cm, 62.4);
+    assert.deepEqual((await outsider.client.from('feedings').select().eq('id', growthId)).data, []);
+    assert.ok((await anonymous.from('feedings').select().eq('id', growthId)).error);
+    assert.ok((await outsider.client.from('feedings').insert({ ...bodyLength, id: randomUUID(), created_by: outsider.user.id })).error);
+    assert.deepEqual((await outsider.client.from('feedings').update({ length_cm: 63 }).eq('id', growthId).select()).data, []);
+    assert.ok((await anonymous.from('feedings').update({ length_cm: 63 }).eq('id', growthId)).error);
+    for (const invalid of [{ length_cm: null }, { length_cm: 29.9 }, { length_cm: 220.1 }, { length_standing: null }, { weight_g: 5300 }, { duration_minutes: 5 }, { mood_after: 'calm' }]) {
+      assert.equal((await caregiverA.client.from('feedings').insert({ ...bodyLength, id: randomUUID(), ...invalid })).error?.code, '23514');
+    }
+    assert.equal((await caregiverA.client.from('feedings').update({ length_standing: true }).eq('id', lengthId)).error?.code, '23514');
+    const updatedLength = await caregiverB.client.from('feedings').update({ length_cm: 62.6, length_standing: true }).eq('id', growthId).eq('version', 1).select().single();
+    assert.ifError(updatedLength.error);
+    assert.equal(updatedLength.data.version, 2);
+    assert.equal(updatedLength.data.length_standing, true);
+    assert.deepEqual((await caregiverA.client.from('feedings').update({ length_cm: 63 }).eq('id', growthId).eq('version', 1).select()).data, []);
+    const combinedHistory = await api.allFeedings('with-length');
+    assert.equal(combinedHistory.every(row => row.length_cm != null), true);
+    assert.ok(combinedHistory.some(row => row.id === lengthId && row.kind === 'weight'));
+    assert.ok(combinedHistory.some(row => row.id === growthId && row.kind === 'length'));
+    assert.equal((await api.latestEntry('with-length')).id, growthId);
+    assert.deepEqual((await outsider.client.from('feedings').delete().eq('id', growthId).select()).data, []);
+    assert.deepEqual((await caregiverB.client.from('feedings').delete().eq('id', growthId).eq('version', 2).select('id')).data, [{ id: growthId }]);
     assert.ifError((await caregiverA.client.from('feedings').update({length_cm:null}).eq('id',lengthId)).error);
     assert.equal((await api.latestEntry()).kind, 'diaper', 'Filtered view does not change latest input context');
     for (let offset=0; offset<weights.length; offset+=100) assert.ifError((await admin.from('feedings').delete().in('id',weights.slice(offset,offset+100).map(row=>row.id))).error);

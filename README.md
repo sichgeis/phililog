@@ -1,6 +1,6 @@
 # Phililog
 
-Ein gemeinsames Logbuch für den Alltag mit dem Kind. Die Smartphone-Web-App erfasst Stillen, Fläschchen, Wickeln, Gewicht, Körpertemperatur, Sonnenbad, Massage und Babygymnastik.
+Ein gemeinsames Logbuch für Gewicht, Körperlänge und den Alltag mit dem Kind. Die Smartphone-Web-App bietet zwei direkte Einstiege für Messungen und enthält auch Stillen, Fläschchen, Wickeln, Temperatur und Aktivitäten.
 
 [App öffnen](https://sichgeis.github.io/phililog/) · [Einrichtung und Betrieb](docs/setup.md) · [Spezifikationen](specs/README.md)
 
@@ -10,21 +10,24 @@ Die App läuft auf GitHub Pages mit Supabase für Anmeldung und gemeinsame Daten
 
 ## Eintragen und nachschlagen
 
-- **Stillen:** Start/Ende per Klick oder Nachtrag; optionale Seite und Schätzung. Ein laufender Entwurf bleibt bis zum Speichern auf dem eigenen Gerät.
+- **Gewicht und Körperlänge** gehören zu den direkt sichtbaren Eintragsarten. Die Eingabe startet beim Gewicht in Gramm und zeigt die letzten beiden Messwerte. Körperlänge lässt sich unabhängig in Zentimetern erfassen, liegend oder stehend. Beim Wiegen bleibt eine gleichzeitig im Liegen gemessene Länge optional.
+- **Stillen** unter „Mehr“: Start/Ende per Klick oder Nachtrag; optionale Seite und Schätzung. Ein laufender Entwurf bleibt bis zum Speichern auf dem eigenen Gerät.
 - **Flasche:** Menge in 5-ml-Schritten, Milchart und Dauer.
 - **Wickeln:** Urin, Stuhl und erfolgreiches Abhalten unabhängig auswählen.
-- **Unter „Mehr“:** Wiegen in Gramm, Temperatur in °C sowie Sonnenbad, Massage und Babygymnastik mit optionaler Dauer. Leere Dauer dieser Aktivitäten oder 0 bedeutet unbekannt; es gibt keinen voreingestellten Wert.
+- **Weitere Einträge unter „Mehr“:** Flasche, Wickeln, Temperatur in °C sowie Sonnenbad, Massage und Babygymnastik mit optionaler Dauer. Leere Dauer dieser Aktivitäten oder 0 bedeutet unbekannt; es gibt keinen voreingestellten Wert.
 - **Befinden danach:** Bei Stillen, Flasche, Wickeln, Sonnenbad, Massage und Babygymnastik optional Quengelig, Schläfrig, Ruhig, Aufmerksam, Zornig oder Eingeschlafen. Eine Auswahl ersetzt die vorherige; erneutes Tippen entfernt sie.
 
 Das Logbuch lässt sich nach jeder Ereignisart filtern, etwa ausschließlich nach Wiegen. Die eigene Ansicht **Gewicht** zeigt pro Messung eine Karte mit dem Alter am Messtag, dem Gewichtspunkt und wahlweise WHO- oder KiGGS-Referenzen für Mädchen: P10, Median P50 und P90. Zusätzlich steht bei jeder geeigneten Messung die individuelle Perzentile: WHO aus den Verteilungsdaten, KiGGS als gekennzeichnete Schätzung zwischen veröffentlichten P3–P97 (außerhalb als Grenze). Auch Werte außerhalb der Banden bleiben sichtbar. Die ersten 14 Lebenstage erscheinen gesondert mit Veränderung gegenüber dem Geburtsgewicht. Eine eigene Geburtskarte ordnet das ausdrücklich hinterlegte Geburtsgewicht nach Schwangerschaftsalter ein (INTERGROWTH‑21st, Mädchen, 33+0–42+6; Zwischenwerte geschätzt). Sie wird nicht mit den späteren Altersperzentilen zu einer Kurve verbunden. Das gemeinsame Geburtsdatum liegt geschützt in den Einstellungen; Alter und Vergleich werden für vorhandene Messungen automatisch berechnet.
 
 Altersreferenzlinien und WHO-z-Scores beginnen ab Lebenstag 14; der Rohgewichtsverlauf enthält weiterhin alle geeigneten Messungen. Der vollständige Gewichtsverlauf zeigt zusätzlich die Zunahme zwischen frei gewählten Messungen (Gramm und Gramm pro Tag) sowie die relative WHO-Position als z-Score. Beim Öffnen ist der Zeitraum von der ersten bis zur neuesten geeigneten Messung vorausgewählt. WHO-Zunahmeperzentilen erscheinen ausschließlich bei passenden veröffentlichten Altersintervallen. Ein optionales Geburtsgewicht in den Einstellungen ermöglicht zusätzlich passende Geburtsgewichtsgruppen in den ersten 60 Tagen. Eine optional beim Wiegen erfasste Körperlänge im Liegen ergänzt unter zwei Jahren den WHO-Vergleich Gewicht zur Länge. Das Alter richtet sich nach dem tatsächlichen Geburtstag; der errechnete Termin verändert es nicht.
 
+Die Ansicht **Körperlänge** zeigt eigenständige Längen und Längen vom Wiegen zusammen. Sie bietet einen Verlauf, Messwerte mit Alter und Perzentile sowie umschaltbare [WHO-Standards](https://www.who.int/tools/child-growth-standards/standards/length-height-for-age) und [KiGGS-Referenzen](https://edoc.rki.de/handle/176904/3254) für Mädchen bis 1856 Lebenstage. Die Messart wechselt in der Referenz ab Tag 731 zu stehend.
+
 Alle Ereignisse erscheinen im gemeinsamen Logbuch und lassen sich bearbeiten, löschen und als CSV exportieren. Neue Einträge werden dem angemeldeten Konto zugeordnet. Versionsprüfungen verhindern das Überschreiben neuerer Änderungen. Nach erfolgreichem Speichern erhält Person A Aquarellkonfetti, Person B Sterne und Regenbogen; reduzierte Bewegung wird berücksichtigt.
 
 ## Tagesbericht und Einstellungen
 
-Der Tagesbericht zeigt Kalenderwochen in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge und Wickelzahlen. Fehlende Schätzungen werden kenntlich gemacht. Wiegen, Temperatur, Sonnenbad, Massage und Babygymnastik verändern diese Summen nicht.
+Der Tagesbericht ist aus dem Logbuch und dem Footer erreichbar. Er zeigt Kalenderwochen in deutscher Zeit: Flaschenmenge, geschätzte Stillmenge und Wickelzahlen. Fehlende Schätzungen werden kenntlich gemacht. Die Summen umfassen Stillen, Flasche und Wickeln.
 
 Einstellungen sind im Footer erreichbar. Die Still-Schätzung wird getrennt für links und rechts festgelegt, anfangs jeweils 25 ml; „Beide“ addiert die Werte. Eigene Mengen und fehlende Schätzungen sind möglich. Neue Standards ändern gespeicherte Ereignisse oder begonnene Entwürfe nicht rückwirkend. „Aktuellen Standard verwenden“ übernimmt sie ausdrücklich.
 
@@ -94,7 +97,7 @@ Am [Betriebsdatum privat] vom Auftraggeber bestätigt:
 - **Budget: 0 €:** ausschließlich kostenlose Tarife und Funktionen, keine kostenpflichtigen Upgrades oder Zusatzdienste.
 - **Datensparsamkeit:** nur für das Logbuch nötige Daten erfassen, keine Werbe- oder Analyse-Tracker.
 
-Die Umsetzung verwendet Vite, TypeScript, CSS und Supabase Auth mit E-Mail/Passwort. Stillen ist die Startauswahl. Beginn und Ende lassen sich per Klick erfassen; alternativ sind Nachträge möglich. Ungespeicherte Entwürfe bleiben auf dem eigenen Gerät erhalten. Eine laufende Stillzeit wird erst beim Speichern mit dem anderen Gerät geteilt. Vollständige Offline-Synchronisation ist nicht Teil des MVP.
+Die Umsetzung verwendet Vite, TypeScript, CSS und Supabase Auth mit E-Mail/Passwort. Gewicht ist die Startauswahl. Beim Stillen lassen sich Beginn und Ende per Klick erfassen; alternativ sind Nachträge möglich. Ungespeicherte Entwürfe bleiben auf dem eigenen Gerät erhalten. Eine laufende Stillzeit wird erst beim Speichern mit dem anderen Gerät geteilt. Vollständige Offline-Synchronisation ist nicht Teil des MVP.
 
 Der kostenlose Supabase-Tarif bietet zum Zeitpunkt der Entscheidung 500 MB Datenbankplatz, kann bei geringer Aktivität pausiert werden und enthält keine automatischen Backups. Export und Datensicherung sind deshalb bei der fachlichen Beschreibung zu klären. Tarifbedingungen vor der Einrichtung erneut prüfen: [Supabase-Preise](https://supabase.com/pricing).
 

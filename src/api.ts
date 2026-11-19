@@ -7,16 +7,19 @@ export const configured = Boolean(url && key && !url.includes('YOUR_PROJECT') &&
 export const supabase = configured ? createClient(url, key, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
 }) : null;
-export async function listFeedings(limit = PAGE_SIZE, before?: { time: string; id: string }, kind?: FeedingKind): Promise<Feeding[]> {
+type FeedingFilter = FeedingKind | 'with-length';
+
+export async function listFeedings(limit = PAGE_SIZE, before?: { time: string; id: string }, kind?: FeedingFilter): Promise<Feeding[]> {
   let query = supabase!.from('feedings').select('*').order('occurred_at', { ascending: false }).order('id', { ascending: false }).limit(limit);
-  if (kind) query = query.eq('kind', kind);
+  if (kind === 'with-length') query = query.not('length_cm', 'is', null);
+  else if (kind) query = query.eq('kind', kind);
   if (before) query = query.or(`occurred_at.lt.${before.time},and(occurred_at.eq.${before.time},id.lt.${before.id})`);
   const { data, error } = await query;
   if (error) throw error;
   return data as Feeding[];
 }
-export async function latestEntry(): Promise<Feeding | null> {
-  const rows = await listFeedings(1);
+export async function latestEntry(kind?: FeedingFilter): Promise<Feeding | null> {
+  const rows = await listFeedings(1, undefined, kind);
   return rows[0] ?? null;
 }
 export async function latestMeal(): Promise<Feeding | null> {
@@ -25,7 +28,7 @@ export async function latestMeal(): Promise<Feeding | null> {
   if (error) throw error;
   return data as Feeding | null;
 }
-export async function allFeedings(kind?: FeedingKind): Promise<Feeding[]> {
+export async function allFeedings(kind?: FeedingFilter): Promise<Feeding[]> {
   const entries: Feeding[] = [];
   let cursor: { time: string; id: string } | undefined;
   for (;;) {

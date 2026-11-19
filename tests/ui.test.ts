@@ -10,6 +10,8 @@ import * as report from '../src/report.ts';
 import * as birthWeight from '../src/birth-weight.ts';
 import * as growth from '../src/growth.ts';
 import * as growthView from '../src/growth-view.ts';
+import * as lengthView from '../src/length-view.ts';
+import * as length from '../src/length.ts';
 
 // Execute the real entry point and handlers in a disposable DOM. Only the API is substituted.
 async function setup(t: any, person = 'legacy-a', reduced = false, gameLoader: () => Promise<any> = async () => { throw new Error('Game unavailable'); }, initialReference: string | null = null) {
@@ -21,7 +23,7 @@ async function setup(t: any, person = 'legacy-a', reduced = false, gameLoader: (
   const submitted: number[] = [];
   const entry = { ...domain.feedingInput({ ...domain.newDraft(), kind: 'bottle', amount: '65' }), id: 'existing', performed_by: person, created_by: 'test-user', version: 1 };
   let create: (p: any) => Promise<any> = async p => ({ ...p.input, id: p.id });
-  Object.assign(window, domain, caregiverHelpers, report, weight, growth, growthView, birthWeight, {
+  Object.assign(window, domain, caregiverHelpers, report, weight, growth, growthView, birthWeight, lengthView, length, {
     readWeightReference: () => weight.readWeightReference(window.localStorage),
     rememberWeightReference: (reference: weight.WeightReference) => weight.rememberWeightReference(reference, window.localStorage),
     loadGameForTest: gameLoader, configured: true, currentFamilyPerson: async () => person,
@@ -38,7 +40,7 @@ async function setup(t: any, person = 'legacy-a', reduced = false, gameLoader: (
       settings = { breast_left_ml: values.left, breast_right_ml: values.right, birth_date: birthDate!, birth_weight_g: birthWeight, gestational_age_days: gestation, version: version + 1 };
       return { ...settings };
     },
-    allFeedings: async () => (window as any).listFeedings(500, undefined, 'weight'),
+    allFeedings: async (kind: string) => (window as any).listFeedings(500, undefined, kind),
     listFeedings: async () => [entry], latestEntry: async () => entry, latestMeal: async () => entry,
     getDailyReport: async () => [], friendlyError: (e: Error) => e.message,
     createFeeding: (p: any) => create(p), updateFeeding: async () => entry,
@@ -121,6 +123,7 @@ test('Ungewisse Übermittlung wiederholt dieselbe ID; fremde Korrektur und Lösc
 test('Neues Layout erhält Bereiche per ID bei Artwechsel, Stillfokus und Befinden-Abwahl', async t => {
   const ui = await setup(t);
   assert.match(ui.find('#time-options').textContent, /Ada/);
+  ui.find('[data-kind="breast"]').click();
   ui.find('#estimate-options').open = true;
   ui.find('#mood-options').open = true;
   ui.find('#time-options').open = false;
@@ -252,6 +255,7 @@ test('Sonnenbad unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder u
 
 test('Laufendes Stillen sperrt Sonnenbad wie andere zusätzliche Ereignisse', async t => {
  const ui = await setup(t);
+ ui.find('[data-kind="breast"]').click();
  ui.find('#start-breast').click();
  assert.equal(ui.find('[data-kind="sunbath"]').disabled, true);
 });
@@ -283,6 +287,7 @@ test('Massage unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Felder und
 
 test('Laufendes Stillen sperrt Massage wie andere zusätzliche Ereignisse', async t => {
  const ui = await setup(t);
+ ui.find('[data-kind="breast"]').click();
  ui.find('#start-breast').click();
  assert.equal(ui.find('[data-kind="massage"]').disabled, true);
 });
@@ -314,6 +319,7 @@ test('Babygymnastik unter Mehr: getrennte Dauer, Entwurf, keine fachfremden Feld
 
 test('Laufendes Stillen sperrt Babygymnastik wie andere zusätzliche Ereignisse', async t => {
  const ui = await setup(t);
+ ui.find('[data-kind="breast"]').click();
  ui.find('#start-breast').click();
  assert.equal(ui.find('[data-kind="gymnastics"]').disabled, true);
 });
@@ -363,6 +369,7 @@ for (const kind of ['sunbath', 'massage', 'gymnastics']) test(`${kind}: Befinden
 
 test('Spiel-Ladefehler erhält laufende Stillzeit und Eingaben; Footer ist ein separater Einstieg', async t => {
   const ui = await setup(t);
+  ui.find('[data-kind="breast"]').click();
   ui.find('#start-breast').click();
   const before = JSON.parse(ui.window.localStorage.getItem('phililog-draft:test-user')!).draft;
   await ui.app.openGame();
@@ -637,4 +644,43 @@ test('Private Profile erhalten beide bisherigen Farbzuordnungen im Logbuch', asy
     await ui.app.enterSession(null);
     assert.equal(ui.window.document.body.textContent.includes(label), false);
   }
+});
+
+test('Gewicht startet sichtbar. Eigenständige und gemeinsame Längen teilen Verlauf und bearbeiten den Originaleintrag', async t => {
+  const ui = await setup(t);
+  assert.equal(ui.find('[data-kind="weight"]').getAttribute('aria-pressed'), 'true');
+  assert.equal(ui.find('#extra-events').open, false);
+  assert.ok(ui.find('#extra-events [data-kind="breast"]'));
+  assert.ok(ui.find('footer [data-view="report"]'));
+  ui.find('.main-nav [data-view="length"]').click(); await ui.app.refresh();
+  assert.match(ui.find('.empty-history').textContent, /Noch keine Längenmessungen/);
+  ui.find('[data-measure="length"]').click();
+  ui.input('#body-length', '62,4');
+  ui.find('#length-method').value = 'standing';
+  ui.find('[data-kind="weight"]').click();
+  assert.equal(ui.find('#length').value, '', 'Eigenständige Länge wird beim Wechsel nicht zum Gewicht kopiert');
+  ui.find('[data-kind="length"]').click();
+  assert.equal(ui.find('#body-length').value, '62,4');
+  assert.equal(ui.find('#length-method').value, 'standing');
+  ui.find('#length-method').value = 'lying';
+  ui.find('[data-time="custom"]').click();
+  ui.input('#local-time', '2026-02-03T12:00');
+  let standalone: domain.Feeding;
+  ui.setCreate(async p => (standalone = { ...p.input, id: 'single', version: 1 }));
+  await ui.app.save();
+  assert.match(ui.find('#messages').textContent, /Eintrag festgehalten/);
+  const paired = { ...domain.feedingInput({ ...domain.newDraft(null, 'weight'), weight: '4200', length: '54', timeMode: 'custom', localTime: '2026-02-01T12:00' }), id: 'pair', version: 1 };
+  (ui.window as any).allFeedings = async (kind: string) => { assert.equal(kind, 'with-length'); return [standalone, paired]; };
+  ui.find('.main-nav [data-view="length"]').click(); await ui.app.refresh();
+  assert.equal(ui.window.document.querySelectorAll('.growth-dot').length, 2);
+  assert.match(ui.find('.length-measurements').textContent, /62,4 cm.*54 cm.*beim Wiegen/s);
+  ui.find('#length-reference').value = 'kiggs';
+  ui.find('#length-reference').dispatchEvent(new ui.window.Event('change'));
+  assert.match(ui.find('.length-measurements').textContent, /Perzentile/);
+  assert.match(ui.find('.growth-panel').textContent, /geschätzt/);
+  ui.find('[data-edit="pair"]').click();
+  assert.equal(ui.find('#length').value, '54');
+  assert.equal(ui.find('#weight').value, '4200');
+  await ui.app.enterSession(null);
+  assert.equal(ui.window.document.querySelector('.length-measurements'), null);
 });

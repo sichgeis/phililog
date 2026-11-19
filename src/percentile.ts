@@ -29,3 +29,24 @@ export function percentileLabel(value: number): string {
   if (value > 99.9) return 'über P99,9';
   return `ca. P${value.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
 }
+
+export function interpolateCentiles(rows: readonly (readonly number[])[], days: number): number[] | null {
+  if (!Number.isFinite(days) || days < 0) return null;
+  const months = days / 30.4375;
+  const upper = rows.findIndex(row => row[0] >= months);
+  if (upper < 0) return null;
+  if (upper === 0) return rows[0].slice(1);
+  const a = rows[upper - 1], b = rows[upper];
+  const fraction = (months - a[0]) / (b[0] - a[0]);
+  return a.slice(1).map((value, i) => value + fraction * (b[i + 1] - value));
+}
+
+export function estimateCentile(measurement: number, values: readonly number[]): string {
+  if (measurement < values[0]) return 'unter P3';
+  if (measurement > values[6]) return 'über P97';
+  const centiles = [3, 10, 25, 50, 75, 90, 97];
+  const upper = values.findIndex(value => value >= measurement);
+  const value = upper === 0 ? 3 : centiles[upper - 1] + (measurement - values[upper - 1])
+    / (values[upper] - values[upper - 1]) * (centiles[upper] - centiles[upper - 1]);
+  return `${percentileLabel(value)} (geschätzt)`;
+}
